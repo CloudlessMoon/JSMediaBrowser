@@ -165,7 +165,7 @@ extension HomeViewController: UICollectionViewDelegateFlowLayout {
             }
             return item
         }
-        browserVC.sourceReference = .init(sourceView: { [weak self] in
+        browserVC.sourceProvider = .init(sourceView: { [weak self] in
             guard let self = self else { return nil }
             guard let cell = self.pictureCell(at: $0) else {
                 return nil

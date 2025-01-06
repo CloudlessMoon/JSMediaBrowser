@@ -29,7 +29,7 @@ public struct MediaBrowserViewControllerConfiguration {
     
 }
 
-public struct MediaBrowserViewControllerSourceReference {
+public struct MediaBrowserViewControllerSourceProvider {
     
     public typealias SourceView = (Int) -> UIView?
     public typealias SourceRect = (Int) -> CGRect?

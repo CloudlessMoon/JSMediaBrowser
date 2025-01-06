@@ -12,7 +12,7 @@ open class MediaBrowserViewController: UIViewController {
     
     public var configuration: MediaBrowserViewControllerConfiguration
     
-    public var sourceReference: MediaBrowserViewControllerSourceReference?
+    public var sourceProvider: MediaBrowserViewControllerSourceProvider?
     
     public var eventHandler: MediaBrowserViewControllerEventHandler?
     
@@ -105,7 +105,7 @@ open class MediaBrowserViewController: UIViewController {
         /// 外部可能设置导航栏, 这里需要隐藏
         self.navigationController?.setNavigationBarHidden(true, animated: false)
         
-        self.cacheSourceView = self.sourceReference?.sourceView?(self.currentPage)
+        self.cacheSourceView = self.sourceProvider?.sourceView?(self.currentPage)
         self.cacheSourceView?.isHidden = true
     }
     
@@ -121,7 +121,7 @@ open class MediaBrowserViewController: UIViewController {
             guard self.view.window != nil else {
                 return
             }
-            self.cacheSourceView = self.sourceReference?.sourceView?(self.currentPage)
+            self.cacheSourceView = self.sourceProvider?.sourceView?(self.currentPage)
             self.cacheSourceView?.isHidden = true
         }
     }
@@ -154,7 +154,13 @@ extension MediaBrowserViewController {
         
         let viewController = navigationController ?? self
         viewController.modalPresentationCapturesStatusBarAppearance = true
-        viewController.modalPresentationStyle = .overCurrentContext
+        viewController.modalPresentationStyle = {
+            if JSCoreHelper.isIPhone {
+                return .custom
+            } else {
+                return .overCurrentContext
+            }
+        }()
         viewController.transitioningDelegate = self
         
         var presenter = sender
@@ -364,7 +370,7 @@ extension MediaBrowserViewController: MediaBrowserViewDelegate {
     
     public func mediaBrowserView(_ mediaBrowserView: MediaBrowserView, willScrollHalfFrom sourceIndex: Int, to targetIndex: Int) {
         self.cacheSourceView?.isHidden = false
-        self.cacheSourceView = self.sourceReference?.sourceView?(targetIndex)
+        self.cacheSourceView = self.sourceProvider?.sourceView?(targetIndex)
         self.cacheSourceView?.isHidden = true
         
         self.eventHandler?.willScrollHalf(from: sourceIndex, to: targetIndex)
@@ -577,7 +583,7 @@ extension MediaBrowserViewController: UIViewControllerTransitioningDelegate, Tra
     }
     
     public var transitionSourceRect: CGRect {
-        return self.sourceReference?.sourceRect?(self.currentPage) ?? CGRect.zero
+        return self.sourceProvider?.sourceRect?(self.currentPage) ?? CGRect.zero
     }
     
     public var transitionTargetView: UIView? {
