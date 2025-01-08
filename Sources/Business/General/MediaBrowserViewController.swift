@@ -564,8 +564,10 @@ extension MediaBrowserViewController: UIViewControllerTransitioningDelegate, Tra
                 return image
             } else if let dataItem = dataItem as? LivePhotoAssetItem, let image = dataItem.thumbnail {
                 return image
+            } else if let image = photoCell.zoomView.asset as? UIImage {
+                return image
             } else {
-                return photoCell.zoomView.asset as? UIImage
+                return nil
             }
         } else if let videoCell = self.currentPageCell as? VideoCell {
             if let image = videoCell.videoPlayerView.thumbnail {
