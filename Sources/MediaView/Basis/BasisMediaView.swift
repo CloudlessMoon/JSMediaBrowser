@@ -8,7 +8,7 @@
 import UIKit
 import JSCoreKit
 
-public class BasisMediaView: UIView {
+open class BasisMediaView: UIView {
     
     public var isEnableVerticalSafeArea = JSCoreHelper.isMac ? true : false
     
@@ -21,23 +21,23 @@ public class BasisMediaView: UIView {
     }
     
     @available(*, unavailable, message: "use init()")
-    required init?(coder: NSCoder) {
+    required public init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
-    public func didInitialize() {
+    open func didInitialize() {
         
     }
     
-    public var containerView: UIView {
+    open var containerView: UIView {
         return self
     }
     
-    public var contentView: UIView? {
+    open var contentView: UIView? {
         return nil
     }
     
-    public var contentViewFrame: CGRect {
+    open var contentViewFrame: CGRect {
         return CGRect.zero
     }
     

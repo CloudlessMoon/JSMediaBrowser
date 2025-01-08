@@ -8,9 +8,7 @@
 import UIKit
 import JSCoreKit
 
-public final class ZoomView: BasisMediaView {
-    
-    public var modifier: ZoomViewModifier?
+open class ZoomView: BasisMediaView {
     
     public var asset: (any ZoomAsset)? {
         didSet {
@@ -83,41 +81,28 @@ public final class ZoomView: BasisMediaView {
         return scrollView
     }()
     
+    public let modifier: ZoomViewModifier
+    
     private var assetView: (any ZoomAssetView)?
     
     private var thumbnailView: UIImageView?
     
     private var isNeededRevertZoom: Bool = false
     
-    public override func didInitialize() {
+    public init(modifier: ZoomViewModifier) {
+        self.modifier = modifier
+        
+        super.init()
+    }
+    
+    open override func didInitialize() {
         super.didInitialize()
         self.contentMode = .center
         
         self.addSubview(self.scrollView)
     }
     
-    public override var containerView: UIView {
-        return self.scrollView
-    }
-    
-    public override var contentView: UIView? {
-        if self.asset != nil {
-            return self.assetView
-        } else if self.thumbnail != nil {
-            return self.thumbnailView
-        } else {
-            return nil
-        }
-    }
-    
-    public override var contentViewFrame: CGRect {
-        guard let contentView = self.contentView else {
-            return CGRect.zero
-        }
-        return self.convert(contentView.frame, from: contentView.superview)
-    }
-    
-    public override func layoutSubviews() {
+    open override func layoutSubviews() {
         super.layoutSubviews()
         /// scrollView
         let previousSize = self.scrollView.bounds.size
@@ -156,6 +141,27 @@ public final class ZoomView: BasisMediaView {
         }
         
         self.revertZoomIfNeeded()
+    }
+    
+    public override var containerView: UIView {
+        return self.scrollView
+    }
+    
+    public override var contentView: UIView? {
+        if self.asset != nil {
+            return self.assetView
+        } else if self.thumbnail != nil {
+            return self.thumbnailView
+        } else {
+            return nil
+        }
+    }
+    
+    public override var contentViewFrame: CGRect {
+        guard let contentView = self.contentView else {
+            return CGRect.zero
+        }
+        return self.convert(contentView.frame, from: contentView.superview)
     }
     
 }
@@ -307,7 +313,7 @@ extension ZoomView {
         guard self.assetView == nil else {
             return
         }
-        guard let assetView = self.modifier?.assetView(in: self, asset: asset) else {
+        guard let assetView = self.modifier.assetView(for: asset) else {
             return
         }
         assetView.isAccessibilityElement = true
@@ -320,7 +326,7 @@ extension ZoomView {
         guard self.thumbnailView == nil else {
             return
         }
-        guard let thumbnailView = self.modifier?.thumbnailView(in: self) else {
+        guard let thumbnailView = self.modifier.thumbnailView() else {
             return
         }
         thumbnailView.isAccessibilityElement = true

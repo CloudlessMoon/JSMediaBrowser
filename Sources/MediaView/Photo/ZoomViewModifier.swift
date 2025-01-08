@@ -9,8 +9,8 @@ import UIKit
 
 public protocol ZoomViewModifier {
     
-    func assetView(in zoomView: ZoomView, asset: any ZoomAsset) -> (any ZoomAssetView)?
+    func assetView(for asset: any ZoomAsset) -> (any ZoomAssetView)?
     
-    func thumbnailView(in zoomView: ZoomView) -> UIImageView?
+    func thumbnailView() -> UIImageView?
     
 }

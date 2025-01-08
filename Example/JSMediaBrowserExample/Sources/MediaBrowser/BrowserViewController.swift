@@ -29,6 +29,9 @@ class BrowserViewController: MediaBrowserViewController {
     
     init() {
         super.init(configuration: .init(
+            zoomView: { _ in
+                return ZoomView(modifier: SDZoomViewModifier())
+            },
             webImageMediator: { _ in
                 return SDWebImageMediator(
                     options: [.fromLoaderOnly],
@@ -37,9 +40,6 @@ class BrowserViewController: MediaBrowserViewController {
             },
             livePhotoMediator: { _ in
                 return PHLivePhotoMediator()
-            },
-            zoomViewModifier: { _ in
-                return SDZoomViewModifier()
             }
         ))
         
@@ -92,8 +92,8 @@ extension BrowserViewController {
 }
 
 private struct SDZoomViewModifier: ZoomViewModifier {
-
-    func assetView(in zoomView: ZoomView, asset: any ZoomAsset) -> (any ZoomAssetView)? {
+    
+    func assetView(for asset: any ZoomAsset) -> (any ZoomAssetView)? {
         if asset is UIImage {
             let imageView = SDAnimatedImageView()
             imageView.autoPlayAnimatedImage = false
@@ -108,7 +108,7 @@ private struct SDZoomViewModifier: ZoomViewModifier {
         }
     }
     
-    func thumbnailView(in zoomView: ZoomView) -> UIImageView? {
+    func thumbnailView() -> UIImageView? {
         let imageView = SDAnimatedImageView()
         imageView.autoPlayAnimatedImage = false
         return imageView

@@ -18,7 +18,7 @@ public enum Stauts: Int {
     case failed
 }
 
-public class VideoPlayerView: BasisMediaView {
+open class VideoPlayerView: BasisMediaView {
     
     public weak var delegate: VideoPlayerViewDelegate?
     
@@ -138,7 +138,7 @@ public class VideoPlayerView: BasisMediaView {
     private var systemObservers = [AnyObject]()
     private var currentFrameImageRef: CGImage?
     
-    public override func didInitialize() {
+    open override func didInitialize() {
         super.didInitialize()
         self.addSubview(self.playerView)
         self.addObserverForSystem()
@@ -151,7 +151,7 @@ public class VideoPlayerView: BasisMediaView {
         self.removeObserverForSystem()
     }
     
-    public override func layoutSubviews() {
+    open override func layoutSubviews() {
         super.layoutSubviews()
         let viewport = self.finalViewportRect
         self.playerView.js_frameApplyTransform = viewport

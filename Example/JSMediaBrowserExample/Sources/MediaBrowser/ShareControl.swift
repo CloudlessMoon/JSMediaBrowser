@@ -34,7 +34,7 @@ class ShareControl: UIButton {
         guard let photoCell = mediaBrowserVC.currentPageCell as? PhotoCell else {
             return
         }
-        guard let image = photoCell.zoomView.asset as? UIImage else {
+        guard let image = photoCell.zoomView?.asset as? UIImage else {
             return
         }
         PHPhotoLibrary.shared().performChanges {

@@ -9,24 +9,33 @@ import UIKit
 
 public class PhotoCell: BasisCell {
     
-    public lazy var zoomView: ZoomView = {
-        return ZoomView()
-    }()
-    
-    public override func didInitialize() {
-        super.didInitialize()
-        self.contentView.insertSubview(self.zoomView, at: 0)
+    public var zoomView: ZoomView? {
+        didSet {
+            guard oldValue != self.zoomView else {
+                return
+            }
+            if let oldValue = oldValue, oldValue.superview == self.contentView {
+                oldValue.removeFromSuperview()
+            }
+            guard let zoomView = self.zoomView else {
+                return
+            }
+            zoomView.removeFromSuperview()
+            self.contentView.insertSubview(zoomView, at: 0)
+            
+            self.setNeedsLayout()
+        }
     }
     
     public override func prepareForReuse() {
         super.prepareForReuse()
-        self.zoomView.stopPlaying()
-        self.zoomView.asset = nil
+        self.zoomView?.stopPlaying()
+        self.zoomView?.asset = nil
     }
     
     public override func layoutSubviews() {
         super.layoutSubviews()
-        self.zoomView.js_frameApplyTransform = self.contentView.bounds
+        self.zoomView?.js_frameApplyTransform = self.contentView.bounds
     }
     
 }
