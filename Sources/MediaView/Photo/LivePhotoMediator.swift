@@ -28,6 +28,10 @@ public struct LivePhotoMediationResult {
     
     public let livePhoto: (any ZoomAsset)?
     
+    public init(livePhoto: (any ZoomAsset)?) {
+        self.livePhoto = livePhoto
+    }
+    
 }
 
 public struct LivePhotoMediationError: Error {
@@ -35,4 +39,8 @@ public struct LivePhotoMediationError: Error {
     public let error: NSError
     public let isCancelled: Bool
     
+    public init(error: NSError, isCancelled: Bool) {
+        self.error = error
+        self.isCancelled = isCancelled
+    }
 }

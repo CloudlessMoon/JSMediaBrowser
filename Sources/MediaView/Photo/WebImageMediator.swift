@@ -27,6 +27,10 @@ public struct WebImageMediationResult {
     
     public let image: (any ZoomAsset)?
     
+    public init(image: (any ZoomAsset)?) {
+        self.image = image
+    }
+    
 }
 
 public struct WebImageMediationError: Error {
@@ -34,4 +38,8 @@ public struct WebImageMediationError: Error {
     public let error: NSError
     public let isCancelled: Bool
     
+    public init(error: NSError, isCancelled: Bool) {
+        self.error = error
+        self.isCancelled = isCancelled
+    }
 }
