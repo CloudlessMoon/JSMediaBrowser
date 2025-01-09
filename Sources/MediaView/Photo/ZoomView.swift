@@ -107,24 +107,33 @@ open class ZoomView: BasisMediaView {
             self.setNeedsRevertZoom()
         }
         
-        let calculateLayout = { (view: UIView, mediaSize: CGSize) in
-            guard JSCGSizeIsValidated(mediaSize) else {
+        let calculateLayout = { (view: UIView, size: CGSize) in
+            guard JSCGSizeIsValidated(size) else {
                 view.frame = .zero
                 return
             }
-            let viewport = self.calculateViewportRect
+            let viewport = self.finalViewportRect
             let scale = {
-                if mediaSize.width / mediaSize.height < viewport.size.width / viewport.size.height {
-                    return viewport.size.height / mediaSize.height
+                let height = size.width > viewport.width ? viewport.width * (size.height / size.width) : size.height
+                if height > viewport.height {
+                    if size.width / size.height < viewport.width / viewport.height {
+                        return viewport.width / size.width
+                    } else {
+                        return viewport.height / size.height
+                    }
                 } else {
-                    return viewport.size.width / mediaSize.width
+                    if size.width / size.height < viewport.width / viewport.height {
+                        return viewport.height / size.height
+                    } else {
+                        return viewport.width / size.width
+                    }
                 }
             }()
             view.frame = CGRect(
                 x: self.bounds.minX,
                 y: self.bounds.minY,
-                width: mediaSize.width * scale * self.zoomScale,
-                height: mediaSize.height * scale * self.zoomScale
+                width: size.width * scale * self.zoomScale,
+                height: size.height * scale * self.zoomScale
             )
         }
         /// assetView
@@ -310,10 +319,6 @@ extension ZoomView {
 
 extension ZoomView {
     
-    private var calculateViewportRect: CGRect {
-        return self.finalViewportRect
-    }
-    
     private func setNeedsRevertZoom() {
         self.isNeededRevertZoom = true
         self.setNeedsLayout()
@@ -331,20 +336,20 @@ extension ZoomView {
         guard let contentView = self.contentView else {
             return
         }
-        let viewport = self.calculateViewportRect
-        let contentViewFrame = self.contentView?.frame ?? .zero
+        let viewport = self.finalViewportRect
+        let contentViewSize = self.contentViewFrame.size
         var contentInset = UIEdgeInsets.zero
         contentInset.top = viewport.minY
         contentInset.left = viewport.minX
         contentInset.right = self.scrollView.bounds.width - viewport.maxX
         contentInset.bottom = self.scrollView.bounds.height - viewport.maxY
-        if viewport.height >= contentViewFrame.height {
-            contentInset.top = floor(viewport.midY - contentViewFrame.height / 2.0)
-            contentInset.bottom = floor(self.scrollView.bounds.height - viewport.midY - contentViewFrame.height / 2.0)
+        if viewport.height >= contentViewSize.height {
+            contentInset.top = floor(viewport.midY - contentViewSize.height / 2.0)
+            contentInset.bottom = floor(self.scrollView.bounds.height - viewport.midY - contentViewSize.height / 2.0)
         }
-        if viewport.width >= contentViewFrame.width {
-            contentInset.left = floor(viewport.midX - contentViewFrame.width / 2.0)
-            contentInset.right = floor(self.scrollView.bounds.width - viewport.midX - contentViewFrame.width / 2.0)
+        if viewport.width >= contentViewSize.width {
+            contentInset.left = floor(viewport.midX - contentViewSize.width / 2.0)
+            contentInset.right = floor(self.scrollView.bounds.width - viewport.midX - contentViewSize.width / 2.0)
         }
         self.scrollView.contentInset = contentInset
         self.scrollView.contentSize = contentView.frame.size
@@ -353,7 +358,7 @@ extension ZoomView {
     private func revertContentOffset(animated: Bool) {
         var x = self.scrollView.contentOffset.x
         var y = self.scrollView.contentOffset.y
-        let viewport = self.calculateViewportRect
+        let viewport = self.finalViewportRect
         if let contentView = self.contentView, !viewport.isEmpty {
             if viewport.width < contentView.frame.width {
                 x = (contentView.frame.width - viewport.width) / 2 - viewport.minX
