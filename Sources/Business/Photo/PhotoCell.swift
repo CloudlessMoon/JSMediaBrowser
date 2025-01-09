@@ -27,12 +27,6 @@ public class PhotoCell: BasisCell {
         }
     }
     
-    public override func prepareForReuse() {
-        super.prepareForReuse()
-        self.zoomView?.stopPlaying()
-        self.zoomView?.asset = nil
-    }
-    
     public override func layoutSubviews() {
         super.layoutSubviews()
         self.zoomView?.js_frameApplyTransform = self.contentView.bounds

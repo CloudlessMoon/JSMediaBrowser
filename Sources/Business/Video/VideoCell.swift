@@ -22,12 +22,6 @@ public class VideoCell: BasisCell {
         self.videoPlayerView.delegate = self
     }
     
-    public override func prepareForReuse() {
-        super.prepareForReuse()
-        self.videoPlayerView.thumbnail = nil
-        self.videoPlayerView.reset()
-    }
-    
     public override func layoutSubviews() {
         super.layoutSubviews()
         self.videoPlayerView.js_frameApplyTransform = self.contentView.bounds
