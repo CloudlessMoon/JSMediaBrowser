@@ -42,8 +42,7 @@ public class MediaBrowserView: UIView {
         let gesture = UITapGestureRecognizer(target: self, action: #selector(self.handleSingleTapGesture))
         gesture.numberOfTapsRequired = 1
         gesture.numberOfTouchesRequired = 1
-        gesture.delaysTouchesBegan = false
-        gesture.delaysTouchesEnded = false
+        gesture.delegate = self
         return gesture
     }()
     
@@ -51,7 +50,7 @@ public class MediaBrowserView: UIView {
         let gesture = UITapGestureRecognizer(target: self, action: #selector(self.handleDoubleTapGesture))
         gesture.numberOfTapsRequired = 2
         gesture.numberOfTouchesRequired = 1
-        gesture.delaysTouchesEnded = false
+        gesture.delegate = self
         return gesture
     }()
     
@@ -399,6 +398,10 @@ extension MediaBrowserView: UIGestureRecognizerDelegate {
     
     public func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldBeRequiredToFailBy otherGestureRecognizer: UIGestureRecognizer) -> Bool {
         return self.gestureDelegate?.mediaBrowserView(self, gestureRecognizer: gestureRecognizer, shouldBeRequiredToFailBy: otherGestureRecognizer) ?? false
+    }
+    
+    public func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldReceive touch: UITouch) -> Bool {
+        return self.gestureDelegate?.mediaBrowserView(self, gestureRecognizer: gestureRecognizer, shouldReceive: touch) ?? true
     }
     
     @objc private func handleSingleTapGesture(_ gestureRecognizer: UITapGestureRecognizer) {

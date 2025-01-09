@@ -246,6 +246,7 @@ extension MediaBrowserViewController: MediaBrowserViewDataSource {
         if cell.zoomView == nil {
             cell.zoomView = self.configuration.zoomView(index)
         }
+        assert(cell.zoomView != nil)
         
         let updateProgress = { [weak cell] (receivedSize: Int64, expectedSize: Int64) in
             let progress = Progress(totalUnitCount: expectedSize)
@@ -424,6 +425,16 @@ extension MediaBrowserViewController: MediaBrowserViewGestureDelegate {
                 return nil
             }
             return true
+        }
+        return nil
+    }
+    
+    public func mediaBrowserView(_ mediaBrowserView: MediaBrowserView, gestureRecognizer: UIGestureRecognizer, shouldReceive touch: UITouch) -> Bool? {
+        if gestureRecognizer == mediaBrowserView.singleTapGesture || gestureRecognizer == mediaBrowserView.doubleTapGesture {
+            guard touch.view is UIControl else {
+                return nil
+            }
+            return false
         }
         return nil
     }

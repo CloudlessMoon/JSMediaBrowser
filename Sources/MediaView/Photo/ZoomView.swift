@@ -50,15 +50,13 @@ open class ZoomView: BasisMediaView {
         }
     }
     
-    public override var contentMode: UIView.ContentMode {
+    public var isEnabledZoom: Bool = true
+    
+    public var minimumZoomScale: CGFloat = 1.0 {
         didSet {
-            if oldValue != self.contentMode {
-                self.setNeedsRevertZoom()
-            }
+            self.scrollView.minimumZoomScale = self.minimumZoomScale
         }
     }
-    
-    public var enabledZoom: Bool = true
     
     public var maximumZoomScale: CGFloat = 2.0 {
         didSet {
@@ -72,7 +70,7 @@ open class ZoomView: BasisMediaView {
         scrollView.showsVerticalScrollIndicator = false
         scrollView.alwaysBounceVertical = false
         scrollView.alwaysBounceHorizontal = false
-        scrollView.minimumZoomScale = 1
+        scrollView.minimumZoomScale = self.minimumZoomScale
         scrollView.maximumZoomScale = self.maximumZoomScale
         scrollView.scrollsToTop = false
         scrollView.delaysContentTouches = false
@@ -97,8 +95,6 @@ open class ZoomView: BasisMediaView {
     
     open override func didInitialize() {
         super.didInitialize()
-        self.contentMode = .center
-        
         self.addSubview(self.scrollView)
     }
     
@@ -111,13 +107,25 @@ open class ZoomView: BasisMediaView {
             self.setNeedsRevertZoom()
         }
         
-        let calculateLayout = { (view: UIView, size: CGSize) in
-            let contentRect = JSCGRectApplyAffineTransformWithAnchorPoint(
-                CGRect(origin: CGPoint.zero, size: size),
-                view.transform,
-                view.layer.anchorPoint
+        let calculateLayout = { (view: UIView, mediaSize: CGSize) in
+            guard JSCGSizeIsValidated(mediaSize) else {
+                view.frame = .zero
+                return
+            }
+            let viewport = self.calculateViewportRect
+            let scale = {
+                if mediaSize.width / mediaSize.height < viewport.size.width / viewport.size.height {
+                    return viewport.size.height / mediaSize.height
+                } else {
+                    return viewport.size.width / mediaSize.width
+                }
+            }()
+            view.frame = CGRect(
+                x: self.bounds.minX,
+                y: self.bounds.minY,
+                width: mediaSize.width * scale * self.zoomScale,
+                height: mediaSize.height * scale * self.zoomScale
             )
-            view.frame = CGRect(origin: .zero, size: contentRect.size)
         }
         /// assetView
         if let assetView = self.assetView {
@@ -159,7 +167,7 @@ open class ZoomView: BasisMediaView {
     
     public override var contentViewFrame: CGRect {
         guard let contentView = self.contentView else {
-            return CGRect.zero
+            return .zero
         }
         return self.convert(contentView.frame, from: contentView.superview)
     }
@@ -210,51 +218,15 @@ extension ZoomView {
         }
     }
     
-    public var minimumZoomScale: CGFloat {
-        let mediaSize = {
-            if let asset = self.asset {
-                return asset.size
-            } else if let thumbnail = self.thumbnail {
-                return thumbnail.size
-            }
-            return CGSize.zero
-        }()
-        var minScale: CGFloat = 1.0
-        if self.contentView == nil || mediaSize.width <= 0 || mediaSize.height <= 0 {
-            minScale = 1.0
-        } else {
-            let viewport: CGRect = self.calculateViewportRect
-            var contentMode = self.contentMode
-            let scaleX: CGFloat = viewport.width / mediaSize.width
-            let scaleY: CGFloat = viewport.height / mediaSize.height
-            let finalHeight: CGFloat = mediaSize.width > viewport.width ? viewport.width * (mediaSize.height / mediaSize.width) : mediaSize.height
-            if finalHeight > viewport.height {
-                contentMode = .scaleAspectFill
-            }
-            if contentMode == .scaleAspectFit {
-                minScale = min(scaleX, scaleY)
-            } else if contentMode == .scaleAspectFill {
-                minScale = max(scaleX, scaleY)
-            } else if contentMode == .center {
-                if scaleX >= 1 && scaleY >= 1 {
-                    minScale = 1.0
-                } else {
-                    minScale = min(scaleX, scaleY)
-                }
-            }
-        }
-        return minScale
-    }
-    
     public var zoomScale: CGFloat {
         return self.scrollView.zoomScale
     }
     
     public func setZoom(scale: CGFloat, animated: Bool) {
         if animated {
-            UIView.animate(withDuration: 0.25, delay: 0.0, options: JSCoreHelper.animationOptionsCurveOut, animations: {
+            UIView.animate(withDuration: 0.25, delay: 0.0, options: JSCoreHelper.animationOptionsCurveOut) {
                 self.scrollView.zoomScale = scale
-            }, completion: nil)
+            }
         } else {
             self.scrollView.zoomScale = scale
         }
@@ -264,8 +236,8 @@ extension ZoomView {
         guard scale > 0 else {
             return
         }
-        let minimumZoomScale: CGFloat = self.minimumZoomScale
-        var zoomRect: CGRect = CGRect.zero
+        let minimumZoomScale = self.minimumZoomScale
+        var zoomRect = CGRect.zero
         zoomRect.size.width = self.scrollView.frame.width / scale / minimumZoomScale
         zoomRect.size.height = self.scrollView.frame.height / scale / minimumZoomScale
         zoomRect.origin.x = point.x - zoomRect.width / 2
@@ -275,9 +247,9 @@ extension ZoomView {
     
     public func zoom(to rect: CGRect, animated: Bool) {
         if animated {
-            UIView.animate(withDuration: 0.25, delay: 0.0, options: JSCoreHelper.animationOptionsCurveOut, animations: {
+            UIView.animate(withDuration: 0.25, delay: 0.0, options: JSCoreHelper.animationOptionsCurveOut) {
                 self.scrollView.zoom(to: rect, animated: false)
-            }, completion: nil)
+            }
         } else {
             self.scrollView.zoom(to: rect, animated: false)
         }
@@ -287,18 +259,10 @@ extension ZoomView {
         if self.bounds.isEmpty {
             return
         }
-        let enabledZoom = self.enabledZoom
-        let minimumZoomScale = self.minimumZoomScale
-        let maximumZoomScale = max(enabledZoom ? self.maximumZoomScale : minimumZoomScale, minimumZoomScale)
-        let shouldFireDidZoomingManual = self.zoomScale == minimumZoomScale
-        self.scrollView.panGestureRecognizer.isEnabled = enabledZoom
-        self.scrollView.pinchGestureRecognizer?.isEnabled = enabledZoom
-        self.scrollView.minimumZoomScale = minimumZoomScale
-        self.scrollView.maximumZoomScale = maximumZoomScale
         /// 重置ZoomScale
-        self.setZoom(scale: minimumZoomScale, animated: false)
+        self.setZoom(scale: self.minimumZoomScale, animated: false)
         /// 手动触发一次缩放
-        if shouldFireDidZoomingManual {
+        if self.zoomScale == self.minimumZoomScale {
             self.handleDidEndZooming()
         }
         /// 重置ContentOffset
@@ -367,9 +331,9 @@ extension ZoomView {
         guard let contentView = self.contentView else {
             return
         }
-        let viewport: CGRect = self.calculateViewportRect
-        let contentViewFrame: CGRect = self.contentViewFrame
-        var contentInset: UIEdgeInsets = UIEdgeInsets.zero
+        let viewport = self.calculateViewportRect
+        let contentViewFrame = self.contentView?.frame ?? .zero
+        var contentInset = UIEdgeInsets.zero
         contentInset.top = viewport.minY
         contentInset.left = viewport.minX
         contentInset.right = self.scrollView.bounds.width - viewport.maxX
@@ -387,9 +351,9 @@ extension ZoomView {
     }
     
     private func revertContentOffset(animated: Bool) {
-        var x: CGFloat = self.scrollView.contentOffset.x
-        var y: CGFloat = self.scrollView.contentOffset.y
-        let viewport: CGRect = self.calculateViewportRect
+        var x = self.scrollView.contentOffset.x
+        var y = self.scrollView.contentOffset.y
+        let viewport = self.calculateViewportRect
         if let contentView = self.contentView, !viewport.isEmpty {
             if viewport.width < contentView.frame.width {
                 x = (contentView.frame.width - viewport.width) / 2 - viewport.minX
@@ -406,6 +370,9 @@ extension ZoomView {
 extension ZoomView: UIScrollViewDelegate {
     
     public func viewForZooming(in scrollView: UIScrollView) -> UIView? {
+        guard self.isEnabledZoom else {
+            return nil
+        }
         return self.contentView
     }
     

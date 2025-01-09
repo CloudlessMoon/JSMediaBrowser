@@ -41,7 +41,7 @@ open class BasisMediaView: UIView {
         return CGRect.zero
     }
     
-    var finalViewportRect: CGRect {
+    public var finalViewportRect: CGRect {
         guard !self.bounds.isEmpty else {
             return CGRect.zero
         }
@@ -57,10 +57,12 @@ open class BasisMediaView: UIView {
         let left = max(safeAreaInsets.left, offsetX)
         let bottom = safeAreaInsets.bottom
         let right = safeAreaInsets.right
-        return CGRect(x: left,
-                      y: top,
-                      width: min(size.width, self.containerView.bounds.width - (left + right)),
-                      height: size.height - (top + bottom))
+        return CGRect(
+            x: left,
+            y: top,
+            width: min(size.width, self.containerView.bounds.width - (left + right)),
+            height: size.height - (top + bottom)
+        )
     }
     
 }
