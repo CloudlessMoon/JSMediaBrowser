@@ -34,9 +34,7 @@ open class MediaBrowserViewController: UIViewController {
                 return
             }
             
-            self.eventHandler?.willReloadData(self.dataSource)
-            
-            self.mediaBrowserView.reloadData()
+            self.reloadData()
         }
     }
     
@@ -198,6 +196,12 @@ extension MediaBrowserViewController {
         return self.presentedFromViewController != nil
     }
     
+    public func reloadData() {
+        self.eventHandler?.willReloadData(self.dataSource)
+        
+        self.mediaBrowserView.reloadData()
+    }
+    
 }
 
 extension MediaBrowserViewController: MediaBrowserViewDataSource {
@@ -224,7 +228,7 @@ extension MediaBrowserViewController: MediaBrowserViewDataSource {
     private func configureCell(_ cell: BasisCell, at index: Int) {
         cell.onPressEmpty = { [weak self] (cell: UICollectionViewCell) in
             guard let self = self else { return }
-            self.mediaBrowserView.reloadData()
+            self.reloadData()
         }
         cell.willDisplayEmptyView = { [weak self] (cell: UICollectionViewCell, emptyView: EmptyView, error: NSError) in
             guard let self = self else {
