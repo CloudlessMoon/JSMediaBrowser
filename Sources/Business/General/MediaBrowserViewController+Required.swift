@@ -50,16 +50,17 @@ public protocol MediaBrowserViewControllerEventHandler {
     
     func willReloadData(_ dataSource: [AssetItem])
     
+    func willDisplayZoomView(_ zoomView: ZoomView, at index: Int)
+    func willDisplayVideoPlayerView(_ videoPlayerView: VideoPlayerView, at index: Int)
+    func willDisplayEmptyView(_ emptyView: EmptyView, with error: NSError, at index: Int)
+    
+    func shouldStartPlaying(at index: Int) -> Bool
+    
     func willScrollHalf(from sourceIndex: Int, to targetIndex: Int)
     func didScroll(to index: Int)
     
     func didSingleTouch()
     func didLongPressTouch()
-    
-    func shouldStartPlaying(at index: Int) -> Bool
-    func willDisplayZoomView(_ zoomView: ZoomView, at index: Int)
-    func willDisplayVideoPlayerView(_ videoPlayerView: VideoPlayerView, at index: Int)
-    func willDisplayEmptyView(_ emptyView: EmptyView, with error: NSError, at index: Int)
     
 }
 
@@ -67,17 +68,17 @@ public extension MediaBrowserViewControllerEventHandler {
     
     func willReloadData(_ dataSource: [AssetItem]) {}
     
-    func willScrollHalf(from sourceIndex: Int, to targetIndex: Int) {}
-    func didScroll(to index: Int) {}
-    
-    func didSingleTouch() {}
-    func didLongPressTouch() {}
-    
     func willDisplayZoomView(_ zoomView: ZoomView, at index: Int) {}
     func willDisplayVideoPlayerView(_ videoPlayerView: VideoPlayerView, at index: Int) {}
     func willDisplayEmptyView(_ emptyView: EmptyView, with error: NSError, at index: Int) {}
     
     func shouldStartPlaying(at index: Int) -> Bool { true }
+    
+    func willScrollHalf(from sourceIndex: Int, to targetIndex: Int) {}
+    func didScroll(to index: Int) {}
+    
+    func didSingleTouch() {}
+    func didLongPressTouch() {}
     
 }
 
