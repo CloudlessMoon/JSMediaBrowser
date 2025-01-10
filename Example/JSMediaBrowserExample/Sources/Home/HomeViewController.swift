@@ -116,13 +116,7 @@ extension HomeViewController: UICollectionViewDataSource {
             fatalError()
         }
         let item = self.dataSource[indexPath.item]
-        if item.contains("mp4") {
-            self.videoFirstImage(with: URL(string: item)!) { image in
-                cell.imageView.image = image
-            }
-        } else {
-            cell.imageView.sd_setImage(with: URL(string: item))
-        }
+        cell.imageView.sd_setImage(with: URL(string: item))
         return cell
     }
     
@@ -155,9 +149,7 @@ extension HomeViewController: UICollectionViewDelegateFlowLayout {
         browserVC.dataSource = self.dataSource.enumerated().map {
             let thumbnail = $0.offset == indexPath.item ? cell?.imageView.image : nil
             var item: AssetItem
-            if $0.element.contains("mp4") {
-                item = VideoItem(videoURL: URL(string: $0.element)!, thumbnail: thumbnail)
-            } else if $0.element.contains("LivePhoto") {
+            if $0.element.contains("LivePhoto") {
                 let video = Bundle.main.url(forResource: "LivePhoto", withExtension: "MOV")!
                 item = LivePhotoItem(imageURL: URL(string: $0.element)!, videoURL: video, thumbnail: thumbnail)
             } else {
@@ -185,23 +177,6 @@ extension HomeViewController {
             return nil
         }
         return cell
-    }
-    
-    private func videoFirstImage(with url: URL, completion: @escaping (UIImage?) -> Void) {
-        DispatchQueue.global().async {
-            let asset = AVURLAsset(url: url)
-            let imageGenerator = AVAssetImageGenerator(asset: asset)
-            imageGenerator.appliesPreferredTrackTransform = true
-            imageGenerator.generateCGImagesAsynchronously(forTimes: [NSValue(time: CMTimeMakeWithSeconds(0, preferredTimescale: 1))]) { _, cgImage, _, _, error in
-                DispatchQueue.main.async {
-                    if let cgImage = cgImage {
-                        completion(UIImage(cgImage: cgImage))
-                    } else {
-                        completion(nil)
-                    }
-                }
-            }
-        }
     }
     
 }

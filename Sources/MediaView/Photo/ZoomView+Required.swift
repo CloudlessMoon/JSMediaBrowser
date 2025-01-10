@@ -35,7 +35,6 @@ public extension ZoomViewEventHandler {
     
 }
 
-
 public struct DefaultZoomViewEventHandler: ZoomViewEventHandler {
     
     public typealias DidZoom = (any ZoomAssetView) -> Void

@@ -51,7 +51,6 @@ public protocol MediaBrowserViewControllerEventHandler {
     func willReloadData(_ dataSource: [AssetItem])
     
     func willDisplayZoomView(_ zoomView: ZoomView, at index: Int)
-    func willDisplayVideoPlayerView(_ videoPlayerView: VideoPlayerView, at index: Int)
     func willDisplayEmptyView(_ emptyView: EmptyView, with error: NSError, at index: Int)
     
     func shouldStartPlaying(at index: Int) -> Bool
@@ -69,7 +68,6 @@ public extension MediaBrowserViewControllerEventHandler {
     func willReloadData(_ dataSource: [AssetItem]) {}
     
     func willDisplayZoomView(_ zoomView: ZoomView, at index: Int) {}
-    func willDisplayVideoPlayerView(_ videoPlayerView: VideoPlayerView, at index: Int) {}
     func willDisplayEmptyView(_ emptyView: EmptyView, with error: NSError, at index: Int) {}
     
     func shouldStartPlaying(at index: Int) -> Bool { true }
@@ -87,7 +85,6 @@ public struct DefaultMediaBrowserViewControllerEventHandler: MediaBrowserViewCon
     public typealias WillReloadData = ([AssetItem]) -> Void
     public typealias ShouldPlaying = (Int) -> Bool
     public typealias DisplayZoomView = (ZoomView, Int) -> Void
-    public typealias DisplayVideoPlayerView = (VideoPlayerView, Int) -> Void
     public typealias DisplayEmptyView = (EmptyView, NSError, Int) -> Void
     public typealias WillScroll = (Int, Int) -> Void
     public typealias DidScroll = (Int) -> Void
@@ -95,7 +92,6 @@ public struct DefaultMediaBrowserViewControllerEventHandler: MediaBrowserViewCon
     
     private let _willReloadData: WillReloadData?
     private let _willDisplayZoomView: DisplayZoomView?
-    private let _willDisplayVideoPlayerView: DisplayVideoPlayerView?
     private let _willDisplayEmptyView: DisplayEmptyView?
     private let _shouldStartPlaying: ShouldPlaying?
     private let _willScrollHalf: WillScroll?
@@ -106,7 +102,6 @@ public struct DefaultMediaBrowserViewControllerEventHandler: MediaBrowserViewCon
     public init(
         willReloadData: WillReloadData? = nil,
         willDisplayZoomView: DisplayZoomView? = nil,
-        willDisplayVideoPlayerView: DisplayVideoPlayerView? = nil,
         willDisplayEmptyView: DisplayEmptyView? = nil,
         shouldStartPlaying: ShouldPlaying? = nil,
         willScrollHalf: WillScroll? = nil,
@@ -116,7 +111,6 @@ public struct DefaultMediaBrowserViewControllerEventHandler: MediaBrowserViewCon
     ) {
         self._willReloadData = willReloadData
         self._willDisplayZoomView = willDisplayZoomView
-        self._willDisplayVideoPlayerView = willDisplayVideoPlayerView
         self._willDisplayEmptyView = willDisplayEmptyView
         self._shouldStartPlaying = shouldStartPlaying
         self._willScrollHalf = willScrollHalf
@@ -147,10 +141,6 @@ public struct DefaultMediaBrowserViewControllerEventHandler: MediaBrowserViewCon
     
     public func willDisplayZoomView(_ zoomView: ZoomView, at index: Int) {
         self._willDisplayZoomView?(zoomView, index)
-    }
-    
-    public func willDisplayVideoPlayerView(_ videoPlayerView: VideoPlayerView, at index: Int) {
-        self._willDisplayVideoPlayerView?(videoPlayerView, index)
     }
     
     public func willDisplayEmptyView(_ emptyView: EmptyView, with error: NSError, at index: Int) {

@@ -23,19 +23,6 @@ struct ImageItem: ImageAssetItem {
     
 }
 
-struct VideoItem: VideoAssetItem {
-    
-    var thumbnail: UIImage?
-    
-    var videoURL: URL
-    
-    init(videoURL: URL, thumbnail: UIImage? = nil) {
-        self.videoURL = videoURL
-        self.thumbnail = thumbnail
-    }
-    
-}
-
 struct LivePhotoItem: LivePhotoAssetItem {
     
     var thumbnail: UIImage?

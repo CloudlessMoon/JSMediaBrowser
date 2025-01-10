@@ -48,16 +48,16 @@ Pod::Spec.new do |s|
   #   ss.dependency "Kingfisher", "~> 8.0"
   # end
 
-  s.subspec "MediaVideo" do |ss|
-    ss.source_files = "Sources/MediaView/Video/*.{swift,h,m}"
-    ss.frameworks   = "AVKit"
-    ss.dependency "JSMediaBrowser/MediaView"
-  end
+  # 后续支持Video
+  # s.subspec "MediaVideo" do |ss|
+  #   ss.source_files = "Sources/MediaView/Video/*.{swift,h,m}"
+  #   ss.frameworks   = "AVKit"
+  #   ss.dependency "JSMediaBrowser/MediaView"
+  # end
 
   s.subspec "Business" do |ss|
     ss.source_files = "Sources/Business/**/*.{swift,h,m}"
     ss.dependency "JSMediaBrowser/Core"
-    ss.dependency "JSMediaBrowser/MediaVideo"
     ss.dependency "JSMediaBrowser/MediaPhoto"
   end
 

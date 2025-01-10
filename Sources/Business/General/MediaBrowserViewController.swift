@@ -213,8 +213,6 @@ extension MediaBrowserViewController: MediaBrowserViewDataSource {
             cell = mediaBrowserView.dequeueReusableCell(PhotoCell.self, reuseIdentifier: "Image", at: index)
         } else if dataItem is LivePhotoAssetItem {
             cell = mediaBrowserView.dequeueReusableCell(PhotoCell.self, reuseIdentifier: "LivePhoto", at: index)
-        } else if dataItem is VideoAssetItem {
-            cell = mediaBrowserView.dequeueReusableCell(VideoCell.self, at: index)
         }
         guard let cell = cell else {
             return mediaBrowserView.dequeueReusableCell(UICollectionViewCell.self, at: index)
@@ -236,8 +234,6 @@ extension MediaBrowserViewController: MediaBrowserViewDataSource {
         }
         if let photoCell = cell as? PhotoCell {
             self.configurePhotoCell(photoCell, at: index)
-        } else if let videoCell = cell as? VideoCell {
-            self.configureVideoCell(videoCell, at: index)
         }
     }
     
@@ -336,20 +332,6 @@ extension MediaBrowserViewController: MediaBrowserViewDataSource {
         }
     }
     
-    private func configureVideoCell(_ cell: VideoCell, at index: Int) {
-        guard let dataItem = self.dataSource[index] as? VideoAssetItem else {
-            return
-        }
-        cell.videoPlayerView.thumbnail = dataItem.thumbnail
-        /// 前后url不相同时需要释放之前的player, 否则会先显示之前的画面, 再显示当前的
-        if cell.videoPlayerView.url != dataItem.videoURL {
-            cell.videoPlayerView.releasePlayer()
-        }
-        cell.setProgress(Progress())
-        cell.videoPlayerView.isAutoPlay = !cell.isHidden
-        cell.videoPlayerView.url = dataItem.videoURL
-    }
-    
 }
 
 extension MediaBrowserViewController: MediaBrowserViewDelegate {
@@ -365,30 +347,12 @@ extension MediaBrowserViewController: MediaBrowserViewDelegate {
             }
             
             self.eventHandler?.willDisplayZoomView(zoomView, at: index)
-        } else if let videoCell = cell as? VideoCell {
-            let startPlaying = {
-                let status = videoCell.videoPlayerView.status
-                if status == .ready || status == .paused {
-                    videoCell.videoPlayerView.play()
-                }
-            }
-            if let eventHandler = self.eventHandler {
-                if eventHandler.shouldStartPlaying(at: index) {
-                    startPlaying()
-                }
-            } else {
-                startPlaying()
-            }
-            
-            self.eventHandler?.willDisplayVideoPlayerView(videoCell.videoPlayerView, at: index)
         }
     }
     
     public func mediaBrowserView(_ mediaBrowserView: MediaBrowserView, didEndDisplaying cell: UICollectionViewCell, forPageAt index: Int) {
         if let photoCell = cell as? PhotoCell {
             photoCell.zoomView?.stopPlaying()
-        } else if let videoCell = cell as? VideoCell {
-            videoCell.videoPlayerView.reset()
         }
     }
     
@@ -579,8 +543,6 @@ extension MediaBrowserViewController: UIViewControllerTransitioningDelegate, Tra
     public var transitionThumbnailView: UIImageView? {
         if let photoCell = self.currentPageCell as? PhotoCell, let zoomView = photoCell.zoomView {
             return zoomView.modifier.thumbnailView()
-        } else if self.currentPageCell is VideoCell {
-            return UIImageView()
         }
         return nil
     }
@@ -599,12 +561,6 @@ extension MediaBrowserViewController: UIViewControllerTransitioningDelegate, Tra
                 return image
             } else {
                 return nil
-            }
-        } else if let videoCell = self.currentPageCell as? VideoCell {
-            if let image = videoCell.videoPlayerView.thumbnail {
-                return image
-            } else {
-                return dataItem.thumbnail
             }
         } else {
             return nil
@@ -626,8 +582,6 @@ extension MediaBrowserViewController: UIViewControllerTransitioningDelegate, Tra
     public var transitionTargetFrame: CGRect {
         if let photoCell = self.currentPageCell as? PhotoCell, let zoomView = photoCell.zoomView {
             return zoomView.contentViewFrame
-        } else if let videoCell = self.currentPageCell as? VideoCell {
-            return videoCell.videoPlayerView.contentViewFrame
         }
         return .zero
     }
