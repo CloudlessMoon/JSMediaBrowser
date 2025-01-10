@@ -169,10 +169,6 @@ open class VideoPlayerView: BasisMediaView {
         }
     }
     
-    public override var containerView: UIView {
-        return self
-    }
-    
     public override var contentView: UIView? {
         if self.isReadyForDisplay {
             return self.playerView

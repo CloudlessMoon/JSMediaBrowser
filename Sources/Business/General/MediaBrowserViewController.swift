@@ -256,13 +256,20 @@ extension MediaBrowserViewController: MediaBrowserViewDataSource {
         let updateCell = { [weak cell] (error: NSError?, cancelled: Bool) in
             cell?.setError(error, cancelled: cancelled)
         }
-        let updateAsset = { [weak cell] (asset: (any ZoomAsset)?) in
-            guard let cell = cell else {
+        let updateAsset = { [weak cell, weak self] (asset: (any ZoomAsset)?) in
+            guard let cell = cell, let self = self else {
                 return
             }
             cell.zoomView?.asset = asset
+            
             /// 解决资源下载完成后不播放的问题
-            cell.zoomView?.startPlaying()
+            if let eventHandler = self.eventHandler {
+                if eventHandler.shouldStartPlaying(at: index) {
+                    cell.zoomView?.startPlaying()
+                }
+            } else {
+                cell.zoomView?.startPlaying()
+            }
         }
         let updateThumbnail = { [weak cell] (thumbnail: UIImage?) in
             guard let cell = cell else {
@@ -349,13 +356,28 @@ extension MediaBrowserViewController: MediaBrowserViewDelegate {
     
     public func mediaBrowserView(_ mediaBrowserView: MediaBrowserView, willDisplay cell: UICollectionViewCell, forPageAt index: Int) {
         if let photoCell = cell as? PhotoCell, let zoomView = photoCell.zoomView {
-            zoomView.startPlaying()
+            if let eventHandler = self.eventHandler {
+                if eventHandler.shouldStartPlaying(at: index) {
+                    zoomView.startPlaying()
+                }
+            } else {
+                zoomView.startPlaying()
+            }
             
             self.eventHandler?.willDisplayZoomView(zoomView, at: index)
         } else if let videoCell = cell as? VideoCell {
-            let status = videoCell.videoPlayerView.status
-            if status == .ready || status == .paused {
-                videoCell.videoPlayerView.play()
+            let startPlaying = {
+                let status = videoCell.videoPlayerView.status
+                if status == .ready || status == .paused {
+                    videoCell.videoPlayerView.play()
+                }
+            }
+            if let eventHandler = self.eventHandler {
+                if eventHandler.shouldStartPlaying(at: index) {
+                    startPlaying()
+                }
+            } else {
+                startPlaying()
             }
             
             self.eventHandler?.willDisplayVideoPlayerView(videoCell.videoPlayerView, at: index)
@@ -396,8 +418,8 @@ extension MediaBrowserViewController: MediaBrowserViewGestureDelegate {
                 return true
             }
             let velocity = gestureRecognizer.velocity(in: gestureRecognizer.view)
-            let minY = ceil(zoomView.minContentOffset.y)
-            let maxY = floor(zoomView.maxContentOffset.y)
+            let minY = zoomView.scrollView.js_minimumContentOffset.y
+            let maxY = zoomView.scrollView.js_maximumContentOffset.y
             let scrollView = zoomView.scrollView
             /// 垂直触摸滑动
             if abs(velocity.x) <= abs(velocity.y) {

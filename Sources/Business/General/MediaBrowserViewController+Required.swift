@@ -12,11 +12,11 @@ public struct MediaBrowserViewControllerConfiguration {
     public typealias BuildZoomView = (Int) -> ZoomView
     public typealias BuildWebImageMediator = (Int) -> WebImageMediator
     public typealias BuildLivePhotoMediator = (Int) -> LivePhotoMediator
-
+    
     public var zoomView: BuildZoomView
     public var webImageMediator: BuildWebImageMediator
     public var livePhotoMediator: BuildLivePhotoMediator
-   
+    
     public init(
         zoomView: @escaping BuildZoomView,
         webImageMediator: @escaping BuildWebImageMediator,
@@ -56,6 +56,7 @@ public protocol MediaBrowserViewControllerEventHandler {
     func didSingleTouch()
     func didLongPressTouch()
     
+    func shouldStartPlaying(at index: Int) -> Bool
     func willDisplayZoomView(_ zoomView: ZoomView, at index: Int)
     func willDisplayVideoPlayerView(_ videoPlayerView: VideoPlayerView, at index: Int)
     func willDisplayEmptyView(_ emptyView: EmptyView, with error: NSError, at index: Int)
@@ -76,11 +77,14 @@ public extension MediaBrowserViewControllerEventHandler {
     func willDisplayVideoPlayerView(_ videoPlayerView: VideoPlayerView, at index: Int) {}
     func willDisplayEmptyView(_ emptyView: EmptyView, with error: NSError, at index: Int) {}
     
+    func shouldStartPlaying(at index: Int) -> Bool { true }
+    
 }
 
 public struct DefaultMediaBrowserViewControllerEventHandler: MediaBrowserViewControllerEventHandler {
     
     public typealias WillReloadData = ([AssetItem]) -> Void
+    public typealias ShouldPlaying = (Int) -> Bool
     public typealias DisplayZoomView = (ZoomView, Int) -> Void
     public typealias DisplayVideoPlayerView = (VideoPlayerView, Int) -> Void
     public typealias DisplayEmptyView = (EmptyView, NSError, Int) -> Void
@@ -92,6 +96,7 @@ public struct DefaultMediaBrowserViewControllerEventHandler: MediaBrowserViewCon
     private let _willDisplayZoomView: DisplayZoomView?
     private let _willDisplayVideoPlayerView: DisplayVideoPlayerView?
     private let _willDisplayEmptyView: DisplayEmptyView?
+    private let _shouldStartPlaying: ShouldPlaying?
     private let _willScrollHalf: WillScroll?
     private let _didScroll: DidScroll?
     private let _didSingleTouch: Touch?
@@ -102,6 +107,7 @@ public struct DefaultMediaBrowserViewControllerEventHandler: MediaBrowserViewCon
         willDisplayZoomView: DisplayZoomView? = nil,
         willDisplayVideoPlayerView: DisplayVideoPlayerView? = nil,
         willDisplayEmptyView: DisplayEmptyView? = nil,
+        shouldStartPlaying: ShouldPlaying? = nil,
         willScrollHalf: WillScroll? = nil,
         didScroll: DidScroll? = nil,
         didSingleTouch: Touch? = nil,
@@ -111,6 +117,7 @@ public struct DefaultMediaBrowserViewControllerEventHandler: MediaBrowserViewCon
         self._willDisplayZoomView = willDisplayZoomView
         self._willDisplayVideoPlayerView = willDisplayVideoPlayerView
         self._willDisplayEmptyView = willDisplayEmptyView
+        self._shouldStartPlaying = shouldStartPlaying
         self._willScrollHalf = willScrollHalf
         self._didScroll = didScroll
         self._didSingleTouch = didSingleTouch
@@ -147,6 +154,10 @@ public struct DefaultMediaBrowserViewControllerEventHandler: MediaBrowserViewCon
     
     public func willDisplayEmptyView(_ emptyView: EmptyView, with error: NSError, at index: Int) {
         self._willDisplayEmptyView?(emptyView, error, index)
+    }
+    
+    public func shouldStartPlaying(at index: Int) -> Bool {
+        return self._shouldStartPlaying?(index) ?? true
     }
     
 }

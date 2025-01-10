@@ -29,10 +29,6 @@ open class BasisMediaView: UIView {
         
     }
     
-    open var containerView: UIView {
-        return self
-    }
-    
     open var contentView: UIView? {
         return nil
     }
@@ -51,8 +47,8 @@ open class BasisMediaView: UIView {
             safeAreaInsets.top = 0
             safeAreaInsets.bottom = 0
         }
-        let size = CGSize(width: min(self.containerView.bounds.width, self.viewportRectMaxWidth), height: self.containerView.bounds.height)
-        let offsetX = (self.containerView.bounds.width - size.width) / 2
+        let size = CGSize(width: min(self.bounds.width, self.viewportRectMaxWidth), height: self.bounds.height)
+        let offsetX = (self.bounds.width - size.width) / 2
         let top = safeAreaInsets.top
         let left = max(safeAreaInsets.left, offsetX)
         let bottom = safeAreaInsets.bottom
@@ -60,7 +56,7 @@ open class BasisMediaView: UIView {
         return CGRect(
             x: left,
             y: top,
-            width: min(size.width, self.containerView.bounds.width - (left + right)),
+            width: min(size.width, self.bounds.width - (left + right)),
             height: size.height - (top + bottom)
         )
     }

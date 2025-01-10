@@ -27,6 +27,9 @@ public struct PHLivePhotoMediator: LivePhotoMediator {
             targetSize: .zero,
             contentMode: .default
         ) {
+            guard let isCancelled = $1[PHLivePhotoInfoCancelledKey] as? Bool else {
+                return
+            }
             if let livePhoto = $0 {
                 let result = LivePhotoMediationResult(livePhoto: livePhoto)
                 completed(.success(result))
@@ -34,7 +37,6 @@ public struct PHLivePhotoMediator: LivePhotoMediator {
                 guard let error = $1[PHLivePhotoInfoErrorKey] as? NSError else {
                     return
                 }
-                let isCancelled = $1[PHLivePhotoInfoCancelledKey] as? Bool ?? false
                 let error1 = LivePhotoMediationError(error: error, isCancelled: isCancelled)
                 completed(.failure(error1))
             }
