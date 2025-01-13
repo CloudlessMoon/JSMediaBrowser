@@ -13,7 +13,10 @@ public struct SDWebImageMediator: WebImageMediator {
     public var options: SDWebImageOptions
     public var context: [SDWebImageContextOption: Any]?
     
-    public init(options: SDWebImageOptions? = nil, context: [SDWebImageContextOption: Any]? = nil) {
+    public init(
+        options: SDWebImageOptions? = nil,
+        context: [SDWebImageContextOption: Any]? = nil
+    ) {
         self.options = options ?? [.retryFailed]
         self.context = context
     }
