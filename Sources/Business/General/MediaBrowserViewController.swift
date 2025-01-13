@@ -42,8 +42,6 @@ open class MediaBrowserViewController: UIViewController {
         return MediaBrowserView()
     }()
     
-    public private(set) weak var presentedFromViewController: UIViewController?
-    
     private lazy var transitionAnimator: TransitionAnimator = {
         let animator = TransitionAnimator()
         animator.delegate = self
@@ -60,6 +58,9 @@ open class MediaBrowserViewController: UIViewController {
     private weak var cacheSourceView: UIView?
     
     private var dismissWhenSlidingDistance: CGFloat = 70
+    
+    private weak var presentedFromViewController: UIViewController?
+    private var isPresented: Bool = false
     
     public init(configuration: MediaBrowserViewControllerConfiguration) {
         self.configuration = configuration
@@ -149,6 +150,7 @@ extension MediaBrowserViewController {
                      animated: Bool,
                      completion: (() -> Void)? = nil) {
         self.presentedFromViewController = sender
+        self.isPresented = true
         
         let viewController = navigationController ?? self
         viewController.modalPresentationCapturesStatusBarAppearance = true
@@ -190,10 +192,6 @@ extension MediaBrowserViewController {
                 completion?()
             }
         }
-    }
-    
-    public var isPresented: Bool {
-        return self.presentedFromViewController != nil
     }
     
     public func reloadData() {
