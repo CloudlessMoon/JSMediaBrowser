@@ -386,8 +386,8 @@ extension MediaBrowserViewController: MediaBrowserViewGestureDelegate {
                 return true
             }
             let velocity = gestureRecognizer.velocity(in: gestureRecognizer.view)
-            let minY = zoomView.scrollView.js_minimumContentOffset.y
-            let maxY = zoomView.scrollView.js_maximumContentOffset.y
+            let minY = ceil(zoomView.scrollView.js_minimumContentOffset.y)
+            let maxY = floor(zoomView.scrollView.js_maximumContentOffset.y)
             let scrollView = zoomView.scrollView
             /// 垂直触摸滑动
             if abs(velocity.x) <= abs(velocity.y) {
