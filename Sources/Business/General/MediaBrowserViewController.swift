@@ -62,6 +62,18 @@ open class MediaBrowserViewController: UIViewController {
     private weak var presentedFromViewController: UIViewController?
     private var isPresented: Bool = false
     
+    private var isTransitionFinished: Bool = false {
+        didSet {
+            guard oldValue != self.isTransitionFinished else {
+                return
+            }
+            guard let photoCell = self.currentPageCell as? PhotoCell, let zoomView = photoCell.zoomView else {
+                return
+            }
+            self.startPlaying(for: zoomView, at: self.currentPage)
+        }
+    }
+    
     public init(configuration: MediaBrowserViewControllerConfiguration) {
         self.configuration = configuration
         
@@ -92,6 +104,13 @@ open class MediaBrowserViewController: UIViewController {
         self.mediaBrowserView.dataSource = self
         self.mediaBrowserView.delegate = self
         self.mediaBrowserView.gestureDelegate = self
+        
+        if let transitionCoordinator = self.transitionCoordinator {
+            transitionCoordinator.animate(alongsideTransition: nil, completion: { [weak self] _ in
+                guard let self = self else { return }
+                self.isTransitionFinished = true
+            })
+        }
     }
     
     open override func viewDidLayoutSubviews() {
@@ -176,7 +195,12 @@ extension MediaBrowserViewController {
         if let presentedViewController = presenter.presentedViewController {
             presenter = presentedViewController
         }
-        presenter.present(viewController, animated: animated, completion: completion)
+        presenter.present(viewController, animated: animated) { [weak self] in
+            guard let self = self else { return }
+            self.isTransitionFinished = true
+            
+            completion?()
+        }
     }
     
     public func hide(animated: Bool, completion: (() -> Void)? = nil) {
@@ -255,19 +279,12 @@ extension MediaBrowserViewController: MediaBrowserViewDataSource {
             cell?.setError(error, cancelled: cancelled)
         }
         let updateAsset = { [weak cell, weak self] (asset: (any ZoomAsset)?) in
-            guard let cell = cell, let self = self else {
+            guard let self = self, let zoomView = cell?.zoomView else {
                 return
             }
-            cell.zoomView?.asset = asset
-            
+            zoomView.asset = asset
             /// 解决资源下载完成后不播放的问题
-            if let eventHandler = self.eventHandler {
-                if eventHandler.shouldStartPlaying(at: index) {
-                    cell.zoomView?.startPlaying()
-                }
-            } else {
-                cell.zoomView?.startPlaying()
-            }
+            self.startPlaying(for: zoomView, at: index)
         }
         let updateThumbnail = { [weak cell] (thumbnail: UIImage?) in
             guard let cell = cell else {
@@ -334,19 +351,29 @@ extension MediaBrowserViewController: MediaBrowserViewDataSource {
         }
     }
     
+    private func startPlaying(for zoomView: ZoomView, at index: Int) {
+        guard self.isTransitionFinished else {
+            return
+        }
+        guard zoomView.asset != nil else {
+            return
+        }
+        if let eventHandler = self.eventHandler {
+            if eventHandler.shouldStartPlaying(at: index) {
+                zoomView.startPlaying()
+            }
+        } else {
+            zoomView.startPlaying()
+        }
+    }
+    
 }
 
 extension MediaBrowserViewController: MediaBrowserViewDelegate {
     
     public func mediaBrowserView(_ mediaBrowserView: MediaBrowserView, willDisplay cell: UICollectionViewCell, forPageAt index: Int) {
         if let photoCell = cell as? PhotoCell, let zoomView = photoCell.zoomView {
-            if let eventHandler = self.eventHandler {
-                if eventHandler.shouldStartPlaying(at: index) {
-                    zoomView.startPlaying()
-                }
-            } else {
-                zoomView.startPlaying()
-            }
+            self.startPlaying(for: zoomView, at: index)
             
             self.eventHandler?.willDisplayZoomView(zoomView, at: index)
         }
