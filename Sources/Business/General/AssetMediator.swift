@@ -44,6 +44,7 @@ internal extension UIView {
     
     private struct AssociatedKeys {
         static var token: UInt8 = 0
+        static var taskIdentifier: UInt8 = 0
     }
     
     var requestToken: AssetMediatorRequestToken? {
@@ -52,6 +53,15 @@ internal extension UIView {
         }
         set {
             objc_setAssociatedObject(self, &AssociatedKeys.token, newValue, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+        }
+    }
+    
+    var taskIdentifier: String? {
+        get {
+            return objc_getAssociatedObject(self, &AssociatedKeys.taskIdentifier) as? String
+        }
+        set {
+            objc_setAssociatedObject(self, &AssociatedKeys.taskIdentifier, newValue, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
         }
     }
     

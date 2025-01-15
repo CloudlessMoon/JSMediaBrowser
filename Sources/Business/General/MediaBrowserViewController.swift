@@ -279,8 +279,8 @@ extension MediaBrowserViewController: MediaBrowserViewDataSource {
             guard let cell = cell ?? self.pageCellForItem(at: index) as? PhotoCell else {
                 return
             }
-            let progress = Progress(totalUnitCount: expectedSize)
-            progress.completedUnitCount = receivedSize
+            let progress = Progress(totalUnitCount: Int64(expectedSize))
+            progress.completedUnitCount = Int64(receivedSize)
             cell.setProgress(progress)
         }
         let updateAsset = { [weak self] (cell: PhotoCell?, asset: (any ZoomAsset)?) in
@@ -324,12 +324,20 @@ extension MediaBrowserViewController: MediaBrowserViewDataSource {
                 updateThumbnail(cell, dataItem.thumbnail)
                 /// 请求图片
                 let imageMediator = self.configuration.imageAssetMediator(index)
-                imageMediator.requestImage(
+                let issuedIdentifier = UUID().uuidString
+                cell.taskIdentifier = issuedIdentifier
+                cell.requestToken = imageMediator.requestImage(
                     url: url,
-                    progress: {
+                    progress: { [weak cell] in
+                        guard issuedIdentifier == cell?.taskIdentifier else {
+                            return
+                        }
                         updateProgress(nil, $0, $1)
                     },
-                    completed: {
+                    completed: { [weak cell] in
+                        guard issuedIdentifier == cell?.taskIdentifier else {
+                            return
+                        }
                         switch $0 {
                         case .success(let value):
                             updateAsset(nil, value.asset)
@@ -345,30 +353,29 @@ extension MediaBrowserViewController: MediaBrowserViewDataSource {
                 updateThumbnail(cell, dataItem.thumbnail)
             }
         } else if let dataItem = self.dataSource[index] as? LivePhotoAssetItem {
+            //            if let token = cell.requestToken, !token.isCancelled {
+            //                token.cancel()
+            //            }
             // 缩略图
-            updateThumbnail(cell, dataItem.thumbnail)
-        
-            if let token = cell.requestToken, !token.isCancelled {
-                token.cancel()
-            }
-            let livePhotoMediator = self.configuration.livePhotoAssetMediator(index)
-            livePhotoMediator.requestLivePhoto(
-                imageURL: dataItem.imageURL,
-                videoURL: dataItem.videoURL,
-                progress: {
-                    updateProgress(nil, $0, $1)
-                },
-                completed: {
-                    switch $0 {
-                    case .success(let value):
-                        updateAsset(nil, value.livePhoto)
-                        updateThumbnail(nil, nil)
-                        updateError(nil, nil, false)
-                    case .failure(let error):
-                        updateAsset(nil, nil)
-                        updateError(nil, error.error, error.isCancelled)
-                    }
-                })
+            //            updateThumbnail(cell, dataItem.thumbnail)
+            //            let livePhotoMediator = self.configuration.livePhotoAssetMediator(index)
+            //            livePhotoMediator.requestLivePhoto(
+            //                imageURL: dataItem.imageURL,
+            //                videoURL: dataItem.videoURL,
+            //                progress: {
+            //                    updateProgress(nil, $0, $1)
+            //                },
+            //                completed: {
+            //                    switch $0 {
+            //                    case .success(let value):
+            //                        updateAsset(nil, value.livePhoto)
+            //                        updateThumbnail(nil, nil)
+            //                        updateError(nil, nil, false)
+            //                    case .failure(let error):
+            //                        updateAsset(nil, nil)
+            //                        updateError(nil, error.error, error.isCancelled)
+            //                    }
+            //                })
         }
     }
     
