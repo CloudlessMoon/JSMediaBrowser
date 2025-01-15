@@ -4,8 +4,8 @@ use_frameworks! :linkage => :dynamic
 def pod_Common
   pod "JSMediaBrowser", :path => "../", :subspecs => [
     "Business", 
-    "MediaPhotoForSDWebImage", 
-    "MediaPhotoForPHLivePhoto"
+    "BusinessForSDWebImage", 
+    "BusinessForPHLivePhoto"
   ]
   pod "QMUIKit"
   pod "SnapKit"

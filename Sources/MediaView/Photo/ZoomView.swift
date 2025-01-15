@@ -359,21 +359,24 @@ extension ZoomView {
     }
     
     private func callWillBeginZooming() {
-        if let assetView = self.assetView {
-            self.eventHandler?.willBeginZooming(assetView)
+        guard let assetView = self.assetView else {
+            return
         }
+        self.eventHandler?.willBeginZooming(assetView)
     }
     
     private func callDidEndZooming(at scale: CGFloat? = nil) {
-        if let assetView = self.assetView {
-            self.eventHandler?.didEndZooming(assetView, at: scale ?? self.zoomScale)
+        guard let assetView = self.assetView else {
+            return
         }
+        self.eventHandler?.didEndZooming(assetView, at: scale ?? self.zoomScale)
     }
     
     private func callDidZoom() {
-        if let assetView = self.assetView {
-            self.eventHandler?.didZoom(assetView)
+        guard let assetView = self.assetView else {
+            return
         }
+        self.eventHandler?.didZoom(assetView)
     }
     
 }

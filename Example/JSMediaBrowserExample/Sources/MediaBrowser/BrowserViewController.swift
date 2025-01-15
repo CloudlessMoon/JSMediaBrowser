@@ -32,13 +32,13 @@ class BrowserViewController: MediaBrowserViewController {
             zoomView: { _ in
                 return ZoomView(modifier: SDZoomViewModifier())
             },
-            webImageMediator: { _ in
-                return SDWebImageMediator(
+            imageAssetMediator: { _ in
+                return SDWebImageAssetMediator(
                     options: [.fromLoaderOnly],
                     context: [.animatedImageClass: SDAnimatedImage.self]
                 )
             },
-            livePhotoMediator: { _ in
+            livePhotoAssetMediator: { _ in
                 return PHLivePhotoMediator()
             }
         ))

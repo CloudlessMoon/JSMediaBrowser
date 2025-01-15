@@ -29,36 +29,21 @@ Pod::Spec.new do |s|
     ss.dependency "JSMediaBrowser/MediaView"
   end
 
-  s.subspec "MediaPhotoForPHLivePhoto" do |ss|
-    ss.source_files = "Sources/MediaView/Photo/PHLivePhoto/*.{swift,h,m}"
-    ss.frameworks   = "PhotosUI"
-    ss.dependency "JSMediaBrowser/MediaPhoto"
-  end
-
-  s.subspec "MediaPhotoForSDWebImage" do |ss|
-    ss.source_files = "Sources/MediaView/Photo/SDWebImage/*.{swift,h,m}"
-    ss.dependency "JSMediaBrowser/MediaPhoto"
-    ss.dependency "SDWebImage", "~> 5.0"
-  end
-
-  # 后续支持Kingfisher
-  # s.subspec "MediaPhotoForKingfisher" do |ss|
-  #   ss.source_files = "Sources/MediaView/Photo/Kingfisher/*.{swift,h,m}"
-  #   ss.dependency "JSMediaBrowser/MediaPhoto"
-  #   ss.dependency "Kingfisher", "~> 8.0"
-  # end
-
-  # 后续支持Video
-  # s.subspec "MediaVideo" do |ss|
-  #   ss.source_files = "Sources/MediaView/Video/*.{swift,h,m}"
-  #   ss.frameworks   = "AVKit"
-  #   ss.dependency "JSMediaBrowser/MediaView"
-  # end
-
   s.subspec "Business" do |ss|
     ss.source_files = "Sources/Business/**/*.{swift,h,m}"
     ss.dependency "JSMediaBrowser/Core"
     ss.dependency "JSMediaBrowser/MediaPhoto"
   end
 
+  s.subspec "BusinessForPHLivePhoto" do |ss|
+    ss.source_files = "Sources/Business/Photo/PHLivePhoto/*.{swift,h,m}"
+    ss.frameworks   = "PhotosUI"
+    ss.dependency "JSMediaBrowser/MediaPhoto"
+  end
+
+  s.subspec "BusinessForSDWebImage" do |ss|
+    ss.source_files = "Sources/Business/Photo/SDWebImage/*.{swift,h,m}"
+    ss.dependency "JSMediaBrowser/MediaPhoto"
+    ss.dependency "SDWebImage", "~> 5.0"
+  end
 end

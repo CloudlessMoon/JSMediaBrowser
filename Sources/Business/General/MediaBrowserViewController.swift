@@ -160,6 +160,10 @@ extension MediaBrowserViewController {
         return self.mediaBrowserView.currentPageCell
     }
     
+    public func pageCellForItem<Cell: UICollectionViewCell>(at index: Int) -> Cell? {
+        return self.mediaBrowserView.pageCellForItem(at: index)
+    }
+    
     public func setCurrentPage(_ index: Int, animated: Bool, completion: (() -> Void)? = nil) {
         self.mediaBrowserView.setCurrentPage(index, animated: animated, completion: completion)
     }
@@ -270,82 +274,99 @@ extension MediaBrowserViewController: MediaBrowserViewDataSource {
         }
         assert(cell.zoomView != nil)
         
-        let updateProgress = { [weak cell] (receivedSize: Int64, expectedSize: Int64) in
+        let updateProgress = { [weak self] (cell: PhotoCell?, receivedSize: Int, expectedSize: Int) in
+            guard let self = self else { return }
+            guard let cell = cell ?? self.pageCellForItem(at: index) as? PhotoCell else {
+                return
+            }
             let progress = Progress(totalUnitCount: expectedSize)
             progress.completedUnitCount = receivedSize
-            cell?.setProgress(progress)
+            cell.setProgress(progress)
         }
-        let updateCell = { [weak cell] (error: NSError?, cancelled: Bool) in
-            cell?.setError(error, cancelled: cancelled)
-        }
-        let updateAsset = { [weak cell, weak self] (asset: (any ZoomAsset)?) in
-            guard let self = self, let zoomView = cell?.zoomView else {
+        let updateAsset = { [weak self] (cell: PhotoCell?, asset: (any ZoomAsset)?) in
+            guard let self = self else { return }
+            guard let cell = cell ?? self.pageCellForItem(at: index) as? PhotoCell else {
+                return
+            }
+            guard let zoomView = cell.zoomView else {
                 return
             }
             zoomView.asset = asset
             /// 解决资源下载完成后不播放的问题
             self.startPlaying(for: zoomView, at: index)
         }
-        let updateThumbnail = { [weak cell] (thumbnail: UIImage?) in
-            guard let cell = cell else {
+        let updateThumbnail = { [weak self] (cell: PhotoCell?, thumbnail: UIImage?) in
+            guard let self = self else { return }
+            guard let cell = cell ?? self.pageCellForItem(at: index) as? PhotoCell else {
                 return
             }
             cell.zoomView?.thumbnail = thumbnail
         }
+        let updateError = { [weak self] (cell: PhotoCell?, error: NSError?, isCancelled: Bool) in
+            guard let self = self else { return }
+            guard let cell = cell ?? self.pageCellForItem(at: index) as? PhotoCell else {
+                return
+            }
+            cell.setError(error, cancelled: isCancelled)
+        }
+        
         if let dataItem = self.dataSource[index] as? ImageAssetItem {
-            let webImageMediator = self.configuration.webImageMediator(index)
             /// 取消请求
-            webImageMediator.cancelRequest(for: cell)
+            if let token = cell.requestToken, !token.isCancelled {
+                token.cancel()
+            }
             /// 如果存在image, 且imageURL为nil时, 则代表是本地图片, 无须网络请求
             if let image = dataItem.image, dataItem.imageURL == nil {
-                updateAsset(image)
-                updateCell(nil, false)
+                updateAsset(cell, image)
+                updateError(cell, nil, false)
             } else if let url = dataItem.imageURL {
                 /// 缩略图
-                updateThumbnail(dataItem.thumbnail)
+                updateThumbnail(cell, dataItem.thumbnail)
                 /// 请求图片
-                webImageMediator.requestImage(
-                    for: cell,
+                let imageMediator = self.configuration.imageAssetMediator(index)
+                imageMediator.requestImage(
                     url: url,
                     progress: {
-                        updateProgress($0, $1)
+                        updateProgress(nil, $0, $1)
                     },
                     completed: {
                         switch $0 {
                         case .success(let value):
-                            updateAsset(value.image)
-                            updateThumbnail(nil)
-                            updateCell(nil, false)
+                            updateAsset(nil, value.asset)
+                            updateThumbnail(nil, nil)
+                            updateError(nil, nil, false)
                         case .failure(let error):
-                            updateAsset(nil)
-                            updateCell(error.error, error.isCancelled)
+                            updateAsset(nil, nil)
+                            updateError(nil, error.error, error.isCancelled)
                         }
-                    })
+                    }
+                )
             } else {
-                updateThumbnail(dataItem.thumbnail)
+                updateThumbnail(cell, dataItem.thumbnail)
             }
         } else if let dataItem = self.dataSource[index] as? LivePhotoAssetItem {
             // 缩略图
-            updateThumbnail(dataItem.thumbnail)
-            
-            let livePhotoMediator = self.configuration.livePhotoMediator(index)
-            livePhotoMediator.cancelRequest(for: cell)
+            updateThumbnail(cell, dataItem.thumbnail)
+        
+            if let token = cell.requestToken, !token.isCancelled {
+                token.cancel()
+            }
+            let livePhotoMediator = self.configuration.livePhotoAssetMediator(index)
             livePhotoMediator.requestLivePhoto(
-                for: cell,
                 imageURL: dataItem.imageURL,
                 videoURL: dataItem.videoURL,
                 progress: {
-                    updateProgress($0, $1)
+                    updateProgress(nil, $0, $1)
                 },
                 completed: {
                     switch $0 {
                     case .success(let value):
-                        updateAsset(value.livePhoto)
-                        updateThumbnail(nil)
-                        updateCell(nil, false)
+                        updateAsset(nil, value.livePhoto)
+                        updateThumbnail(nil, nil)
+                        updateError(nil, nil, false)
                     case .failure(let error):
-                        updateAsset(nil)
-                        updateCell(error.error, error.isCancelled)
+                        updateAsset(nil, nil)
+                        updateError(nil, error.error, error.isCancelled)
                     }
                 })
         }
