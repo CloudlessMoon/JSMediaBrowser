@@ -22,7 +22,7 @@ open class BasisMediaView: UIView {
     
     @available(*, unavailable, message: "use init()")
     required public init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+        fatalError()
     }
     
     open func didInitialize() {

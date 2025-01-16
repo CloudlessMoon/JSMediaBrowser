@@ -7,15 +7,15 @@
 
 import UIKit
 
-public class BasisCell: UICollectionViewCell {
+open class BasisCell: UICollectionViewCell {
     
-    public lazy var emptyView: EmptyView = {
+    public private(set) lazy var emptyView: EmptyView = {
         let view = EmptyView()
         view.isHidden = true
         return view
     }()
     
-    public lazy var pieProgressView: PieProgressView = {
+    public private(set) lazy var pieProgressView: PieProgressView = {
         let view = PieProgressView()
         view.tintColor = .white
         view.minimumProgress = 0.05
@@ -25,17 +25,35 @@ public class BasisCell: UICollectionViewCell {
     public var onPressEmpty: ((UICollectionViewCell) -> Void)?
     public var willDisplayEmptyView: ((UICollectionViewCell, EmptyView, NSError) -> Void)?
     
+    private var error: NSError? {
+        didSet {
+            guard oldValue != self.error else {
+                return
+            }
+            self.updateProgress()
+        }
+    }
+    
+    private var progress = Progress() {
+        didSet {
+            guard oldValue != self.progress else {
+                return
+            }
+            self.updateProgress()
+        }
+    }
+    
     public override init(frame: CGRect) {
         super.init(frame: frame)
         self.didInitialize()
     }
     
+    @available(*, unavailable, message: "use init()")
     required public init?(coder: NSCoder) {
-        super.init(coder: coder)
-        self.didInitialize()
+        fatalError()
     }
     
-    public func didInitialize() {
+    open func didInitialize() {
         self.contentView.addSubview(self.emptyView)
         self.contentView.addSubview(self.pieProgressView)
         
@@ -47,15 +65,7 @@ public class BasisCell: UICollectionViewCell {
         }
     }
     
-    public override func prepareForReuse() {
-        super.prepareForReuse()
-        self.contentView.bringSubviewToFront(self.pieProgressView)
-        self.emptyView.isHidden = true
-        self.pieProgressView.isHidden = false
-        self.pieProgressView.progress = 0.0
-    }
-    
-    public override func layoutSubviews() {
+    open override func layoutSubviews() {
         super.layoutSubviews()
         self.emptyView.frame = self.bounds
         
@@ -66,21 +76,32 @@ public class BasisCell: UICollectionViewCell {
     }
     
     public func setProgress(_ progress: Progress) {
+        self.progress = progress
+        
         self.pieProgressView.setProgress(Float(progress.fractionCompleted), animated: true)
     }
     
-    public func setError(_ error: NSError?, cancelled: Bool) {
-        if cancelled {
-            self.pieProgressView.isHidden = false
+    public func setError(_ error: NSError?) {
+        self.error = error
+        
+        if let error = error {
+            self.emptyView.title = NSAttributedString(string: error.localizedDescription, attributes: nil)
+            self.willDisplayEmptyView?(self, self.emptyView, error)
+            self.emptyView.isHidden = false
         } else {
-            if let error = error {
-                self.emptyView.title = NSAttributedString(string: error.localizedDescription, attributes: nil)
-                self.willDisplayEmptyView?(self, self.emptyView, error)
-                self.emptyView.isHidden = false
-            } else {
-                self.emptyView.isHidden = true
-            }
+            self.emptyView.isHidden = true
+        }
+    }
+    
+}
+
+extension BasisCell {
+    
+    private func updateProgress() {
+        if self.error != nil || self.progress.fractionCompleted == 1.0 || self.progress.totalUnitCount == 0 {
             self.pieProgressView.isHidden = true
+        } else {
+            self.pieProgressView.isHidden = false
         }
     }
     

@@ -7,7 +7,7 @@
 
 import UIKit
 
-public class PhotoCell: BasisCell {
+open class PhotoCell: BasisCell {
     
     public var zoomView: ZoomView? {
         didSet {
@@ -27,7 +27,7 @@ public class PhotoCell: BasisCell {
         }
     }
     
-    public override func layoutSubviews() {
+    open override func layoutSubviews() {
         super.layoutSubviews()
         self.zoomView?.js_frameApplyTransform = self.contentView.bounds
     }

@@ -39,30 +39,3 @@ public protocol AssetMediatorRequestToken {
     func cancel()
     
 }
-
-internal extension UIView {
-    
-    private struct AssociatedKeys {
-        static var token: UInt8 = 0
-        static var taskIdentifier: UInt8 = 0
-    }
-    
-    var requestToken: AssetMediatorRequestToken? {
-        get {
-            return objc_getAssociatedObject(self, &AssociatedKeys.token) as? AssetMediatorRequestToken
-        }
-        set {
-            objc_setAssociatedObject(self, &AssociatedKeys.token, newValue, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
-        }
-    }
-    
-    var taskIdentifier: String? {
-        get {
-            return objc_getAssociatedObject(self, &AssociatedKeys.taskIdentifier) as? String
-        }
-        set {
-            objc_setAssociatedObject(self, &AssociatedKeys.taskIdentifier, newValue, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
-        }
-    }
-    
-}

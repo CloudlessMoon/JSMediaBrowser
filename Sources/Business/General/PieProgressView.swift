@@ -84,10 +84,9 @@ public class PieProgressView: UIControl {
         self.didInitialize()
     }
     
-    required public init?(coder: NSCoder) {
-        super.init(coder: coder)
-        self.didInitialize()
-        self.tintColorDidChange()
+    @available(*, unavailable, message: "use init()")
+    required init?(coder: NSCoder) {
+        fatalError()
     }
     
     func didInitialize() {

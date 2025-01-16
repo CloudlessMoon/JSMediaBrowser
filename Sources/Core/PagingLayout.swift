@@ -16,9 +16,9 @@ public class PagingLayout: UICollectionViewFlowLayout {
         self.didInitialize()
     }
     
-    required public init?(coder: NSCoder) {
-        super.init(coder: coder)
-        self.didInitialize()
+    @available(*, unavailable, message: "use init()")
+    required init?(coder: NSCoder) {
+        fatalError()
     }
     
     public func didInitialize() {
