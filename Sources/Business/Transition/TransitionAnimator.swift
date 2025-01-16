@@ -90,24 +90,26 @@ extension TransitionAnimator {
         }
         
         var style: TransitioningStyle = isEntering ? self.enteringStyle : self.exitingStyle
-        let sourceView = self.delegate?.transitionSourceView
+        var sourceCornerRadius: CGFloat
         var sourceRect: CGRect
         if style == .zoom {
+            let transitionSourceView = self.delegate?.transitionSourceView
             let transitionSourceRect = self.delegate?.transitionSourceRect ?? .zero
             let currentView = isEntering ? toView : fromView
-            if let sourceView = sourceView, transitionSourceRect.isEmpty {
-                sourceRect = currentView.convert(sourceView.frame, from: sourceView.superview)
+            if let transitionSourceView = transitionSourceView, transitionSourceRect.isEmpty {
+                sourceRect = currentView.convert(transitionSourceView.frame, from: transitionSourceView.superview)
             } else if !transitionSourceRect.isEmpty {
-                sourceRect = currentView.convert(transitionSourceRect, from: sourceView)
+                sourceRect = currentView.convert(transitionSourceRect, from: transitionSourceView)
             } else {
                 sourceRect = .zero
             }
-            /// 判断sourceRect是否与currentView相交
             if !sourceRect.isEmpty && !sourceRect.intersects(currentView.frame) {
                 sourceRect = .zero
             }
+            sourceCornerRadius = transitionSourceView?.layer.cornerRadius ?? 0
         } else {
             sourceRect = .zero
+            sourceCornerRadius = 0
         }
         
         let contentViewFrame = self.delegate?.transitionTargetFrame ?? CGRect.zero
@@ -118,13 +120,30 @@ extension TransitionAnimator {
         }
         
         /// will
-        self.handleAnimationEntering(style: style, isEntering: isEntering, fromView: fromView, toView: toView, sourceView: sourceView, sourceRect: sourceRect)
+        self.handleAnimationEntering(
+            style: style,
+            isEntering: isEntering,
+            fromView: fromView,
+            toView: toView,
+            sourceRect: sourceRect,
+            sourceCornerRadius: sourceCornerRadius
+        )
         UIView.animate(withDuration: self.duration, delay: 0, options: isEntering ? JSCoreHelper.animationOptionsCurveIn : .curveLinear) {
             /// processing
-            self.handleAnimationProcessing(style: style, isEntering: isEntering, fromView: fromView, toView: toView)
+            self.handleAnimationProcessing(
+                style: style,
+                isEntering: isEntering,
+                fromView: fromView,
+                toView: toView
+            )
         } completion: { (finished) in
             /// end
-            self.handleAnimationCompletion(style: style, isEntering: isEntering, fromView: fromView, toView: toView)
+            self.handleAnimationCompletion(
+                style: style,
+                isEntering: isEntering,
+                fromView: fromView,
+                toView: toView
+            )
             
             completion(finished)
         }
@@ -139,8 +158,8 @@ extension TransitionAnimator {
         isEntering: Bool,
         fromView: UIView,
         toView: UIView,
-        sourceView: UIView?,
-        sourceRect: CGRect
+        sourceRect: CGRect,
+        sourceCornerRadius: CGFloat
     ) {
         let currentView: UIView? = isEntering ? toView : fromView
         if style == .fade {
@@ -168,7 +187,7 @@ extension TransitionAnimator {
             boundsAnimation.fromValue = NSValue(cgRect: isEntering ? sourceBounds : zoomContentViewBoundsInView)
             boundsAnimation.toValue = NSValue(cgRect: isEntering ? zoomContentViewBoundsInView : sourceBounds)
             /// 计算cornerRadius
-            let cornerRadius: CGFloat = sourceView?.layer.cornerRadius ?? 0
+            let cornerRadius = sourceCornerRadius
             let cornerRadiusAnimation: CABasicAnimation = CABasicAnimation(keyPath: "cornerRadius")
             cornerRadiusAnimation.fromValue = isEntering ? cornerRadius : 0
             cornerRadiusAnimation.toValue = isEntering ? 0 : cornerRadius
