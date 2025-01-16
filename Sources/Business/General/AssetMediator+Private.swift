@@ -22,7 +22,7 @@ internal extension UIView {
         }
     }
     
-    var requestToken: AssetMediatorRequestToken? {
+    var mb_requestToken: AssetMediatorRequestToken? {
         get {
             return objc_getAssociatedObject(self, &AssociatedKeys.token) as? AssetMediatorRequestToken
         }
@@ -31,7 +31,7 @@ internal extension UIView {
         }
     }
     
-    var requestIdentifier: AtomicInt? {
+    var mb_requestIdentifier: AtomicInt? {
         get {
             return objc_getAssociatedObject(self, &AssociatedKeys.requestIdentifier) as? AtomicInt
         }

@@ -305,7 +305,7 @@ extension MediaBrowserViewController: MediaBrowserViewDataSource {
         updateProgress(cell, 0, 0)
         
         /// 取消请求
-        if let token = cell.requestToken, !token.isCancelled {
+        if let token = cell.mb_requestToken, !token.isCancelled {
             token.cancel()
         }
         
@@ -318,17 +318,17 @@ extension MediaBrowserViewController: MediaBrowserViewDataSource {
                 
                 let imageMediator = self.configuration.imageAssetMediator(index)
                 let identifier = UIView.AtomicInt()
-                cell.requestIdentifier = identifier
-                cell.requestToken = imageMediator.requestImage(
+                cell.mb_requestIdentifier = identifier
+                cell.mb_requestToken = imageMediator.requestImage(
                     url: url,
                     progress: { [weak cell] in
-                        guard let cell = cell, identifier == cell.requestIdentifier else {
+                        guard let cell = cell, identifier == cell.mb_requestIdentifier else {
                             return
                         }
                         updateProgress(cell, $0, $1)
                     },
                     completed: { [weak cell] in
-                        guard let cell = cell, identifier == cell.requestIdentifier else {
+                        guard let cell = cell, identifier == cell.mb_requestIdentifier else {
                             return
                         }
                         switch $0 {
@@ -350,18 +350,18 @@ extension MediaBrowserViewController: MediaBrowserViewDataSource {
             
             let livePhotoMediator = self.configuration.livePhotoAssetMediator(index)
             let identifier = UIView.AtomicInt()
-            cell.requestIdentifier = identifier
-            cell.requestToken = livePhotoMediator.requestLivePhoto(
+            cell.mb_requestIdentifier = identifier
+            cell.mb_requestToken = livePhotoMediator.requestLivePhoto(
                 imageURL: dataItem.imageURL,
                 videoURL: dataItem.videoURL,
                 progress: { [weak cell] in
-                    guard let cell = cell, identifier == cell.requestIdentifier else {
+                    guard let cell = cell, identifier == cell.mb_requestIdentifier else {
                         return
                     }
                     updateProgress(cell, $0, $1)
                 },
                 completed: { [weak cell] in
-                    guard let cell = cell, identifier == cell.requestIdentifier else {
+                    guard let cell = cell, identifier == cell.mb_requestIdentifier else {
                         return
                     }
                     switch $0 {
