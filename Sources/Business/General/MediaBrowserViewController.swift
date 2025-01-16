@@ -55,8 +55,6 @@ open class MediaBrowserViewController: UIViewController {
     
     private var gestureBeganLocation: CGPoint = CGPoint.zero
     
-    private weak var cacheSourceView: UIView?
-    
     private var dismissWhenSlidingDistance: CGFloat = 70
     
     private weak var presentedFromViewController: UIViewController?
@@ -93,7 +91,7 @@ open class MediaBrowserViewController: UIViewController {
     }
     
     deinit {
-        
+        print("\(Self.self) 释放")
     }
     
     open override func viewDidLoad() {
@@ -104,13 +102,6 @@ open class MediaBrowserViewController: UIViewController {
         self.mediaBrowserView.dataSource = self
         self.mediaBrowserView.delegate = self
         self.mediaBrowserView.gestureDelegate = self
-        
-        if let transitionCoordinator = self.transitionCoordinator {
-            transitionCoordinator.animate(alongsideTransition: nil, completion: { [weak self] _ in
-                guard let self = self else { return }
-                self.isTransitionFinished = true
-            })
-        }
     }
     
     open override func viewDidLayoutSubviews() {
@@ -123,24 +114,11 @@ open class MediaBrowserViewController: UIViewController {
         /// 外部可能设置导航栏, 这里需要隐藏
         self.navigationController?.setNavigationBarHidden(true, animated: false)
         
-        self.cacheSourceView = self.sourceProviderView(at: self.currentPage)
-        self.cacheSourceView?.isHidden = true
-    }
-    
-    open override func viewDidDisappear(_ animated: Bool) {
-        super.viewDidDisappear(animated)
-        self.cacheSourceView?.isHidden = false
-    }
-    
-    open override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
-        super.viewWillTransition(to: size, with: coordinator)
-        self.cacheSourceView?.isHidden = false
-        coordinator.animateAlongsideTransition(in: self.view, animation: nil) { context in
-            guard self.view.window != nil else {
-                return
-            }
-            self.cacheSourceView = self.sourceProviderView(at: self.currentPage)
-            self.cacheSourceView?.isHidden = true
+        if let transitionCoordinator = self.transitionCoordinator, !self.isTransitionFinished {
+            transitionCoordinator.animate(alongsideTransition: nil, completion: { [weak self] _ in
+                guard let self = self else { return }
+                self.isTransitionFinished = true
+            })
         }
     }
     
@@ -393,19 +371,6 @@ extension MediaBrowserViewController: MediaBrowserViewDataSource {
     
 }
 
-extension MediaBrowserViewController {
-    
-    private func sourceProviderView(at index: Int) -> UIView? {
-        let sourceView = self.sourceProvider?.sourceView?(index)
-        let sourceRect = self.sourceProvider?.sourceRect?(index) ?? .zero
-        guard let sourceView = sourceView, sourceRect.isEmpty else {
-            return nil
-        }
-        return sourceView
-    }
-    
-}
-
 extension MediaBrowserViewController: MediaBrowserViewDelegate {
     
     public func mediaBrowserView(_ mediaBrowserView: MediaBrowserView, willDisplay cell: UICollectionViewCell, forPageAt index: Int) {
@@ -423,10 +388,6 @@ extension MediaBrowserViewController: MediaBrowserViewDelegate {
     }
     
     public func mediaBrowserView(_ mediaBrowserView: MediaBrowserView, willScrollHalfFrom sourceIndex: Int, to targetIndex: Int) {
-        self.cacheSourceView?.isHidden = false
-        self.cacheSourceView = self.sourceProviderView(at: targetIndex)
-        self.cacheSourceView?.isHidden = true
-        
         self.eventHandler?.willScrollHalf(from: sourceIndex, to: targetIndex)
     }
     
@@ -634,7 +595,7 @@ extension MediaBrowserViewController: UIViewControllerTransitioningDelegate, Tra
     }
     
     public var transitionSourceView: UIView? {
-        return self.cacheSourceView
+        return self.sourceProvider?.sourceView?(self.currentPage)
     }
     
     public var transitionSourceRect: CGRect {
