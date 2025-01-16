@@ -114,7 +114,7 @@ extension HomeViewController: UICollectionViewDataSource {
             fatalError()
         }
         let item = self.dataSource[indexPath.item]
-        cell.imageView.sd_setImage(with: URL(string: item))
+        cell.imageView.sd_setImage(with: URL(string: item), placeholderImage: nil, options: [.decodeFirstFrameOnly])
         return cell
     }
     
