@@ -123,7 +123,7 @@ open class MediaBrowserViewController: UIViewController {
         /// 外部可能设置导航栏, 这里需要隐藏
         self.navigationController?.setNavigationBarHidden(true, animated: false)
         
-        self.cacheSourceView = self.sourceProvider?.sourceView?(self.currentPage)
+        self.cacheSourceView = self.sourceProviderView(at: self.currentPage)
         self.cacheSourceView?.isHidden = true
     }
     
@@ -139,7 +139,7 @@ open class MediaBrowserViewController: UIViewController {
             guard self.view.window != nil else {
                 return
             }
-            self.cacheSourceView = self.sourceProvider?.sourceView?(self.currentPage)
+            self.cacheSourceView = self.sourceProviderView(at: self.currentPage)
             self.cacheSourceView?.isHidden = true
         }
     }
@@ -393,6 +393,19 @@ extension MediaBrowserViewController: MediaBrowserViewDataSource {
     
 }
 
+extension MediaBrowserViewController {
+    
+    private func sourceProviderView(at index: Int) -> UIView? {
+        let sourceView = self.sourceProvider?.sourceView?(index)
+        let sourceRect = self.sourceProvider?.sourceRect?(index) ?? .zero
+        guard let sourceView = sourceView, sourceRect.isEmpty else {
+            return nil
+        }
+        return sourceView
+    }
+    
+}
+
 extension MediaBrowserViewController: MediaBrowserViewDelegate {
     
     public func mediaBrowserView(_ mediaBrowserView: MediaBrowserView, willDisplay cell: UICollectionViewCell, forPageAt index: Int) {
@@ -411,7 +424,7 @@ extension MediaBrowserViewController: MediaBrowserViewDelegate {
     
     public func mediaBrowserView(_ mediaBrowserView: MediaBrowserView, willScrollHalfFrom sourceIndex: Int, to targetIndex: Int) {
         self.cacheSourceView?.isHidden = false
-        self.cacheSourceView = self.sourceProvider?.sourceView?(targetIndex)
+        self.cacheSourceView = self.sourceProviderView(at: targetIndex)
         self.cacheSourceView?.isHidden = true
         
         self.eventHandler?.willScrollHalf(from: sourceIndex, to: targetIndex)
@@ -625,7 +638,7 @@ extension MediaBrowserViewController: UIViewControllerTransitioningDelegate, Tra
     }
     
     public var transitionSourceRect: CGRect {
-        return self.sourceProvider?.sourceRect?(self.currentPage) ?? CGRect.zero
+        return self.sourceProvider?.sourceRect?(self.currentPage) ?? .zero
     }
     
     public var transitionTargetView: UIView? {

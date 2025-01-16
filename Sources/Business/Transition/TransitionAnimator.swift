@@ -91,18 +91,23 @@ extension TransitionAnimator {
         
         var style: TransitioningStyle = isEntering ? self.enteringStyle : self.exitingStyle
         let sourceView = self.delegate?.transitionSourceView
-        var sourceRect = CGRect.zero
+        var sourceRect: CGRect
         if style == .zoom {
-            let currentView: UIView = isEntering ? toView : fromView
-            if let sourceView = sourceView {
+            let transitionSourceRect = self.delegate?.transitionSourceRect ?? .zero
+            let currentView = isEntering ? toView : fromView
+            if let sourceView = sourceView, transitionSourceRect.isEmpty {
                 sourceRect = currentView.convert(sourceView.frame, from: sourceView.superview)
-            } else if let transitionSourceRect = self.delegate?.transitionSourceRect {
-                sourceRect = currentView.convert(transitionSourceRect, to: currentView)
+            } else if !transitionSourceRect.isEmpty {
+                sourceRect = currentView.convert(transitionSourceRect, from: sourceView)
+            } else {
+                sourceRect = .zero
             }
-            /// 判断sourceRect是否与needView相交
+            /// 判断sourceRect是否与currentView相交
             if !sourceRect.isEmpty && !sourceRect.intersects(currentView.frame) {
-                sourceRect = CGRect.zero
+                sourceRect = .zero
             }
+        } else {
+            sourceRect = .zero
         }
         
         let contentViewFrame = self.delegate?.transitionTargetFrame ?? CGRect.zero
