@@ -382,9 +382,6 @@ extension MediaBrowserViewController: MediaBrowserViewDataSource {
         guard self.isTransitionFinished else {
             return
         }
-        guard zoomView.asset != nil else {
-            return
-        }
         if let eventHandler = self.eventHandler {
             if eventHandler.shouldStartPlaying(at: index) {
                 zoomView.startPlaying()
@@ -598,7 +595,7 @@ extension MediaBrowserViewController: UIViewControllerTransitioningDelegate, Tra
     
     public var transitionThumbnailView: UIImageView? {
         if let photoCell = self.currentPageCell as? PhotoCell, let zoomView = photoCell.zoomView {
-            return zoomView.modifier.thumbnailView()
+            return zoomView.configuration.thumbnailView()
         }
         return nil
     }

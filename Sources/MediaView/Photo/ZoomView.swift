@@ -10,6 +10,8 @@ import JSCoreKit
 
 open class ZoomView: BasisMediaView {
     
+    public var configuration: ZoomViewConfiguration
+    
     public var eventHandler: ZoomViewEventHandler?
     
     public var asset: (any ZoomAsset)? {
@@ -85,12 +87,10 @@ open class ZoomView: BasisMediaView {
         return scrollView
     }()
     
-    public let modifier: ZoomViewModifier
-    
     private var isNeededRevertZoom: Bool = false
     
-    public init(modifier: ZoomViewModifier, eventHandler: ZoomViewEventHandler? = nil) {
-        self.modifier = modifier
+    public init(configuration: ZoomViewConfiguration, eventHandler: ZoomViewEventHandler? = nil) {
+        self.configuration = configuration
         self.eventHandler = eventHandler
         
         super.init()
@@ -155,10 +155,13 @@ open class ZoomView: BasisMediaView {
 extension ZoomView {
     
     public var isPlaying: Bool {
-        guard let assetView = self.assetView else {
+        if self.asset != nil, let assetView = self.assetView {
+            return assetView.isPlaying
+        } else if self.thumbnail != nil, let thumbnailView = self.thumbnailView {
+            return thumbnailView.isAnimating
+        } else {
             return false
         }
-        return assetView.isPlaying
     }
     
     public func startPlaying() {
@@ -274,7 +277,7 @@ extension ZoomView {
         guard self.assetView == nil else {
             return
         }
-        guard let assetView = self.modifier.assetView(for: asset) else {
+        guard let assetView = self.configuration.assetView(asset) else {
             return
         }
         assetView.isAccessibilityElement = true
@@ -287,7 +290,7 @@ extension ZoomView {
         guard self.thumbnailView == nil else {
             return
         }
-        guard let thumbnailView = self.modifier.thumbnailView() else {
+        guard let thumbnailView = self.configuration.thumbnailView() else {
             return
         }
         thumbnailView.isAccessibilityElement = true

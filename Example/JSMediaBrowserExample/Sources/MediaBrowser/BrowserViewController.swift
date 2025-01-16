@@ -30,7 +30,27 @@ class BrowserViewController: MediaBrowserViewController {
     init() {
         super.init(configuration: .init(
             zoomView: { _ in
-                return ZoomView(modifier: SDZoomViewModifier())
+                return ZoomView(configuration: .init(
+                    assetView: {
+                        if $0 is UIImage {
+                            let imageView = SDAnimatedImageView()
+                            imageView.autoPlayAnimatedImage = false
+                            if #available(iOS 17.0, *) {
+                                imageView.preferredImageDynamicRange = .high
+                            }
+                            return imageView
+                        } else if $0 is PHLivePhoto {
+                            return PHLivePhotoView()
+                        } else {
+                            return nil
+                        }
+                    },
+                    thumbnailView: {
+                        let imageView = SDAnimatedImageView()
+                        imageView.autoPlayAnimatedImage = false
+                        return imageView
+                    }
+                ))
             },
             imageAssetMediator: { _ in
                 return SDWebImageAssetMediator(
@@ -87,31 +107,6 @@ extension BrowserViewController {
     func updatePageControl(for index: Int? = nil) {
         self.pageControl.numberOfPages = self.totalUnitPage
         self.pageControl.currentPage = index ?? self.currentPage
-    }
-    
-}
-
-private struct SDZoomViewModifier: ZoomViewModifier {
-    
-    func assetView(for asset: any ZoomAsset) -> (any ZoomAssetView)? {
-        if asset is UIImage {
-            let imageView = SDAnimatedImageView()
-            imageView.autoPlayAnimatedImage = false
-            if #available(iOS 17.0, *) {
-                imageView.preferredImageDynamicRange = .high
-            }
-            return imageView
-        } else if asset is PHLivePhoto {
-            return PHLivePhotoView()
-        } else {
-            return nil
-        }
-    }
-    
-    func thumbnailView() -> UIImageView? {
-        let imageView = SDAnimatedImageView()
-        imageView.autoPlayAnimatedImage = false
-        return imageView
     }
     
 }

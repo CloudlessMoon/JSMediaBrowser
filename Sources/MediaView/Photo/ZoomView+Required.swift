@@ -7,11 +7,21 @@
 
 import UIKit
 
-public protocol ZoomViewModifier {
+public struct ZoomViewConfiguration {
     
-    func assetView(for asset: any ZoomAsset) -> (any ZoomAssetView)?
+    public typealias BuildAssetView = (any ZoomAsset) -> (any ZoomAssetView)?
+    public typealias BuildThumbnailView = () -> UIImageView?
+
+    public var assetView: BuildAssetView
+    public var thumbnailView: BuildThumbnailView
     
-    func thumbnailView() -> UIImageView?
+    public init(
+        assetView: @escaping BuildAssetView,
+        thumbnailView: @escaping BuildThumbnailView
+    ) {
+        self.assetView = assetView
+        self.thumbnailView = thumbnailView
+    }
     
 }
 
