@@ -28,8 +28,6 @@ class HomeViewController: UIViewController {
     override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
         super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
         self.extendedLayoutIncludesOpaqueBars = true
-        
-        SDImageCachesManager.shared.clear(with: .all)
     }
     
     required init?(coder: NSCoder) {
