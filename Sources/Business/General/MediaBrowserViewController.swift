@@ -294,11 +294,45 @@ extension MediaBrowserViewController: MediaBrowserViewDataSource {
             } else if let url = dataItem.imageURL {
                 updateAsset(cell, nil, dataItem.thumbnail)
                 
-                let imageMediator = self.configuration.imageAssetMediator(index)
+                if let imageMediator = self.configuration.imageAssetMediator(index) {
+                    let identifier = UIView.AtomicInt()
+                    cell.mb_requestIdentifier = identifier
+                    cell.mb_requestToken = imageMediator.requestImage(
+                        url: url,
+                        progress: { [weak cell] in
+                            guard let cell = cell, identifier == cell.mb_requestIdentifier else {
+                                return
+                            }
+                            updateProgress(cell, $0, $1)
+                        },
+                        completed: { [weak cell] in
+                            guard let cell = cell, identifier == cell.mb_requestIdentifier else {
+                                return
+                            }
+                            switch $0 {
+                            case .success(let value):
+                                updateAsset(cell, value.asset, nil)
+                            case .failure(let error):
+                                if !error.isCancelled {
+                                    updateAsset(cell, nil, nil)
+                                }
+                                updateError(cell, error.error, error.isCancelled)
+                            }
+                        }
+                    )
+                }
+            } else {
+                updateAsset(cell, nil, dataItem.thumbnail)
+            }
+        } else if let dataItem = dataItem as? LivePhotoAssetItem {
+            updateAsset(cell, nil, dataItem.thumbnail)
+            
+            if let livePhotoMediator = self.configuration.livePhotoAssetMediator(index) {
                 let identifier = UIView.AtomicInt()
                 cell.mb_requestIdentifier = identifier
-                cell.mb_requestToken = imageMediator.requestImage(
-                    url: url,
+                cell.mb_requestToken = livePhotoMediator.requestLivePhoto(
+                    imageURL: dataItem.imageURL,
+                    videoURL: dataItem.videoURL,
                     progress: { [weak cell] in
                         guard let cell = cell, identifier == cell.mb_requestIdentifier else {
                             return
@@ -320,39 +354,7 @@ extension MediaBrowserViewController: MediaBrowserViewDataSource {
                         }
                     }
                 )
-            } else {
-                updateAsset(cell, nil, dataItem.thumbnail)
             }
-        } else if let dataItem = dataItem as? LivePhotoAssetItem {
-            updateAsset(cell, nil, dataItem.thumbnail)
-            
-            let livePhotoMediator = self.configuration.livePhotoAssetMediator(index)
-            let identifier = UIView.AtomicInt()
-            cell.mb_requestIdentifier = identifier
-            cell.mb_requestToken = livePhotoMediator.requestLivePhoto(
-                imageURL: dataItem.imageURL,
-                videoURL: dataItem.videoURL,
-                progress: { [weak cell] in
-                    guard let cell = cell, identifier == cell.mb_requestIdentifier else {
-                        return
-                    }
-                    updateProgress(cell, $0, $1)
-                },
-                completed: { [weak cell] in
-                    guard let cell = cell, identifier == cell.mb_requestIdentifier else {
-                        return
-                    }
-                    switch $0 {
-                    case .success(let value):
-                        updateAsset(cell, value.asset, nil)
-                    case .failure(let error):
-                        if !error.isCancelled {
-                            updateAsset(cell, nil, nil)
-                        }
-                        updateError(cell, error.error, error.isCancelled)
-                    }
-                }
-            )
         }
     }
     
