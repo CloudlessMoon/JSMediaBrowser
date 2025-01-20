@@ -54,8 +54,12 @@ class BrowserViewController: MediaBrowserViewController {
             },
             imageAssetMediator: { _ in
                 return SDWebImageAssetMediator(
-                    options: [.fromLoaderOnly],
-                    context: [.animatedImageClass: SDAnimatedImage.self]
+                    options: [.retryFailed],
+                    context: [
+                        .storeCacheType: SDImageCacheType.disk.rawValue,
+                        .queryCacheType: SDImageCacheType.disk.rawValue,
+                        .animatedImageClass: SDAnimatedImage.self
+                    ]
                 )
             },
             livePhotoAssetMediator: { _ in

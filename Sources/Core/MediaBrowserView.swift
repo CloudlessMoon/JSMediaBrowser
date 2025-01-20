@@ -87,6 +87,7 @@ public class MediaBrowserView: UIView {
     
     private var previousOffsetIndex: CGFloat = 0.0
     
+    private var isScrollingToPage: Bool = false
     private var endScrollingCompletions: [() -> Void] = []
     
     public override init(frame: CGRect) {
@@ -139,9 +140,12 @@ extension MediaBrowserView {
         let previousPage = self.currentPage
         self.currentPage = index
         
+        self.isScrollingToPage = true
         self.delegate?.mediaBrowserView(self, willScrollHalfFrom: previousPage, to: index)
         self.scrollToPage(at: index, animated: animated) { [weak self] in
             guard let self = self else { return }
+            self.isScrollingToPage = false
+            
             self.delegate?.mediaBrowserView(self, didScrollTo: self.currentPage)
             
             completion?()
@@ -193,6 +197,22 @@ extension MediaBrowserView {
         return self.collectionView.contentOffset
     }
     
+    public var isTracking: Bool {
+        return self.collectionView.isTracking
+    }
+    
+    public var isDragging: Bool {
+        return self.collectionView.isDragging
+    }
+    
+    public var isDecelerating: Bool {
+        return self.collectionView.isDecelerating
+    }
+    
+    public var isScrollAnimating: Bool {
+        return self.isScrollingToPage
+    }
+    
     public func dequeueReusableCell<Cell: UICollectionViewCell>(_ cellClass: Cell.Type,
                                                                 reuseIdentifier: String? = nil,
                                                                 at index: Int) -> Cell {
@@ -232,26 +252,6 @@ extension MediaBrowserView {
             fatalError()
         }
         return cell
-    }
-    
-}
-
-extension MediaBrowserView {
-    
-    public var isTracking: Bool {
-        return self.collectionView.isTracking
-    }
-    
-    public var isDragging: Bool {
-        return self.collectionView.isDragging
-    }
-    
-    public var isDecelerating: Bool {
-        return self.collectionView.isDecelerating
-    }
-    
-    public var panGestureRecognizer: UIPanGestureRecognizer {
-        return self.collectionView.panGestureRecognizer
     }
     
 }
@@ -331,10 +331,10 @@ extension MediaBrowserView: UIScrollViewDelegate {
     }
     
     public func scrollViewDidEndScrollingAnimation(_ scrollView: UIScrollView) {
-        self.endScrollingCompletions.forEach {
+        self.endScrollingCompletions.removeAll {
             $0()
+            return true
         }
-        self.endScrollingCompletions.removeAll()
     }
     
     private var offsetIndex: CGFloat {

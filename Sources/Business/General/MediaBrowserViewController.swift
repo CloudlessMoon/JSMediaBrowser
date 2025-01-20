@@ -146,6 +146,22 @@ extension MediaBrowserViewController {
         self.mediaBrowserView.setCurrentPage(index, animated: animated, completion: completion)
     }
     
+    public var isTracking: Bool {
+        return self.mediaBrowserView.isTracking
+    }
+    
+    public var isDragging: Bool {
+        return self.mediaBrowserView.isDragging
+    }
+    
+    public var isDecelerating: Bool {
+        return self.mediaBrowserView.isDecelerating
+    }
+    
+    public var isScrollAnimating: Bool {
+        return self.mediaBrowserView.isScrollAnimating
+    }
+    
     public func show(from sender: UIViewController,
                      navigationController: UINavigationController? = nil,
                      animated: Bool,
@@ -362,6 +378,9 @@ extension MediaBrowserViewController: MediaBrowserViewDataSource {
         guard self.isTransitionFinished else {
             return
         }
+        guard !self.isDragging && !self.isDecelerating && !self.isScrollAnimating else {
+            return
+        }
         if let eventHandler = self.eventHandler {
             if eventHandler.shouldStartPlaying(at: index) {
                 zoomView.startPlaying()
@@ -394,6 +413,10 @@ extension MediaBrowserViewController: MediaBrowserViewDelegate {
     }
     
     public func mediaBrowserView(_ mediaBrowserView: MediaBrowserView, didScrollTo index: Int) {
+        if let photoCell = self.currentPageCell as? PhotoCell, let zoomView = photoCell.zoomView {
+            self.startPlaying(for: zoomView, at: index)
+        }
+        
         self.eventHandler?.didScroll(to: index)
     }
     
