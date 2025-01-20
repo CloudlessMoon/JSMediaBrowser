@@ -38,12 +38,12 @@ Pod::Spec.new do |s|
   s.subspec "BusinessForPHLivePhoto" do |ss|
     ss.source_files = "Sources/Business/Photo/PHLivePhoto/*.{swift,h,m}"
     ss.frameworks   = "PhotosUI"
-    ss.dependency "JSMediaBrowser/MediaPhoto"
+    ss.dependency "JSMediaBrowser/Business"
   end
 
   s.subspec "BusinessForSDWebImage" do |ss|
     ss.source_files = "Sources/Business/Photo/SDWebImage/*.{swift,h,m}"
-    ss.dependency "JSMediaBrowser/MediaPhoto"
+    ss.dependency "JSMediaBrowser/Business"
     ss.dependency "SDWebImage", "~> 5.0"
   end
 end
