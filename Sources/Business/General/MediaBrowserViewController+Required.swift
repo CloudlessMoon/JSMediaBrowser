@@ -48,7 +48,7 @@ public struct MediaBrowserViewControllerSourceProvider {
 
 public protocol MediaBrowserViewControllerEventHandler {
     
-    func willReloadData(_ dataSource: [AssetItem])
+    func didChangedData(current: [AssetItem], previous: [AssetItem])
     
     func willDisplayZoomView(_ zoomView: ZoomView, at index: Int)
     func willDisplayEmptyView(_ emptyView: EmptyView, with error: NSError, at index: Int)
@@ -65,7 +65,7 @@ public protocol MediaBrowserViewControllerEventHandler {
 
 public extension MediaBrowserViewControllerEventHandler {
     
-    func willReloadData(_ dataSource: [AssetItem]) {}
+    func didChangedData(current: [AssetItem], previous: [AssetItem]) {}
     
     func willDisplayZoomView(_ zoomView: ZoomView, at index: Int) {}
     func willDisplayEmptyView(_ emptyView: EmptyView, with error: NSError, at index: Int) {}
@@ -82,7 +82,7 @@ public extension MediaBrowserViewControllerEventHandler {
 
 public struct DefaultMediaBrowserViewControllerEventHandler: MediaBrowserViewControllerEventHandler {
     
-    public typealias WillReloadData = ([AssetItem]) -> Void
+    public typealias ChangedDataSource = ([AssetItem], [AssetItem]) -> Void
     public typealias ShouldPlaying = (Int) -> Bool
     public typealias DisplayZoomView = (ZoomView, Int) -> Void
     public typealias DisplayEmptyView = (EmptyView, NSError, Int) -> Void
@@ -90,7 +90,7 @@ public struct DefaultMediaBrowserViewControllerEventHandler: MediaBrowserViewCon
     public typealias DidScroll = (Int) -> Void
     public typealias Touch = () -> Void
     
-    private let _willReloadData: WillReloadData?
+    private let _didChangedData: ChangedDataSource?
     private let _willDisplayZoomView: DisplayZoomView?
     private let _willDisplayEmptyView: DisplayEmptyView?
     private let _shouldStartPlaying: ShouldPlaying?
@@ -100,7 +100,7 @@ public struct DefaultMediaBrowserViewControllerEventHandler: MediaBrowserViewCon
     private let _didLongPressTouch: Touch?
     
     public init(
-        willReloadData: WillReloadData? = nil,
+        didChangedData: ChangedDataSource? = nil,
         willDisplayZoomView: DisplayZoomView? = nil,
         willDisplayEmptyView: DisplayEmptyView? = nil,
         shouldStartPlaying: ShouldPlaying? = nil,
@@ -109,7 +109,7 @@ public struct DefaultMediaBrowserViewControllerEventHandler: MediaBrowserViewCon
         didSingleTouch: Touch? = nil,
         didLongPressTouch: Touch? = nil
     ) {
-        self._willReloadData = willReloadData
+        self._didChangedData = didChangedData
         self._willDisplayZoomView = willDisplayZoomView
         self._willDisplayEmptyView = willDisplayEmptyView
         self._shouldStartPlaying = shouldStartPlaying
@@ -119,8 +119,8 @@ public struct DefaultMediaBrowserViewControllerEventHandler: MediaBrowserViewCon
         self._didLongPressTouch = didLongPressTouch
     }
     
-    public func willReloadData(_ dataSource: [AssetItem]) {
-        self._willReloadData?(dataSource)
+    public func didChangedData(current: [AssetItem], previous: [AssetItem]) {
+        self._didChangedData?(current, previous)
     }
     
     public func willScrollHalf(from sourceIndex: Int, to targetIndex: Int) {

@@ -68,7 +68,7 @@ class BrowserViewController: MediaBrowserViewController {
         ))
         
         self.eventHandler = DefaultMediaBrowserViewControllerEventHandler(
-            willReloadData: { [weak self] _ in
+            didChangedData: { [weak self] _, _ in
                 guard let self = self else { return }
                 self.updatePageControl()
             },
