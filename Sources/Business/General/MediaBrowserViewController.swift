@@ -410,6 +410,8 @@ extension MediaBrowserViewController: MediaBrowserViewDelegate {
     
     public func mediaBrowserView(_ mediaBrowserView: MediaBrowserView, willScrollHalfFrom sourceIndex: Int, to targetIndex: Int) {
         self.eventHandler?.willScrollHalf(from: sourceIndex, to: targetIndex)
+        
+        print("\(#function)")
     }
     
     public func mediaBrowserView(_ mediaBrowserView: MediaBrowserView, didScrollTo index: Int) {
@@ -418,6 +420,8 @@ extension MediaBrowserViewController: MediaBrowserViewDelegate {
         }
         
         self.eventHandler?.didScroll(to: index)
+        
+        print("\(#function)")
     }
     
     public func mediaBrowserViewDidScroll(_ mediaBrowserView: MediaBrowserView) {
