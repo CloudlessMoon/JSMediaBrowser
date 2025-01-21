@@ -21,11 +21,10 @@ Pod::Spec.new do |s|
 
   s.subspec "MediaView" do |ss|
     ss.source_files = "Sources/MediaView/Basis/*.{swift,h,m}"
-    ss.dependency "JSMediaBrowser/Core"
   end
 
-  s.subspec "MediaPhoto" do |ss|
-    ss.source_files = "Sources/MediaView/Photo/*.{swift,h,m}"
+  s.subspec "MediaZoomView" do |ss|
+    ss.source_files = "Sources/MediaView/ZoomView/*.{swift,h,m}"
     ss.dependency "JSMediaBrowser/MediaView"
   end
 
@@ -36,7 +35,7 @@ Pod::Spec.new do |s|
       "Sources/Business/Photo/SDWebImage/*.{swift,h,m}"
     ]
     ss.dependency "JSMediaBrowser/Core"
-    ss.dependency "JSMediaBrowser/MediaPhoto"
+    ss.dependency "JSMediaBrowser/MediaZoomView"
   end
 
   s.subspec "BusinessForPHLivePhoto" do |ss|
