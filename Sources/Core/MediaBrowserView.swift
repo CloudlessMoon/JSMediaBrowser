@@ -140,13 +140,14 @@ extension MediaBrowserView {
         let previousPage = self.currentPage
         self.currentPage = index
         
+        self.callWillScrollHalf(from: previousPage, to: index)
+        
         self.isScrollingToPage = true
-        self.delegate?.mediaBrowserView(self, willScrollHalfFrom: previousPage, to: index)
         self.scrollToPage(at: index, animated: animated) { [weak self] in
             guard let self = self else { return }
             self.isScrollingToPage = false
             
-            self.delegate?.mediaBrowserView(self, didScrollTo: self.currentPage)
+            self.callDidScrollToIndex()
             
             completion?()
         }
@@ -295,10 +296,6 @@ extension MediaBrowserView: UIScrollViewDelegate {
         guard !self.collectionView.bounds.isEmpty && !self.isPossiblyRotating else {
             return
         }
-        defer {
-            self.delegate?.mediaBrowserViewDidScroll(self)
-        }
-        
         let betweenOrEqual = { (minimumValue: CGFloat, value: CGFloat, maximumValue: CGFloat) -> Bool in
             return minimumValue <= value && value <= maximumValue
         }
@@ -311,9 +308,10 @@ extension MediaBrowserView: UIScrollViewDelegate {
         if turnPageToRight || turnPageToLeft {
             let index = Int(round(offsetIndex))
             if index >= 0 && index < self.totalUnitPage && self.currentPage != index {
-                self.delegate?.mediaBrowserView(self, willScrollHalfFrom: self.currentPage, to: index)
-                
+                let previousPage = self.currentPage
                 self.currentPage = index
+                
+                self.callWillScrollHalf(from: previousPage, to: index)
             }
             self.previousOffsetIndex = offsetIndex
         }
@@ -323,11 +321,11 @@ extension MediaBrowserView: UIScrollViewDelegate {
         guard !decelerate else {
             return
         }
-        self.delegate?.mediaBrowserView(self, didScrollTo: self.currentPage)
+        self.callDidScrollToIndex()
     }
     
     public func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
-        self.delegate?.mediaBrowserView(self, didScrollTo: self.currentPage)
+        self.callDidScrollToIndex()
     }
     
     public func scrollViewDidEndScrollingAnimation(_ scrollView: UIScrollView) {
@@ -386,6 +384,14 @@ extension MediaBrowserView: UIScrollViewDelegate {
         } else {
             completion?()
         }
+    }
+    
+    private func callWillScrollHalf(from sourceIndex: Int, to targetIndex: Int) {
+        self.delegate?.mediaBrowserView(self, willScrollHalfFrom: sourceIndex, to: targetIndex)
+    }
+    
+    private func callDidScrollToIndex() {
+        self.delegate?.mediaBrowserView(self, didScrollTo: self.currentPage)
     }
     
 }

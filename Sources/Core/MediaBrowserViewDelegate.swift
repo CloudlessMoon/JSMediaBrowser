@@ -17,8 +17,6 @@ public protocol MediaBrowserViewDelegate: AnyObject {
     
     func mediaBrowserView(_ mediaBrowserView: MediaBrowserView, didScrollTo index: Int)
     
-    func mediaBrowserViewDidScroll(_ mediaBrowserView: MediaBrowserView)
-    
 }
 
 public protocol MediaBrowserViewGestureDelegate: AnyObject {

@@ -424,10 +424,6 @@ extension MediaBrowserViewController: MediaBrowserViewDelegate {
         print("\(#function)")
     }
     
-    public func mediaBrowserViewDidScroll(_ mediaBrowserView: MediaBrowserView) {
-        
-    }
-    
 }
 
 extension MediaBrowserViewController: MediaBrowserViewGestureDelegate {
