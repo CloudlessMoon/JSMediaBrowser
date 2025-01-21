@@ -88,6 +88,7 @@ public class MediaBrowserView: UIView {
     private var previousOffsetIndex: CGFloat = 0.0
     
     private var isScrollingToPage: Bool = false
+    private var draggingPage: Int?
     private var endScrollingCompletions: [() -> Void] = []
     
     public override init(frame: CGRect) {
@@ -317,15 +318,27 @@ extension MediaBrowserView: UIScrollViewDelegate {
         }
     }
     
+    public func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
+        self.draggingPage = self.currentPage
+    }
+    
     public func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
         guard !decelerate else {
             return
         }
-        self.callDidScrollToIndex()
+        if self.draggingPage != self.currentPage {
+            self.draggingPage = nil
+            
+            self.callDidScrollToIndex()
+        }
     }
     
     public func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
-        self.callDidScrollToIndex()
+        if self.draggingPage != self.currentPage {
+            self.draggingPage = nil
+            
+            self.callDidScrollToIndex()
+        }
     }
     
     public func scrollViewDidEndScrollingAnimation(_ scrollView: UIScrollView) {
