@@ -73,17 +73,16 @@ open class ZoomView: BasisMediaView {
     }
     
     public private(set) lazy var scrollView: UIScrollView = {
-        let scrollView = UIScrollView(frame: CGRect(origin: CGPoint.zero, size: frame.size))
+        let scrollView = UIScrollView()
         scrollView.showsHorizontalScrollIndicator = false
         scrollView.showsVerticalScrollIndicator = false
         scrollView.alwaysBounceVertical = false
         scrollView.alwaysBounceHorizontal = false
+        scrollView.scrollsToTop = false
+        scrollView.contentInsetAdjustmentBehavior = .never
         scrollView.minimumZoomScale = self.minimumZoomScale
         scrollView.maximumZoomScale = self.maximumZoomScale
-        scrollView.scrollsToTop = false
-        scrollView.delaysContentTouches = false
         scrollView.delegate = self
-        scrollView.contentInsetAdjustmentBehavior = .never
         return scrollView
     }()
     
@@ -103,11 +102,9 @@ open class ZoomView: BasisMediaView {
     
     open override func layoutSubviews() {
         super.layoutSubviews()
-        /// scrollView
-        let previousSize = self.scrollView.bounds.size
-        if previousSize != self.bounds.size {
+        /// scrollView.frame
+        if self.scrollView.bounds.size != self.bounds.size {
             self.scrollView.frame = self.bounds
-            self.setNeedsRevertZoom()
         }
         /// assetView
         if let assetView = self.assetView {
@@ -128,6 +125,17 @@ open class ZoomView: BasisMediaView {
                 return thumbnail.size
             }()
             thumbnailView.frame = self.contentViewFrameThatFits(thumbnailSize)
+        }
+        /// scrollView.content
+        if let contentView = self.contentView {
+            let contentViewSize = contentView.bounds.size
+            let contentInset = self.contentInsetThatFits(contentViewSize)
+            if self.scrollView.contentInset != contentInset {
+                self.scrollView.contentInset = contentInset
+            }
+            if self.scrollView.contentSize != contentViewSize {
+                self.scrollView.contentSize = contentViewSize
+            }
         }
         
         self.revertZoomIfNeeded()
@@ -228,6 +236,9 @@ extension ZoomView {
     }
     
     public func contentSizeThatFits(_ size: CGSize) -> CGSize {
+        guard JSCGSizeIsValidated(size) else {
+            return .zero
+        }
         let viewport = self.viewportRect
         let scale = {
             let height = size.width > viewport.width ? viewport.width * (size.height / size.width) : size.height
@@ -252,6 +263,9 @@ extension ZoomView {
     }
     
     public func contentInsetThatFits(_ size: CGSize) -> UIEdgeInsets {
+        guard JSCGSizeIsValidated(size) else {
+            return .zero
+        }
         let viewport = self.viewportRect
         var contentInset = UIEdgeInsets.zero
         contentInset.top = viewport.minY
@@ -316,49 +330,15 @@ extension ZoomView {
     }
     
     private func revertZoomIfNeeded() {
-        guard self.isNeededRevertZoom else {
+        guard self.isNeededRevertZoom && !self.bounds.isEmpty else {
             return
         }
         self.isNeededRevertZoom = false
-        self.revertZooming()
-    }
-    
-    private func revertZooming() {
-        if self.bounds.isEmpty {
-            return
-        }
-        /// 重置ZoomScale
+        
+        /// 重置zoomScale
         self.setZoom(scale: self.minimumZoomScale, animated: false)
-        /// 手动触发一次缩放
-        if self.zoomScale == self.minimumZoomScale {
-            self.handleDidEndZooming()
-        }
-        /// 重置ContentOffset
-        self.revertContentOffset(animated: false)
-    }
-    
-    private func handleDidEndZooming() {
-        guard let contentView = self.contentView else {
-            return
-        }
-        let contentViewSize = self.contentViewFrame.size
-        self.scrollView.contentInset = self.contentInsetThatFits(contentViewSize)
-        self.scrollView.contentSize = contentView.frame.size
-    }
-    
-    private func revertContentOffset(animated: Bool) {
-        var x = self.scrollView.contentOffset.x
-        var y = self.scrollView.contentOffset.y
-        let viewport = self.viewportRect
-        if let contentView = self.contentView, !viewport.isEmpty {
-            if viewport.width < contentView.frame.width {
-                x = (contentView.frame.width - viewport.width) / 2 - viewport.minX
-            }
-            if viewport.height < contentView.frame.height {
-                y = -self.scrollView.contentInset.top
-            }
-        }
-        self.scrollView.setContentOffset(CGPoint(x: x, y: y), animated: animated)
+        /// 重置contentOffset
+        self.scrollView.contentOffset = self.scrollView.js_minimumContentOffset
     }
     
     private func callWillBeginZooming() {
@@ -393,18 +373,18 @@ extension ZoomView: UIScrollViewDelegate {
         return self.contentView
     }
     
-    public func scrollViewDidZoom(_ scrollView: UIScrollView) {
-        self.handleDidEndZooming()
-        
-        self.callDidZoom()
-    }
-    
     public func scrollViewWillBeginZooming(_ scrollView: UIScrollView, with view: UIView?) {
         self.callWillBeginZooming()
     }
     
     public func scrollViewDidEndZooming(_ scrollView: UIScrollView, with view: UIView?, atScale scale: CGFloat) {
         self.callDidEndZooming(at: scale)
+    }
+    
+    public func scrollViewDidZoom(_ scrollView: UIScrollView) {
+        self.setNeedsLayout()
+        
+        self.callDidZoom()
     }
     
 }

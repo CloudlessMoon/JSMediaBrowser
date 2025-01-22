@@ -34,7 +34,7 @@ open class BasisMediaView: UIView {
     }
     
     open var contentViewFrame: CGRect {
-        return CGRect.zero
+        return .zero
     }
     
 }
