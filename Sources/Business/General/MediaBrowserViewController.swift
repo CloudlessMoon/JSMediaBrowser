@@ -106,11 +106,6 @@ open class MediaBrowserViewController: UIViewController {
         self.mediaBrowserView.gestureDelegate = self
     }
     
-    open override func viewDidLayoutSubviews() {
-        super.viewDidLayoutSubviews()
-        self.mediaBrowserView.js_frameApplyTransform = self.view.bounds
-    }
-    
     open override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         /// 外部可能设置导航栏, 这里需要隐藏
@@ -121,6 +116,15 @@ open class MediaBrowserViewController: UIViewController {
                 guard let self = self else { return }
                 self.isTransitionFinished = true
             })
+        }
+    }
+    
+    open override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        self.mediaBrowserView.js_frameApplyTransform = self.view.bounds
+        
+        if let cell = self.currentPageCell as? PhotoCell {
+            self.configViewportInsets(for: cell)
         }
     }
     
@@ -272,18 +276,8 @@ extension MediaBrowserViewController: MediaBrowserViewDataSource {
         if cell.zoomView == nil {
             cell.zoomView = self.configuration.zoomView(index)
         }
-        guard let zoomView = cell.zoomView else {
-            assertionFailure()
-            return
-        }
-        zoomView.viewportInsets = {
-            let insets = self.view.safeAreaInsets
-            if JSCoreHelper.isMac {
-                return insets
-            } else {
-                return UIEdgeInsets(top: 0, left: insets.left, bottom: 0, right: insets.right)
-            }
-        }()
+        
+        self.configViewportInsets(for: cell)
         
         let updateAsset = { [weak self] (cell: PhotoCell, asset: (any ZoomAsset)?, thumbnail: UIImage?) in
             guard let self = self else { return }
@@ -385,6 +379,20 @@ extension MediaBrowserViewController: MediaBrowserViewDataSource {
                 )
             }
         }
+    }
+    
+    private func configViewportInsets(for cell: PhotoCell) {
+        guard let zoomView = cell.zoomView else {
+            return
+        }
+        zoomView.viewportInsets = {
+            let insets = self.view.safeAreaInsets
+            if JSCoreHelper.isMac {
+                return insets
+            } else {
+                return UIEdgeInsets(top: 0, left: insets.left, bottom: 0, right: insets.right)
+            }
+        }()
     }
     
     private func startPlaying(for zoomView: ZoomView, at index: Int) {
