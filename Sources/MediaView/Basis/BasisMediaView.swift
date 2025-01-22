@@ -10,9 +10,9 @@ import JSCoreKit
 
 open class BasisMediaView: UIView {
     
-    public var contentInset: UIEdgeInsets = .zero {
+    public var viewportInsets: UIEdgeInsets = .zero {
         didSet {
-            guard oldValue != self.contentInset else {
+            guard oldValue != self.viewportInsets else {
                 return
             }
             self.setNeedsLayout()
@@ -52,13 +52,13 @@ extension BasisMediaView {
         guard !self.bounds.isEmpty else {
             return CGRect.zero
         }
-        let contentInset = self.contentInset
+        let viewportInsets = self.viewportInsets
         let size = CGSize(width: min(self.bounds.width, self.viewportRectMaxWidth), height: self.bounds.height)
         let offsetX = (self.bounds.width - size.width) / 2
-        let top = contentInset.top
-        let left = max(contentInset.left, offsetX)
-        let bottom = contentInset.bottom
-        let right = contentInset.right
+        let top = viewportInsets.top
+        let left = max(viewportInsets.left, offsetX)
+        let bottom = viewportInsets.bottom
+        let right = viewportInsets.right
         return CGRect(
             x: left,
             y: top,

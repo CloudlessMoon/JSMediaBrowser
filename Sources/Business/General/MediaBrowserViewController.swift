@@ -276,7 +276,7 @@ extension MediaBrowserViewController: MediaBrowserViewDataSource {
             assertionFailure()
             return
         }
-        zoomView.contentInset = {
+        zoomView.viewportInsets = {
             let insets = self.view.safeAreaInsets
             if JSCoreHelper.isMac {
                 return insets
