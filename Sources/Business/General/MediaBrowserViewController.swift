@@ -505,10 +505,12 @@ extension MediaBrowserViewController: MediaBrowserViewGestureDelegate {
     public func mediaBrowserView(_ mediaBrowserView: MediaBrowserView, dismissingChanged gestureRecognizer: UIPanGestureRecognizer) {
         let gestureRecognizerView: UIView = gestureRecognizer.view ?? mediaBrowserView
         switch gestureRecognizer.state {
+        case .possible:
+            break
         case .began:
             self.gestureBeganLocation = gestureRecognizer.location(in: gestureRecognizerView)
-            self.transitionInteractiver.begin()
             if self.isPresented {
+                self.transitionInteractiver.begin()
                 self.hide(animated: true)
             }
         case .changed:
@@ -537,12 +539,12 @@ extension MediaBrowserViewController: MediaBrowserViewGestureDelegate {
             } else {
                 self.resetDismissingAnimation()
             }
-        default:
+        @unknown default:
             break
         }
     }
     
-    public func beginDismissingAnimation() {
+    private func beginDismissingAnimation() {
         if let context = self.transitionInteractiver.context {
             self.transitionAnimator.performAnimation(using: context, isEntering: false) { finished in
                 self.transitionInteractiver.finish()
@@ -552,12 +554,12 @@ extension MediaBrowserViewController: MediaBrowserViewGestureDelegate {
         }
     }
     
-    public func resetDismissingAnimation() {
+    private func resetDismissingAnimation() {
         self.gestureBeganLocation = CGPoint.zero
         UIView.animate(withDuration: self.transitionAnimator.duration, delay: 0, options: JSCoreHelper.animationOptionsCurveOut) {
             self.currentPageCell?.transform = CGAffineTransform.identity
-            self.transitionAnimatorViews?.forEach { (subview) in
-                subview.alpha = 1.0
+            self.transitionAnimatorViews?.forEach {
+                $0.alpha = 1.0
             }
         } completion: { finished in
             self.transitionInteractiver.cancel()
