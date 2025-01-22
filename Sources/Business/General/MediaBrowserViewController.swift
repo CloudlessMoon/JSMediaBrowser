@@ -277,8 +277,6 @@ extension MediaBrowserViewController: MediaBrowserViewDataSource {
             cell.zoomView = self.configuration.zoomView(index)
         }
         
-        self.configViewportInsets(for: cell)
-        
         let updateAsset = { [weak self] (cell: PhotoCell, asset: (any ZoomAsset)?, thumbnail: UIImage?) in
             guard let self = self else { return }
             guard let zoomView = cell.zoomView else {
@@ -379,6 +377,8 @@ extension MediaBrowserViewController: MediaBrowserViewDataSource {
                 )
             }
         }
+        
+        self.configViewportInsets(for: cell)
     }
     
     private func configViewportInsets(for cell: PhotoCell) {
