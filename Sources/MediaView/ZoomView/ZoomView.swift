@@ -128,7 +128,7 @@ open class ZoomView: BasisMediaView {
         }
         /// scrollView.content
         if let contentView = self.contentView {
-            let contentViewSize = contentView.bounds.size
+            let contentViewSize = contentView.frame.size
             let contentInset = self.contentInsetThatFits(contentViewSize)
             if self.scrollView.contentInset != contentInset {
                 self.scrollView.contentInset = contentInset
@@ -200,8 +200,8 @@ extension ZoomView {
     public func zoom(to point: CGPoint, scale: CGFloat, animated: Bool) {
         let minimumZoomScale = self.minimumZoomScale
         var zoomRect = CGRect.zero
-        zoomRect.size.width = self.scrollView.bounds.width / scale / minimumZoomScale
-        zoomRect.size.height = self.scrollView.bounds.height / scale / minimumZoomScale
+        zoomRect.size.width = self.bounds.width / scale / minimumZoomScale
+        zoomRect.size.height = self.bounds.height / scale / minimumZoomScale
         zoomRect.origin.x = point.x - zoomRect.width / 2
         zoomRect.origin.y = point.y - zoomRect.height / 2
         self.zoom(to: zoomRect, animated: animated)
@@ -383,6 +383,7 @@ extension ZoomView: UIScrollViewDelegate {
     
     public func scrollViewDidZoom(_ scrollView: UIScrollView) {
         self.setNeedsLayout()
+        self.layoutIfNeeded()
         
         self.callDidZoom()
     }
