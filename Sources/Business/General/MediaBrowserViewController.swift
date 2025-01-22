@@ -493,8 +493,8 @@ extension MediaBrowserViewController: MediaBrowserViewGestureDelegate {
         if zoomView.zoomScale != minimumZoomScale {
             zoomView.setZoom(scale: minimumZoomScale, animated: true)
         } else {
-            let gesturePoint: CGPoint = gestureRecognizer.location(in: zoomView.contentView)
-            zoomView.zoom(to: gesturePoint, scale: zoomView.maximumZoomScale, animated: true)
+            let location = gestureRecognizer.location(in: zoomView.contentView)
+            zoomView.zoom(to: location, scale: zoomView.maximumZoomScale, animated: true)
         }
     }
     

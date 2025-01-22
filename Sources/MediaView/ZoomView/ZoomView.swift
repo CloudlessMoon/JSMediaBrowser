@@ -194,7 +194,15 @@ extension ZoomView {
     }
     
     public func setZoom(scale: CGFloat, animated: Bool) {
-        self.zoom(to: self.scrollView.center, scale: scale, animated: animated)
+        let center = {
+            let center = self.scrollView.center
+            let contentOffset = self.scrollView.contentOffset
+            return CGPoint(
+                x: center.x + max((contentOffset.x - self.bounds.width) / 2, 0),
+                y: center.y + max((contentOffset.y - self.bounds.height) / 2, 0)
+            )
+        }()
+        self.zoom(to: center, scale: scale, animated: animated)
     }
     
     public func zoom(to point: CGPoint, scale: CGFloat, animated: Bool) {
