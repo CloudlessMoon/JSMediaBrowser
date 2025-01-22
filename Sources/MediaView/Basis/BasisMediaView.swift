@@ -13,7 +13,7 @@ open class BasisMediaView: UIView {
     public var isEnableVerticalSafeArea = JSCoreHelper.isMac ? true : false
     
     /// 以下属性viewportRect为zero时才会生效, 若自定义viewportRect, 请自行实现
-    private var viewportRectMaxWidth: CGFloat = 580
+    private var viewportRectMaxWidth = 580.0
     
     public init() {
         super.init(frame: .zero)
@@ -37,16 +37,22 @@ open class BasisMediaView: UIView {
         return CGRect.zero
     }
     
-    public var finalViewportRect: CGRect {
+}
+
+extension BasisMediaView {
+    
+    public var viewportRect: CGRect {
         guard !self.bounds.isEmpty else {
             return CGRect.zero
         }
-        var safeAreaInsets = self.safeAreaInsets
-        if !self.isEnableVerticalSafeArea {
-            /// 关闭垂直的安全区域
-            safeAreaInsets.top = 0
-            safeAreaInsets.bottom = 0
-        }
+        let safeAreaInsets = {
+            let insets = self.safeAreaInsets
+            if self.isEnableVerticalSafeArea {
+                return insets
+            } else {
+                return UIEdgeInsets(top: 0, left: insets.left, bottom: 0, right: insets.right)
+            }
+        }()
         let size = CGSize(width: min(self.bounds.width, self.viewportRectMaxWidth), height: self.bounds.height)
         let offsetX = (self.bounds.width - size.width) / 2
         let top = safeAreaInsets.top

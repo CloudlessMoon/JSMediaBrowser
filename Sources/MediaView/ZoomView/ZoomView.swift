@@ -228,7 +228,7 @@ extension ZoomView {
     }
     
     public func contentSizeThatFits(_ size: CGSize) -> CGSize {
-        let viewport = self.finalViewportRect
+        let viewport = self.viewportRect
         let scale = {
             let height = size.width > viewport.width ? viewport.width * (size.height / size.width) : size.height
             if height > viewport.height {
@@ -252,7 +252,7 @@ extension ZoomView {
     }
     
     public func contentInsetThatFits(_ size: CGSize) -> UIEdgeInsets {
-        let viewport = self.finalViewportRect
+        let viewport = self.viewportRect
         var contentInset = UIEdgeInsets.zero
         contentInset.top = viewport.minY
         contentInset.left = viewport.minX
@@ -349,7 +349,7 @@ extension ZoomView {
     private func revertContentOffset(animated: Bool) {
         var x = self.scrollView.contentOffset.x
         var y = self.scrollView.contentOffset.y
-        let viewport = self.finalViewportRect
+        let viewport = self.viewportRect
         if let contentView = self.contentView, !viewport.isEmpty {
             if viewport.width < contentView.frame.width {
                 x = (contentView.frame.width - viewport.width) / 2 - viewport.minX
