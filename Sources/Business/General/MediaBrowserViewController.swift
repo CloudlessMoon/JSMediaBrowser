@@ -272,16 +272,18 @@ extension MediaBrowserViewController: MediaBrowserViewDataSource {
         if cell.zoomView == nil {
             cell.zoomView = self.configuration.zoomView(index)
         }
-        
-        cell.zoomView?.viewportInsets = { [weak self] in
-            guard let self = self else { return .zero }
+        guard let zoomView = cell.zoomView else {
+            assertionFailure()
+            return
+        }
+        zoomView.viewportInsets = {
             let insets = self.view.safeAreaInsets
             if JSCoreHelper.isMac {
                 return insets
             } else {
                 return UIEdgeInsets(top: 0, left: insets.left, bottom: 0, right: insets.right)
             }
-        }
+        }()
         
         let updateAsset = { [weak self] (cell: PhotoCell, asset: (any ZoomAsset)?, thumbnail: UIImage?) in
             guard let self = self else { return }
