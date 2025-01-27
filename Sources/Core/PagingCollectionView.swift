@@ -21,14 +21,12 @@ public class PagingCollectionView: UICollectionView {
     
     public func didInitialize() {
         self.backgroundColor = nil
+        self.isPagingEnabled = true
         self.showsHorizontalScrollIndicator = false
         self.showsVerticalScrollIndicator = false
         self.alwaysBounceVertical = false
         self.alwaysBounceHorizontal = true
         self.scrollsToTop = false
-        self.delaysContentTouches = false
-        self.decelerationRate = .fast
-        self.isPagingEnabled = true
         self.contentInsetAdjustmentBehavior = .never
     }
     
