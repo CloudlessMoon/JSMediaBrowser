@@ -76,8 +76,8 @@ open class ZoomView: BasisMediaView {
         let scrollView = UIScrollView()
         scrollView.showsHorizontalScrollIndicator = false
         scrollView.showsVerticalScrollIndicator = false
-        scrollView.alwaysBounceVertical = false
-        scrollView.alwaysBounceHorizontal = false
+        scrollView.alwaysBounceVertical = true
+        scrollView.alwaysBounceHorizontal = true
         scrollView.scrollsToTop = false
         scrollView.contentInsetAdjustmentBehavior = .never
         scrollView.minimumZoomScale = self.minimumZoomScale

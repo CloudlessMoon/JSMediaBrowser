@@ -447,6 +447,9 @@ extension MediaBrowserViewController: MediaBrowserViewGestureDelegate {
     
     public func mediaBrowserView(_ mediaBrowserView: MediaBrowserView, shouldBegin gestureRecognizer: UIGestureRecognizer) -> Bool? {
         if gestureRecognizer == mediaBrowserView.dismissingGesture, let gestureRecognizer = gestureRecognizer as? UIPanGestureRecognizer {
+            guard self.isPresented else {
+                return false
+            }
             guard let photoCell = self.currentPageCell as? PhotoCell, let zoomView = photoCell.zoomView else {
                 return true
             }
@@ -502,7 +505,6 @@ extension MediaBrowserViewController: MediaBrowserViewGestureDelegate {
         guard self.isPresented else {
             return
         }
-        
         self.hide(animated: true)
     }
     
@@ -524,29 +526,36 @@ extension MediaBrowserViewController: MediaBrowserViewGestureDelegate {
     }
     
     public func mediaBrowserView(_ mediaBrowserView: MediaBrowserView, dismissingChanged gestureRecognizer: UIPanGestureRecognizer) {
+        guard self.isPresented else {
+            return
+        }
         let gestureRecognizerView: UIView = gestureRecognizer.view ?? mediaBrowserView
         switch gestureRecognizer.state {
         case .possible:
             break
         case .began:
             self.gestureBeganLocation = gestureRecognizer.location(in: gestureRecognizerView)
-            if self.isPresented {
-                self.transitionInteractiver.begin()
-                self.hide(animated: true)
-            }
+            self.transitionInteractiver.begin()
+            self.hide(animated: true)
         case .changed:
             let location = gestureRecognizer.location(in: gestureRecognizerView)
-            let horizontalDistance = location.x - self.gestureBeganLocation.x
-            var verticalDistance = location.y - self.gestureBeganLocation.y
             let height = NSNumber(value: Double(gestureRecognizerView.bounds.height / 2))
-            var ratio = 1.0
-            var alpha = 1.0
-            if self.isPresented {
-                ratio = JSCoreHelper.interpolateValue(abs(verticalDistance), inputRange: [0, height], outputRange: [1.0, 0.4], extrapolateLeft: .clamp, extrapolateRight: .clamp)
-                alpha = JSCoreHelper.interpolateValue(abs(verticalDistance), inputRange: [0, height], outputRange: [1.0, 0.2], extrapolateLeft: .clamp, extrapolateRight: .clamp)
-            } else {
-                verticalDistance = -JSCoreHelper.bounce(fromValue: 0, toValue: verticalDistance > 0 ? -height.doubleValue : height.doubleValue, time: abs(verticalDistance) / height.doubleValue, coeff: 1.2)
-            }
+            let horizontalDistance = location.x - self.gestureBeganLocation.x
+            let verticalDistance = location.y - self.gestureBeganLocation.y
+            let ratio = JSCoreHelper.interpolateValue(
+                abs(verticalDistance),
+                inputRange: [0, height],
+                outputRange: [1.0, 0.4],
+                extrapolateLeft: .clamp,
+                extrapolateRight: .clamp
+            )
+            let alpha = JSCoreHelper.interpolateValue(
+                abs(verticalDistance),
+                inputRange: [0, height],
+                outputRange: [1.0, 0.2],
+                extrapolateLeft: .clamp,
+                extrapolateRight: .clamp
+            )
             let transform = CGAffineTransform(translationX: horizontalDistance, y: verticalDistance).scaledBy(x: ratio, y: ratio)
             self.currentPageCell?.transform = transform
             self.transitionAnimatorViews?.forEach { (subview) in
@@ -555,7 +564,7 @@ extension MediaBrowserViewController: MediaBrowserViewGestureDelegate {
         case .ended, .cancelled, .failed:
             let location = gestureRecognizer.location(in: gestureRecognizer.view)
             let verticalDistance = location.y - self.gestureBeganLocation.y
-            if abs(verticalDistance) > self.dismissWhenSlidingDistance && self.isPresented {
+            if abs(verticalDistance) > self.dismissWhenSlidingDistance {
                 self.beginDismissingAnimation()
             } else {
                 self.resetDismissingAnimation()
