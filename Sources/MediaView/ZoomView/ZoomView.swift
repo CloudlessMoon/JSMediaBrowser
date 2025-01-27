@@ -76,8 +76,8 @@ open class ZoomView: BasisMediaView {
         let scrollView = UIScrollView()
         scrollView.showsHorizontalScrollIndicator = false
         scrollView.showsVerticalScrollIndicator = false
-        scrollView.alwaysBounceVertical = false
-        scrollView.alwaysBounceHorizontal = false
+        scrollView.alwaysBounceVertical = true
+        scrollView.alwaysBounceHorizontal = true
         scrollView.scrollsToTop = false
         scrollView.contentInsetAdjustmentBehavior = .never
         scrollView.minimumZoomScale = self.minimumZoomScale
@@ -238,8 +238,8 @@ extension ZoomView {
         return CGRect(
             x: self.bounds.minX,
             y: self.bounds.minY,
-            width: contentSize.width * self.zoomScale,
-            height: contentSize.height * self.zoomScale
+            width: JSFloorPixelValue(contentSize.width * self.zoomScale),
+            height: JSFloorPixelValue(contentSize.height * self.zoomScale)
         )
     }
     
@@ -265,8 +265,8 @@ extension ZoomView {
             }
         }()
         return CGSize(
-            width: size.width * scale,
-            height: size.height * scale
+            width: JSFloorPixelValue(size.width * scale),
+            height: JSFloorPixelValue(size.height * scale)
         )
     }
     
@@ -288,7 +288,11 @@ extension ZoomView {
             contentInset.left = viewport.midX - size.width / 2.0
             contentInset.right = self.bounds.width - viewport.midX - size.width / 2.0
         }
-        return contentInset
+        return UIEdgeInsets(
+            top: JSFloorPixelValue(contentInset.top),
+            left: JSFloorPixelValue(contentInset.left),
+            bottom: JSFloorPixelValue(contentInset.bottom),
+            right: JSFloorPixelValue(contentInset.right))
     }
     
 }
