@@ -103,7 +103,7 @@ extension TransitionAnimator {
             } else {
                 sourceRect = .zero
             }
-            if !sourceRect.isEmpty && !sourceRect.intersects(currentView.frame) {
+            if !sourceRect.isEmpty && !sourceRect.intersects(currentView.bounds) {
                 sourceRect = .zero
             }
             sourceCornerRadius = transitionSourceView?.layer.cornerRadius ?? 0
