@@ -56,7 +56,7 @@ public class MediaBrowserView: UIView {
     
     public private(set) lazy var longPressGesture: UILongPressGestureRecognizer = {
         let gesture = UILongPressGestureRecognizer(target: self, action: #selector(self.handleLongPressGesture))
-        gesture.minimumPressDuration = 1
+        gesture.minimumPressDuration = 0.5
         gesture.delegate = self
         return gesture
     }()
