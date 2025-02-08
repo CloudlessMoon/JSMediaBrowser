@@ -402,7 +402,7 @@ extension MediaBrowserViewController: MediaBrowserViewDataSource {
         guard !self.isDragging && !self.isDecelerating && !self.isScrollAnimating else {
             return
         }
-        guard !cell.isHidden, let zoomView = cell.zoomView else {
+        guard !cell.isHidden && cell.window != nil, let zoomView = cell.zoomView else {
             return
         }
         if let eventHandler = self.eventHandler {
