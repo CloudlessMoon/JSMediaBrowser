@@ -67,10 +67,10 @@ open class MediaBrowserViewController: UIViewController {
             guard oldValue != self.isTransitionFinished else {
                 return
             }
-            guard let photoCell = self.currentPageCell as? PhotoCell, let zoomView = photoCell.zoomView else {
+            guard let photoCell = self.currentPageCell as? PhotoCell else {
                 return
             }
-            self.startPlaying(for: zoomView, at: self.currentPage)
+            self.startPlaying(for: photoCell, at: self.currentPage)
         }
     }
     
@@ -276,7 +276,7 @@ extension MediaBrowserViewController: MediaBrowserViewDataSource {
         if cell.zoomView == nil {
             cell.zoomView = self.configuration.zoomView(index)
         }
-        
+
         let updateAsset = { [weak self] (cell: PhotoCell, asset: (any ZoomAsset)?, thumbnail: UIImage?) in
             guard let self = self else { return }
             guard let zoomView = cell.zoomView else {
@@ -285,7 +285,7 @@ extension MediaBrowserViewController: MediaBrowserViewDataSource {
             zoomView.asset = asset
             zoomView.thumbnail = thumbnail
             /// 解决资源下载完成后不播放的问题
-            self.startPlaying(for: zoomView, at: index)
+            self.startPlaying(for: cell, at: index)
         }
         let updateError = { (cell: PhotoCell, error: NSError?, isCancelled: Bool) in
             if isCancelled && (cell.zoomView?.asset != nil || cell.zoomView?.thumbnail != nil) {
@@ -395,11 +395,14 @@ extension MediaBrowserViewController: MediaBrowserViewDataSource {
         }()
     }
     
-    private func startPlaying(for zoomView: ZoomView, at index: Int) {
+    private func startPlaying(for cell: PhotoCell, at index: Int) {
         guard self.isTransitionFinished else {
             return
         }
         guard !self.isDragging && !self.isDecelerating && !self.isScrollAnimating else {
+            return
+        }
+        guard !cell.isHidden, let zoomView = cell.zoomView else {
             return
         }
         if let eventHandler = self.eventHandler {
@@ -417,15 +420,15 @@ extension MediaBrowserViewController: MediaBrowserViewDelegate {
     
     public func mediaBrowserView(_ mediaBrowserView: MediaBrowserView, willDisplay cell: UICollectionViewCell, forPageAt index: Int) {
         if let photoCell = cell as? PhotoCell, let zoomView = photoCell.zoomView {
-            self.startPlaying(for: zoomView, at: index)
+            self.startPlaying(for: photoCell, at: index)
             
             self.eventHandler?.willDisplayZoomView(zoomView, at: index)
         }
     }
     
     public func mediaBrowserView(_ mediaBrowserView: MediaBrowserView, didEndDisplaying cell: UICollectionViewCell, forPageAt index: Int) {
-        if let photoCell = cell as? PhotoCell {
-            photoCell.zoomView?.stopPlaying()
+        if let photoCell = cell as? PhotoCell, let zoomView = photoCell.zoomView {
+            zoomView.stopPlaying()
         }
     }
     
@@ -434,8 +437,8 @@ extension MediaBrowserViewController: MediaBrowserViewDelegate {
     }
     
     public func mediaBrowserView(_ mediaBrowserView: MediaBrowserView, didScrollTo index: Int) {
-        if let photoCell = self.currentPageCell as? PhotoCell, let zoomView = photoCell.zoomView {
-            self.startPlaying(for: zoomView, at: index)
+        if let photoCell = self.currentPageCell as? PhotoCell {
+            self.startPlaying(for: photoCell, at: index)
         }
         
         self.eventHandler?.didScroll(to: index)
