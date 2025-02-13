@@ -7,9 +7,15 @@
 
 import UIKit
 
+public enum ImageAssetSource {
+    
+    case url(URL?)
+    case provider(Any)
+    
+}
+
 public protocol ImageAssetItem: AssetItem {
     
-    var image: UIImage? { get set }
-    var imageURL: URL? { get set }
+    var source: ImageAssetSource { get set }
     
 }

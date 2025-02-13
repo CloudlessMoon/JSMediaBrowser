@@ -5,14 +5,14 @@
 //  Created by jiasong on 2025/1/15.
 //
 
-import Foundation
+import UIKit
 
 public protocol ImageAssetMediator {
     
     func requestImage(
-        url: URL,
+        source: ImageAssetSource,
         progress: @escaping AssetMediatorProgress,
         completed: @escaping AssetMediatorCompleted
-    ) -> AssetMediatorRequestToken
+    ) -> AssetMediatorRequestToken?
     
 }

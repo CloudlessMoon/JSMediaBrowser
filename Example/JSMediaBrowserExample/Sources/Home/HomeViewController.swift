@@ -148,9 +148,9 @@ extension HomeViewController: UICollectionViewDelegateFlowLayout {
             var item: AssetItem
             if $0.element.contains("LivePhoto") {
                 let video = Bundle.main.url(forResource: "LivePhoto", withExtension: "MOV")!
-                item = LivePhotoItem(imageURL: URL(string: $0.element)!, videoURL: video, thumbnail: cell?.imageView.image)
+                item = LivePhotoItem(source: .url(image: URL(string: $0.element), video: video), thumbnail: cell?.imageView.image)
             } else {
-                item = ImageItem(imageURL: URL(string: $0.element), thumbnail: cell?.imageView.image)
+                item = ImageItem(source: .url(URL(string: $0.element)), thumbnail: cell?.imageView.image)
             }
             return item
         }
