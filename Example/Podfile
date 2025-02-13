@@ -2,10 +2,9 @@ platform :ios, "13.0"
 use_frameworks! :linkage => :dynamic
 
 def pod_Common
-  pod "JSMediaBrowser", :path => "../", :subspecs => [
+  pod "JSMediaBrowser", :path => "..", :subspecs => [
     "Business", 
     "BusinessForSDWebImage",
-    "BusinessForSDWebImagePhotos", 
     "BusinessForPHLivePhoto"
   ]
   pod "QMUIKit"
