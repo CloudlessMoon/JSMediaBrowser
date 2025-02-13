@@ -5,6 +5,7 @@ def pod_Common
   pod "JSMediaBrowser", :path => "..", :subspecs => [
     "Business", 
     "BusinessForSDWebImage",
+    "BusinessForSDWebImagePhotos",
     "BusinessForPHLivePhoto"
   ]
   pod "QMUIKit"

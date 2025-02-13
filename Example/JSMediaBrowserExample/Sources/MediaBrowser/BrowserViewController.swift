@@ -53,7 +53,7 @@ class BrowserViewController: MediaBrowserViewController {
                 ))
             },
             imageAssetMediator: { _ in
-                return SDWebImageAssetMediator(
+                return SDWebImagePhotosAssetMediator(
                     options: [.retryFailed],
                     context: [
                         .storeCacheType: SDImageCacheType.disk.rawValue,

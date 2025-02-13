@@ -32,7 +32,8 @@ Pod::Spec.new do |s|
     ss.source_files = "Sources/Business/**/*.{swift,h,m}"
     ss.exclude_files = [
       "Sources/Business/Photo/PHLivePhoto/*.{swift,h,m}", 
-      "Sources/Business/Photo/SDWebImage/*.{swift,h,m}"
+      "Sources/Business/Photo/SDWebImage/*.{swift,h,m}",
+      "Sources/Business/Photo/SDWebImagePhotos/*.{swift,h,m}"
     ]
     ss.dependency "JSMediaBrowser/Core"
     ss.dependency "JSMediaBrowser/MediaZoomView"
@@ -48,5 +49,11 @@ Pod::Spec.new do |s|
     ss.source_files = "Sources/Business/Photo/SDWebImage/*.{swift,h,m}"
     ss.dependency "JSMediaBrowser/Business"
     ss.dependency "SDWebImage", "~> 5.0"
+  end
+
+  s.subspec "BusinessForSDWebImagePhotos" do |ss|
+    ss.source_files = "Sources/Business/Photo/SDWebImagePhotos/*.{swift,h,m}"
+    ss.dependency "JSMediaBrowser/BusinessForSDWebImage"
+    ss.dependency "SDWebImagePhotosPlugin", "~> 1.0"
   end
 end
