@@ -10,21 +10,11 @@ import UIKit
 public struct MediaBrowserViewControllerConfiguration {
     
     public typealias BuildZoomView = (Int) -> ZoomView
-    public typealias BuildImageAssetMediator = (Int) -> ImageAssetMediator?
-    public typealias BuildLivePhotoAssetMediator = (Int) -> LivePhotoAssetMediator?
     
     public var zoomView: BuildZoomView
-    public var imageAssetMediator: BuildImageAssetMediator
-    public var livePhotoAssetMediator: BuildLivePhotoAssetMediator
     
-    public init(
-        zoomView: @escaping BuildZoomView,
-        imageAssetMediator: @escaping BuildImageAssetMediator,
-        livePhotoAssetMediator: @escaping BuildLivePhotoAssetMediator
-    ) {
+    public init(zoomView: @escaping BuildZoomView) {
         self.zoomView = zoomView
-        self.imageAssetMediator = imageAssetMediator
-        self.livePhotoAssetMediator = livePhotoAssetMediator
     }
     
 }
@@ -48,7 +38,7 @@ public struct MediaBrowserViewControllerSourceProvider {
 
 public protocol MediaBrowserViewControllerEventHandler {
     
-    func didChangedData(current: [AssetItem], previous: [AssetItem])
+    func didChangedData(current: [any AssetItem], previous: [any AssetItem])
     
     func willDisplayZoomView(_ zoomView: ZoomView, at index: Int)
     func willDisplayEmptyView(_ emptyView: EmptyView, with error: NSError, at index: Int)
@@ -65,7 +55,7 @@ public protocol MediaBrowserViewControllerEventHandler {
 
 public extension MediaBrowserViewControllerEventHandler {
     
-    func didChangedData(current: [AssetItem], previous: [AssetItem]) {}
+    func didChangedData(current: [any AssetItem], previous: [any AssetItem]) {}
     
     func willDisplayZoomView(_ zoomView: ZoomView, at index: Int) {}
     func willDisplayEmptyView(_ emptyView: EmptyView, with error: NSError, at index: Int) {}
@@ -82,7 +72,7 @@ public extension MediaBrowserViewControllerEventHandler {
 
 public struct DefaultMediaBrowserViewControllerEventHandler: MediaBrowserViewControllerEventHandler {
     
-    public typealias ChangedDataSource = ([AssetItem], [AssetItem]) -> Void
+    public typealias ChangedDataSource = ([any AssetItem], [any AssetItem]) -> Void
     public typealias ShouldPlaying = (Int) -> Bool
     public typealias DisplayZoomView = (ZoomView, Int) -> Void
     public typealias DisplayEmptyView = (EmptyView, NSError, Int) -> Void
@@ -119,7 +109,7 @@ public struct DefaultMediaBrowserViewControllerEventHandler: MediaBrowserViewCon
         self._didLongPressTouch = didLongPressTouch
     }
     
-    public func didChangedData(current: [AssetItem], previous: [AssetItem]) {
+    public func didChangedData(current: [any AssetItem], previous: [any AssetItem]) {
         self._didChangedData?(current, previous)
     }
     

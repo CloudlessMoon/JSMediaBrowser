@@ -6,20 +6,36 @@
 //
 
 import UIKit
+import SDWebImage
 import JSMediaBrowser
 
 struct ImageItem: ImageAssetItem {
-
-    var source: ImageAssetSource
+    
+    var source: SDWebImagePhotosAssetMediator.Source
     
     var thumbnail: UIImage?
+    
+    var mediator: SDWebImagePhotosAssetMediator {
+        return .init(
+            options: [.retryFailed],
+            context: [
+                .storeCacheType: SDImageCacheType.disk.rawValue,
+                .queryCacheType: SDImageCacheType.disk.rawValue,
+                .animatedImageClass: SDAnimatedImage.self
+            ]
+        )
+    }
     
 }
 
 struct LivePhotoItem: LivePhotoAssetItem {
     
-    var source: LivePhotoAssetSource
+    var source: PHLivePhotoMediator.Source
     
     var thumbnail: UIImage?
-
+    
+    var mediator: PHLivePhotoMediator {
+        return .init()
+    }
+    
 }

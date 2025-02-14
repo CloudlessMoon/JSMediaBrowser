@@ -8,14 +8,29 @@
 import UIKit
 import PhotosUI
 
-public struct PHLivePhotoMediator: LivePhotoAssetMediator {
+public struct PHLivePhotoMediator: AssetMediator {
     
-    public init() {
-        
+    public enum Source {
+        case url(image: URL?, video: URL?)
+        case asset(PHAsset?)
     }
     
-    public func requestLivePhoto(
-        source: LivePhotoAssetSource,
+    public var targetSize: CGSize
+    public var contentMode: PHImageContentMode
+    public var options: PHLivePhotoRequestOptions?
+    
+    public init(
+        targetSize: CGSize = .zero,
+        contentMode: PHImageContentMode = .default,
+        options: PHLivePhotoRequestOptions? = nil
+    ) {
+        self.targetSize = targetSize
+        self.contentMode = contentMode
+        self.options = options
+    }
+    
+    public func request(
+        source: Source,
         progress: @escaping AssetMediatorProgress,
         completed: @escaping AssetMediatorCompleted
     ) -> AssetMediatorRequestToken? {
@@ -43,23 +58,24 @@ public struct PHLivePhotoMediator: LivePhotoAssetMediator {
             let id = PHLivePhoto.request(
                 withResourceFileURLs: [image, video],
                 placeholderImage: nil,
-                targetSize: .zero,
-                contentMode: .default,
+                targetSize: self.targetSize,
+                contentMode: self.contentMode,
                 resultHandler: handler
             )
-            return PHLivePhotoRequestToken(id: id)
-        case .provider(let provider):
-            guard let asset = provider as? PHAsset else {
-                assertionFailure("not supported")
+            return PHLivePhotoRequestToken(id: id, imageManager: nil)
+        case .asset(let asset):
+            guard let asset = asset else {
                 return nil
             }
-            let id = PHImageManager.default().requestLivePhoto(
+            let imageManager = PHImageManager.default()
+            let id = imageManager.requestLivePhoto(
                 for: asset,
-                targetSize: .zero,
-                contentMode: .default,
-                options: nil,
-                resultHandler: handler)
-            return PHLivePhotoRequestToken(id: id)
+                targetSize: self.targetSize,
+                contentMode: self.contentMode,
+                options: self.options,
+                resultHandler: handler
+            )
+            return PHLivePhotoRequestToken(id: id, imageManager: imageManager)
         }
     }
     
@@ -71,8 +87,11 @@ public final class PHLivePhotoRequestToken: AssetMediatorRequestToken {
     
     private let id: Int32
     
-    fileprivate init(id: Int32) {
+    private weak var imageManager: PHImageManager?
+    
+    fileprivate init(id: Int32, imageManager: PHImageManager?) {
         self.id = id
+        self.imageManager = imageManager
     }
     
     public func cancel() {
@@ -80,7 +99,12 @@ public final class PHLivePhotoRequestToken: AssetMediatorRequestToken {
             return
         }
         self.isCancelled = true
-        PHLivePhoto.cancelRequest(withRequestID: self.id)
+        
+        if let imageManager = self.imageManager {
+            imageManager.cancelImageRequest(self.id)
+        } else {
+            PHLivePhoto.cancelRequest(withRequestID: self.id)
+        }
     }
     
 }

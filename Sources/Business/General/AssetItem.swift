@@ -9,6 +9,12 @@ import UIKit
 
 public protocol AssetItem {
     
-    var thumbnail: UIImage? { get set }
+    associatedtype Mediator: AssetMediator
+    
+    var source: Mediator.Source { get }
+    
+    var thumbnail: UIImage? { get }
+    
+    var mediator: Mediator { get }
     
 }

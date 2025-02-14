@@ -28,7 +28,7 @@ open class MediaBrowserViewController: UIViewController {
         }
     }
     
-    public var dataSource: [AssetItem] = [] {
+    public var dataSource: [any AssetItem] = [] {
         didSet {
             guard self.isViewLoaded else {
                 return
@@ -73,6 +73,8 @@ open class MediaBrowserViewController: UIViewController {
             self.startPlaying(for: photoCell, at: self.currentPage)
         }
     }
+    
+    private var atomicInt = UIView.AtomicInt()
     
     public init(configuration: MediaBrowserViewControllerConfiguration) {
         self.configuration = configuration
@@ -237,19 +239,19 @@ extension MediaBrowserViewController: MediaBrowserViewDataSource {
     public func mediaBrowserView(_ mediaBrowserView: MediaBrowserView, cellForPageAt index: Int) -> UICollectionViewCell {
         var cell: BasisCell?
         let dataItem = self.dataSource[index]
-        if dataItem is ImageAssetItem {
+        if dataItem is any ImageAssetItem {
             cell = mediaBrowserView.dequeueReusableCell(PhotoCell.self, reuseIdentifier: "Image", at: index)
-        } else if dataItem is LivePhotoAssetItem {
+        } else if dataItem is any LivePhotoAssetItem {
             cell = mediaBrowserView.dequeueReusableCell(PhotoCell.self, reuseIdentifier: "LivePhoto", at: index)
         }
         guard let cell = cell else {
             return mediaBrowserView.dequeueReusableCell(UICollectionViewCell.self, at: index)
         }
-        self.configureCell(cell, at: index)
+        self.configCell(cell, at: index)
         return cell
     }
     
-    private func configureCell(_ cell: BasisCell, at index: Int) {
+    private func configCell(_ cell: BasisCell, at index: Int) {
         cell.onPressEmpty = { [weak self] (cell: UICollectionViewCell) in
             guard let self = self else { return }
             self.reloadData()
@@ -262,16 +264,14 @@ extension MediaBrowserViewController: MediaBrowserViewDataSource {
         }
         
         if let photoCell = cell as? PhotoCell {
-            self.configurePhotoCell(photoCell, at: index)
+            self.configPhotoCell(photoCell, at: index)
         }
     }
     
-    private func configurePhotoCell(_ cell: PhotoCell, at index: Int) {
+    private func configPhotoCell(_ cell: PhotoCell, at index: Int) {
         guard index < self.dataSource.count else {
             return
         }
-        let dataItem = self.dataSource[index]
-        
         /// 初始化zoomView
         if cell.zoomView == nil {
             cell.zoomView = self.configuration.zoomView(index)
@@ -299,6 +299,8 @@ extension MediaBrowserViewController: MediaBrowserViewDataSource {
             progress.completedUnitCount = Int64(receivedSize)
             cell.setProgress(progress)
         }
+        let dataItem = self.dataSource[index]
+        
         /// 重置下数据
         updateAsset(cell, nil, dataItem.thumbnail)
         updateProgress(cell, 0, 0)
@@ -308,59 +310,31 @@ extension MediaBrowserViewController: MediaBrowserViewDataSource {
         if let token = cell.mb_requestToken, !token.isCancelled {
             token.cancel()
         }
-        if let dataItem = dataItem as? ImageAssetItem, let mediator = self.configuration.imageAssetMediator(index) {
-            let identifier = UIView.AtomicInt()
-            cell.mb_requestIdentifier = identifier
-            cell.mb_requestToken = mediator.requestImage(
-                source: dataItem.source,
-                progress: { [weak cell] in
-                    guard let cell = cell, identifier == cell.mb_requestIdentifier else {
-                        return
-                    }
-                    updateProgress(cell, $0, $1)
-                },
-                completed: { [weak cell] in
-                    guard let cell = cell, identifier == cell.mb_requestIdentifier else {
-                        return
-                    }
-                    switch $0 {
-                    case .success(let value):
-                        updateAsset(cell, value.asset, nil)
-                    case .failure(let error):
-                        if !error.isCancelled {
-                            updateAsset(cell, nil, nil)
-                        }
-                        updateError(cell, error.error, error.isCancelled)
-                    }
+        let identifier = self.atomicInt.increment()
+        cell.mb_requestIdentifier = identifier
+        cell.mb_requestToken = dataItem.request(
+            source: dataItem.source,
+            progress: { [weak cell] in
+                guard let cell = cell, identifier == cell.mb_requestIdentifier else {
+                    return
                 }
-            )
-        } else if let dataItem = dataItem as? LivePhotoAssetItem, let mediator = self.configuration.livePhotoAssetMediator(index) {
-            let identifier = UIView.AtomicInt()
-            cell.mb_requestIdentifier = identifier
-            cell.mb_requestToken = mediator.requestLivePhoto(
-                source: dataItem.source,
-                progress: { [weak cell] in
-                    guard let cell = cell, identifier == cell.mb_requestIdentifier else {
-                        return
-                    }
-                    updateProgress(cell, $0, $1)
-                },
-                completed: { [weak cell] in
-                    guard let cell = cell, identifier == cell.mb_requestIdentifier else {
-                        return
-                    }
-                    switch $0 {
-                    case .success(let value):
-                        updateAsset(cell, value.asset, nil)
-                    case .failure(let error):
-                        if !error.isCancelled {
-                            updateAsset(cell, nil, nil)
-                        }
-                        updateError(cell, error.error, error.isCancelled)
-                    }
+                updateProgress(cell, $0, $1)
+            },
+            completed: { [weak cell] in
+                guard let cell = cell, identifier == cell.mb_requestIdentifier else {
+                    return
                 }
-            )
-        }
+                switch $0 {
+                case .success(let value):
+                    updateAsset(cell, value.asset, nil)
+                case .failure(let error):
+                    if !error.isCancelled {
+                        updateAsset(cell, nil, nil)
+                    }
+                    updateError(cell, error.error, error.isCancelled)
+                }
+            }
+        )
         
         self.configViewportInsets(for: cell)
     }
@@ -615,14 +589,10 @@ extension MediaBrowserViewController: UIViewControllerTransitioningDelegate, Tra
     }
     
     public var transitionThumbnail: UIImage? {
-        let dataItem = self.dataSource[self.currentPage]
-        
         if let photoCell = self.currentPageCell as? PhotoCell, let zoomView = photoCell.zoomView {
             if let image = zoomView.thumbnail {
                 return image
-            } else if let dataItem = dataItem as? ImageAssetItem, let thumbnail = dataItem.thumbnail {
-                return thumbnail
-            } else if let dataItem = dataItem as? LivePhotoAssetItem, let thumbnail = dataItem.thumbnail {
+            } else if let thumbnail = self.dataSource[self.currentPage].thumbnail {
                 return thumbnail
             } else if let image = zoomView.asset as? UIImage {
                 return image

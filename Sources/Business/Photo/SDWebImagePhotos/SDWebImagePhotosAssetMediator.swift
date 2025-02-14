@@ -9,7 +9,12 @@ import SDWebImage
 import SDWebImagePhotosPlugin
 import Photos
 
-public struct SDWebImagePhotosAssetMediator: ImageAssetMediator {
+public struct SDWebImagePhotosAssetMediator: AssetMediator {
+    
+    public enum Source {
+        case url(URL?)
+        case asset(PHAsset?)
+    }
     
     public var manager: SDWebImageManager
     public var options: SDWebImageOptions
@@ -25,26 +30,27 @@ public struct SDWebImagePhotosAssetMediator: ImageAssetMediator {
         self.context = context
     }
     
-    public func requestImage(
-        source: ImageAssetSource,
+    public func request(
+        source: Source,
         progress: @escaping AssetMediatorProgress,
         completed: @escaping AssetMediatorCompleted
     ) -> AssetMediatorRequestToken? {
         switch source {
-        case .url:
+        case .url(let url):
+            guard let url = url else {
+                return nil
+            }
             let mediator = SDWebImageAssetMediator(
                 manager: self.manager,
                 options: self.options,
                 context: self.context
             )
-            return mediator.requestImage(source: source, progress: progress, completed: completed)
-        case .provider(let provider):
-            guard let asset = provider as? PHAsset else {
-                assertionFailure("not supported")
+            return mediator.request(source: url, progress: progress, completed: completed)
+        case .asset(let asset):
+            guard let asset = asset else {
                 return nil
             }
             let photosURL = NSURL.sd_URL(with: asset) as URL
-            let source = ImageAssetSource.url(photosURL)
             let context = {
                 let context = [.imageLoader: SDImagePhotosLoader.shared] as [SDWebImageContextOption: Any]
                 return context.merging(self.context ?? [:], uniquingKeysWith: { $1 })
@@ -54,7 +60,7 @@ public struct SDWebImagePhotosAssetMediator: ImageAssetMediator {
                 options: self.options,
                 context: context
             )
-            return mediator.requestImage(source: source, progress: progress, completed: completed)
+            return mediator.request(source: photosURL, progress: progress, completed: completed)
         }
     }
     

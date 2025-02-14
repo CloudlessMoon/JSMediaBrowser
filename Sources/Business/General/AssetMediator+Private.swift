@@ -11,15 +11,17 @@ internal extension UIView {
     
     struct AtomicInt: Equatable {
         
-        private static var current: UInt = 1
-        
-        private let value: UInt
+        private var value: UInt
         
         init() {
-            let value = AtomicInt.current
-            AtomicInt.current = value + 1
-            self.value = value
+            self.value = 0
         }
+        
+        mutating func increment() -> Self {
+            self.value += 1
+            return self
+        }
+        
     }
     
     var mb_requestToken: AssetMediatorRequestToken? {

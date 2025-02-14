@@ -7,15 +7,6 @@
 
 import UIKit
 
-public enum LivePhotoAssetSource {
-    
-    case url(image: URL?, video: URL?)
-    case provider(Any)
-    
-}
-
 public protocol LivePhotoAssetItem: AssetItem {
-    
-    var source: LivePhotoAssetSource { get set }
     
 }

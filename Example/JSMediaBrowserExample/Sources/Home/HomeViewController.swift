@@ -83,6 +83,10 @@ class HomeViewController: UIViewController {
         self.navigationController?.navigationBar.barStyle = .black
         self.navigationController?.navigationBar.tintColor = .white
         self.navigationController?.navigationBar.titleTextAttributes = [NSAttributedString.Key.foregroundColor: UIColor.white]
+        
+        self.navigationItem.rightBarButtonItems = [
+            UIBarButtonItem(title: "清理缓存", style: .plain, target: self, action: #selector(self.onClear))
+        ]
     }
     
     override func viewDidDisappear(_ animated: Bool) {
@@ -114,7 +118,7 @@ extension HomeViewController: UICollectionViewDataSource {
             fatalError()
         }
         let item = self.dataSource[indexPath.item]
-        cell.imageView.sd_setImage(with: URL(string: item), placeholderImage: nil, options: [.decodeFirstFrameOnly])
+        cell.imageView.sd_setImage(with: URL(string: item), placeholderImage: nil, options: [.decodeFirstFrameOnly, .retryFailed])
         return cell
     }
     
@@ -145,7 +149,7 @@ extension HomeViewController: UICollectionViewDelegateFlowLayout {
         let browserVC = BrowserViewController()
         browserVC.dataSource = self.dataSource.enumerated().map {
             let cell = collectionView.cellForItem(at: IndexPath(item: $0.offset, section: 0)) as? HomePictureCell
-            var item: AssetItem
+            var item: any AssetItem
             if $0.element.contains("LivePhoto") {
                 let video = Bundle.main.url(forResource: "LivePhoto", withExtension: "MOV")!
                 item = LivePhotoItem(source: .url(image: URL(string: $0.element), video: video), thumbnail: cell?.imageView.image)
@@ -174,6 +178,13 @@ extension HomeViewController {
             return nil
         }
         return cell
+    }
+    
+    @objc private func onClear() {
+        SDImageCache.shared.clearMemory()
+        SDImageCache.shared.clearDisk(onCompletion: nil)
+        
+        self.collectionView.reloadData()
     }
     
 }
