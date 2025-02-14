@@ -16,11 +16,11 @@ public struct SDWebImageAssetMediator: ImageAssetMediator {
     
     public init(
         manager: SDWebImageManager = .shared,
-        options: SDWebImageOptions? = nil,
+        options: SDWebImageOptions = [.retryFailed],
         context: [SDWebImageContextOption: Any]? = nil
     ) {
         self.manager = manager
-        self.options = options ?? [.retryFailed]
+        self.options = options
         self.context = context
     }
     

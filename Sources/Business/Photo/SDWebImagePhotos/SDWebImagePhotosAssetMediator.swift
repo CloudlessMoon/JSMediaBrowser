@@ -7,17 +7,21 @@
 
 import SDWebImage
 import SDWebImagePhotosPlugin
+import Photos
 
 public struct SDWebImagePhotosAssetMediator: ImageAssetMediator {
     
+    public var manager: SDWebImageManager
     public var options: SDWebImageOptions
     public var context: [SDWebImageContextOption: Any]?
     
     public init(
-        options: SDWebImageOptions? = nil,
+        manager: SDWebImageManager = .shared,
+        options: SDWebImageOptions = [.retryFailed],
         context: [SDWebImageContextOption: Any]? = nil
     ) {
-        self.options = options ?? [.retryFailed]
+        self.manager = manager
+        self.options = options
         self.context = context
     }
     
@@ -29,6 +33,7 @@ public struct SDWebImagePhotosAssetMediator: ImageAssetMediator {
         switch source {
         case .url:
             let mediator = SDWebImageAssetMediator(
+                manager: self.manager,
                 options: self.options,
                 context: self.context
             )
@@ -40,19 +45,17 @@ public struct SDWebImagePhotosAssetMediator: ImageAssetMediator {
             }
             let photosURL = NSURL.sd_URL(with: asset) as URL
             let source = ImageAssetSource.url(photosURL)
+            let context = {
+                let context = [.imageLoader: SDImagePhotosLoader.shared] as [SDWebImageContextOption: Any]
+                return context.merging(self.context ?? [:], uniquingKeysWith: { $1 })
+            }()
             let mediator = SDWebImageAssetMediator(
-                manager: .photos,
+                manager: self.manager,
                 options: self.options,
-                context: self.context
+                context: context
             )
             return mediator.requestImage(source: source, progress: progress, completed: completed)
         }
     }
-    
-}
-
-public extension SDWebImageManager {
-    
-    static let photos = SDWebImageManager(cache: SDImageCache.shared, loader: SDImagePhotosLoader.shared)
     
 }
