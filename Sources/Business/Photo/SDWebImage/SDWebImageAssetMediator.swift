@@ -25,7 +25,7 @@ public struct SDWebImageAssetMediator: AssetMediator {
     }
     
     public func request(
-        source: URL,
+        source: URL?,
         progress: @escaping AssetMediatorProgress,
         completed: @escaping AssetMediatorCompleted
     ) -> AssetMediatorRequestToken? {

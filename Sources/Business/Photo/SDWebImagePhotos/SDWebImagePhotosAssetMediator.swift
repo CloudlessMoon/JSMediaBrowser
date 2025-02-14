@@ -37,9 +37,6 @@ public struct SDWebImagePhotosAssetMediator: AssetMediator {
     ) -> AssetMediatorRequestToken? {
         switch source {
         case .url(let url):
-            guard let url = url else {
-                return nil
-            }
             let mediator = SDWebImageAssetMediator(
                 manager: self.manager,
                 options: self.options,
