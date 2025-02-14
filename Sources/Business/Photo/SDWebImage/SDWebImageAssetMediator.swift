@@ -5,7 +5,6 @@
 //  Created by jiasong on 2020/12/13.
 //
 
-import UIKit
 import SDWebImage
 
 public struct SDWebImageAssetMediator: AssetMediator {
@@ -34,20 +33,16 @@ public struct SDWebImageAssetMediator: AssetMediator {
             options: self.options,
             context: self.context,
             progress: { receivedSize, expectedSize, targetUR in
-                SDCallbackQueue.main.async {
-                    progress(receivedSize, expectedSize)
-                }
+                progress(receivedSize, expectedSize)
             },
             completed: { image, data, error, cacheType, finished, url in
-                SDCallbackQueue.main.async {
-                    let nsError = error as? NSError
-                    if let nsError = nsError {
-                        let error = AssetMediatorError(error: nsError, isCancelled: nsError.code == SDWebImageError.cancelled.rawValue)
-                        completed(.failure(error))
-                    } else {
-                        let result = AssetMediatorResult(asset: image)
-                        completed(.success(result))
-                    }
+                let nsError = error as? NSError
+                if let nsError = nsError {
+                    let error = AssetMediatorError(error: nsError, isCancelled: nsError.code == SDWebImageError.cancelled.rawValue)
+                    completed(.failure(error))
+                } else {
+                    let result = AssetMediatorResult(asset: image)
+                    completed(.success(result))
                 }
             }
         )

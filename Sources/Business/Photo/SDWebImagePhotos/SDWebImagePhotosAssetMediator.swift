@@ -13,7 +13,7 @@ public struct SDWebImagePhotosAssetMediator: AssetMediator {
     
     public enum Source {
         case url(URL?)
-        case asset(PHAsset?)
+        case asset(localIdentifier: String?)
     }
     
     public var manager: SDWebImageManager
@@ -43,11 +43,11 @@ public struct SDWebImagePhotosAssetMediator: AssetMediator {
                 context: self.context
             )
             return mediator.request(source: url, progress: progress, completed: completed)
-        case .asset(let asset):
-            guard let asset = asset else {
+        case .asset(let identifier):
+            guard let identifier = identifier else {
                 return nil
             }
-            let photosURL = NSURL.sd_URL(with: asset) as URL
+            let photosURL = NSURL.sd_URL(withAssetLocalIdentifier: identifier) as URL
             let context = {
                 let context = [.imageLoader: SDImagePhotosLoader.shared] as [SDWebImageContextOption: Any]
                 return context.merging(self.context ?? [:], uniquingKeysWith: { $1 })

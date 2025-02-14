@@ -314,24 +314,28 @@ extension MediaBrowserViewController: MediaBrowserViewDataSource {
         cell.mb_requestIdentifier = identifier
         cell.mb_requestToken = dataItem.request(
             source: dataItem.source,
-            progress: { [weak cell] in
-                guard let cell = cell, identifier == cell.mb_requestIdentifier else {
-                    return
-                }
-                updateProgress(cell, $0, $1)
-            },
-            completed: { [weak cell] in
-                guard let cell = cell, identifier == cell.mb_requestIdentifier else {
-                    return
-                }
-                switch $0 {
-                case .success(let value):
-                    updateAsset(cell, value.asset, nil)
-                case .failure(let error):
-                    if !error.isCancelled {
-                        updateAsset(cell, nil, nil)
+            progress: { [weak cell] receivedSize, expectedSize in
+                JSCurrentOrAsyncExecuteOnMainThread {
+                    guard let cell = cell, identifier == cell.mb_requestIdentifier else {
+                        return
                     }
-                    updateError(cell, error.error, error.isCancelled)
+                    updateProgress(cell, receivedSize, expectedSize)
+                }
+            },
+            completed: { [weak cell] result in
+                JSCurrentOrAsyncExecuteOnMainThread {
+                    guard let cell = cell, identifier == cell.mb_requestIdentifier else {
+                        return
+                    }
+                    switch result {
+                    case .success(let value):
+                        updateAsset(cell, value.asset, nil)
+                    case .failure(let error):
+                        if !error.isCancelled {
+                            updateAsset(cell, nil, nil)
+                        }
+                        updateError(cell, error.error, error.isCancelled)
+                    }
                 }
             }
         )

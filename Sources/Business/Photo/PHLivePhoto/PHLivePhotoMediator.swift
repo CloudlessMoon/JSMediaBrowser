@@ -5,7 +5,6 @@
 //  Created by jiasong on 2024/12/31.
 //
 
-import UIKit
 import PhotosUI
 
 public struct PHLivePhotoMediator: AssetMediator {

@@ -5,7 +5,6 @@
 //  Created by jiasong on 2024/12/30.
 //
 
-import UIKit
 import PhotosUI
 
 extension PHLivePhoto: ZoomAsset {}

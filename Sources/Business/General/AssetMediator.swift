@@ -5,7 +5,7 @@
 //  Created by jiasong on 2024/12/31.
 //
 
-import UIKit
+import Foundation
 
 public typealias AssetMediatorProgress = (_ receivedSize: Int, _ expectedSize: Int) -> Void
 public typealias AssetMediatorCompleted = (Result<AssetMediatorResult, AssetMediatorError>) -> Void
