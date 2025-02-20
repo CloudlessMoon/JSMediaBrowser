@@ -7,7 +7,7 @@
 
 import UIKit
 
-public class EmptyView: UIView {
+open class EmptyView: UIView {
     
     public var image: UIImage? {
         didSet {
@@ -79,18 +79,18 @@ public class EmptyView: UIView {
     }
     
     @available(*, unavailable, message: "use init()")
-    required init?(coder: NSCoder) {
+    required public init?(coder: NSCoder) {
         fatalError()
     }
     
-    public func didInitialize() {
+    open func didInitialize() {
         self.addSubview(self.imageView)
         self.addSubview(self.titleLabel)
         self.addSubview(self.subtitleLabel)
         self.addSubview(self.actionButton)
     }
     
-    public override func layoutSubviews() {
+    open override func layoutSubviews() {
         super.layoutSubviews()
         let imageSize = self.imageView.sizeThatFits(CGSize(width: min(self.frame.width * 0.4, 120), height: 0))
         let titleSize = self.titleLabel.sizeThatFits(CGSize(width: min(self.frame.width * 0.6, 280), height: 0))
@@ -111,7 +111,11 @@ public class EmptyView: UIView {
         self.actionButton.isHidden = buttonSize.height == 0
     }
     
-    @objc func handleAction(button: UIButton) {
+}
+
+extension EmptyView {
+    
+    @objc private func handleAction(button: UIButton) {
         self.onPressAction?(button)
     }
     

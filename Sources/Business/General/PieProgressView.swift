@@ -7,7 +7,7 @@
 
 import UIKit
 
-public class PieProgressView: UIControl {
+open class PieProgressView: UIControl {
     
     public enum Shape: Int {
         case sector
@@ -67,29 +67,27 @@ public class PieProgressView: UIControl {
         }
     }
     
-    fileprivate var needSetProgress: Bool = true
+    private var needSetProgress: Bool = true
     
-    fileprivate lazy var progressLayer: PieProgressLayer = {
-        let layer = PieProgressLayer()
-        layer.contentsScale = UIScreen.main.scale
-        return layer
+    private lazy var progressLayer: PieProgressLayer = {
+        return PieProgressLayer()
     }()
     
-    fileprivate lazy var trackLayer: CALayer = {
+    private lazy var trackLayer: CALayer = {
         return CALayer()
     }()
     
-    public override init(frame: CGRect) {
-        super.init(frame: frame)
+    public init() {
+        super.init(frame: .zero)
         self.didInitialize()
     }
     
     @available(*, unavailable, message: "use init()")
-    required init?(coder: NSCoder) {
-        fatalError()
+    required public init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
     
-    func didInitialize() {
+    open func didInitialize() {
         self.backgroundColor = nil
         self.lineWidth = CGFloat(self.lineWidth)
         self.trackWidth = CGFloat(self.trackWidth)
@@ -101,7 +99,7 @@ public class PieProgressView: UIControl {
         self.layer.addSublayer(self.progressLayer)
     }
     
-    public override func layoutSubviews() {
+    open override func layoutSubviews() {
         super.layoutSubviews()
         self.progressLayer.frame = self.bounds
         self.progressLayer.cornerRadius = min(self.bounds.width, self.bounds.height) / 2
@@ -110,7 +108,7 @@ public class PieProgressView: UIControl {
         self.trackLayer.cornerRadius = self.progressLayer.cornerRadius
     }
     
-    public override func tintColorDidChange() {
+    open override func tintColorDidChange() {
         super.tintColorDidChange()
         self.progressLayer.fillColor = self.tintColor
         self.progressLayer.strokeColor = self.tintColor
@@ -125,7 +123,7 @@ public class PieProgressView: UIControl {
 
 extension PieProgressView {
     
-    @objc public func setProgress(_ progress: Float, animated: Bool) {
+    public func setProgress(_ progress: Float, animated: Bool) {
         self.needSetProgress = false
         self.progress = max(self.minimumProgress, min(1.0, progress))
         self.needSetProgress = true
@@ -151,6 +149,25 @@ private class PieProgressLayer: CALayer {
     fileprivate var shape: PieProgressView.Shape = .sector
     fileprivate var animationDuration: CFTimeInterval = 0.5
     fileprivate var shouldChangeProgressWithAnimation: Bool = true
+    
+    override init() {
+        super.init()
+        self.didInitialize()
+    }
+    
+    override init(layer: Any) {
+        super.init(layer: layer)
+        self.didInitialize()
+    }
+    
+    @available(*, unavailable, message: "use init()")
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    func didInitialize() {
+        self.contentsScale = UIScreen.main.scale
+    }
     
     override class func needsDisplay(forKey key: String) -> Bool {
         return key == #keyPath(progress) || super.needsDisplay(forKey: key)

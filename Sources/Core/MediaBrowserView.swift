@@ -7,7 +7,7 @@
 
 import UIKit
 
-public class MediaBrowserView: UIView {
+open class MediaBrowserView: UIView {
     
     public weak var dataSource: MediaBrowserViewDataSource? {
         didSet {
@@ -97,11 +97,11 @@ public class MediaBrowserView: UIView {
     }
     
     @available(*, unavailable, message: "use init()")
-    required init?(coder: NSCoder) {
+    required public init?(coder: NSCoder) {
         fatalError()
     }
     
-    public func didInitialize() {
+    open func didInitialize() {
         self.dimmingView = UIView()
         self.dimmingView?.backgroundColor = .black
         
@@ -119,7 +119,7 @@ public class MediaBrowserView: UIView {
         }
     }
     
-    public override func layoutSubviews() {
+    open override func layoutSubviews() {
         super.layoutSubviews()
         self.dimmingView?.frame = self.bounds
         

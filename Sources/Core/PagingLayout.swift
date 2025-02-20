@@ -7,7 +7,7 @@
 
 import UIKit
 
-public class PagingLayout: UICollectionViewFlowLayout {
+open class PagingLayout: UICollectionViewFlowLayout {
     
     public var pageSpacing: CGFloat = 10
     
@@ -17,11 +17,11 @@ public class PagingLayout: UICollectionViewFlowLayout {
     }
     
     @available(*, unavailable, message: "use init()")
-    required init?(coder: NSCoder) {
+    required public init?(coder: NSCoder) {
         fatalError()
     }
     
-    public func didInitialize() {
+    open func didInitialize() {
         self.minimumLineSpacing = 0
         self.minimumInteritemSpacing = 0
         self.scrollDirection = .horizontal
@@ -32,7 +32,7 @@ public class PagingLayout: UICollectionViewFlowLayout {
 
 extension PagingLayout {
     
-    public override func layoutAttributesForElements(in rect: CGRect) -> [UICollectionViewLayoutAttributes]? {
+    open override func layoutAttributesForElements(in rect: CGRect) -> [UICollectionViewLayoutAttributes]? {
         var resultAttributes: [UICollectionViewLayoutAttributes] = []
         let originalAttributes: [UICollectionViewLayoutAttributes] = super.layoutAttributesForElements(in: rect) ?? []
         for originalAttributesItem in originalAttributes {
@@ -43,7 +43,7 @@ extension PagingLayout {
         return resultAttributes
     }
     
-    public override func layoutAttributesForItem(at indexPath: IndexPath) -> UICollectionViewLayoutAttributes? {
+    open override func layoutAttributesForItem(at indexPath: IndexPath) -> UICollectionViewLayoutAttributes? {
         guard let collectionView = self.collectionView else {
             return nil
         }
@@ -68,11 +68,11 @@ extension PagingLayout {
 
 extension PagingLayout {
     
-    public override func shouldInvalidateLayout(forBoundsChange newBounds: CGRect) -> Bool {
+    open override func shouldInvalidateLayout(forBoundsChange newBounds: CGRect) -> Bool {
         return true
     }
     
-    public override func invalidationContext(forBoundsChange newBounds: CGRect) -> UICollectionViewLayoutInvalidationContext {
+    open override func invalidationContext(forBoundsChange newBounds: CGRect) -> UICollectionViewLayoutInvalidationContext {
         let context: UICollectionViewLayoutInvalidationContext = super.invalidationContext(forBoundsChange: newBounds)
         if let flowContext = context as? UICollectionViewFlowLayoutInvalidationContext {
             flowContext.invalidateFlowLayoutDelegateMetrics = true

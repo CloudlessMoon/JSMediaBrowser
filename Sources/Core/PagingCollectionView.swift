@@ -7,7 +7,7 @@
 
 import UIKit
 
-public class PagingCollectionView: UICollectionView {
+open class PagingCollectionView: UICollectionView {
     
     public override init(frame: CGRect, collectionViewLayout layout: UICollectionViewLayout) {
         super.init(frame: frame, collectionViewLayout: layout)
@@ -15,11 +15,11 @@ public class PagingCollectionView: UICollectionView {
     }
     
     @available(*, unavailable, message: "use init()")
-    required init?(coder: NSCoder) {
+    required public init?(coder: NSCoder) {
         fatalError()
     }
     
-    public func didInitialize() {
+    open func didInitialize() {
         self.backgroundColor = nil
         self.isPagingEnabled = true
         self.showsHorizontalScrollIndicator = false
@@ -30,7 +30,7 @@ public class PagingCollectionView: UICollectionView {
         self.contentInsetAdjustmentBehavior = .never
     }
     
-    public override func touchesShouldCancel(in view: UIView) -> Bool {
+    open override func touchesShouldCancel(in view: UIView) -> Bool {
         // 默认情况下只有当view是非UIControl的时候才会返回YES，这里统一对UIControl也返回YES
         guard view is UIControl else {
             return super.touchesShouldCancel(in: view)
