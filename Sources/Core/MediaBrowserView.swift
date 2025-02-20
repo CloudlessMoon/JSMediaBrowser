@@ -330,6 +330,8 @@ extension MediaBrowserView: UIScrollViewDelegate {
             self.draggingPage = nil
             
             self.callDidScrollToIndex()
+        } else {
+            self.draggingPage = nil
         }
     }
     
@@ -338,6 +340,8 @@ extension MediaBrowserView: UIScrollViewDelegate {
             self.draggingPage = nil
             
             self.callDidScrollToIndex()
+        } else {
+            self.draggingPage = nil
         }
     }
     
