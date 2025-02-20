@@ -35,7 +35,7 @@ open class PieProgressView: UIControl {
         }
     }
     
-    public var minimumProgress: Float = 0.0 {
+    public var minimumProgress: Float = 0.05 {
         didSet {
             self.progress = Float(self.progress)
         }

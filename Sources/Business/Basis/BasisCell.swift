@@ -18,7 +18,6 @@ open class BasisCell: UICollectionViewCell {
     public private(set) lazy var pieProgressView: PieProgressView = {
         let view = PieProgressView()
         view.tintColor = .white
-        view.minimumProgress = 0.05
         return view
     }()
     
