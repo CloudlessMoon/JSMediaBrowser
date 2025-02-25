@@ -16,7 +16,7 @@ public class Transitioner: NSObject {
     
     public var type: TransitionerType = .presenting
     
-    public weak var context: UIViewControllerContextTransitioning?
+    public private(set) weak var context: UIViewControllerContextTransitioning?
     
     public override init() {
         super.init()

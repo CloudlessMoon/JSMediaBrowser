@@ -89,7 +89,7 @@ open class MediaBrowserViewController: UIViewController {
         return interactiver
     }()
     
-    private var gestureBeganLocation: CGPoint = CGPoint.zero
+    private var gestureBeganLocation = CGPoint.zero
     
     private var dismissWhenSlidingDistance: CGFloat = 70
     
@@ -458,9 +458,6 @@ extension MediaBrowserViewController: UIGestureRecognizerDelegate {
     
     public func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
         if gestureRecognizer == self.dismissingRecognizer, let gestureRecognizer = gestureRecognizer as? UIPanGestureRecognizer {
-            guard self.isPresented else {
-                return false
-            }
             guard let photoCell = self.currentPageCell as? PhotoCell, let zoomView = photoCell.zoomView else {
                 return true
             }
@@ -537,9 +534,6 @@ extension MediaBrowserViewController: UIGestureRecognizerDelegate {
     }
     
     @objc private func handleDismissing(_ gestureRecognizer: UIPanGestureRecognizer) {
-        guard self.isPresented else {
-            return
-        }
         let gestureRecognizerView = gestureRecognizer.view ?? self.contentView
         
         switch gestureRecognizer.state {
@@ -548,7 +542,9 @@ extension MediaBrowserViewController: UIGestureRecognizerDelegate {
         case .began:
             self.gestureBeganLocation = gestureRecognizer.location(in: gestureRecognizerView)
             self.transitionInteractiver.begin()
-            self.hide(animated: true)
+            if self.isPresented {
+                self.hide(animated: true)
+            }
         case .changed:
             let location = gestureRecognizer.location(in: gestureRecognizerView)
             let height = NSNumber(value: Double(gestureRecognizerView.bounds.height / 2))
@@ -598,6 +594,7 @@ extension MediaBrowserViewController: UIGestureRecognizerDelegate {
     
     private func resetDismissingAnimation() {
         self.gestureBeganLocation = CGPoint.zero
+        
         UIView.animate(withDuration: self.transitionAnimator.duration, delay: 0, options: JSCoreHelper.animationOptionsCurveOut) {
             self.currentPageCell?.transform = CGAffineTransform.identity
             self.transitionAnimatorViews?.forEach {
