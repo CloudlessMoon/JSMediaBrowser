@@ -40,8 +40,42 @@ open class MediaBrowserViewController: UIViewController {
         }
     }
     
-    public private(set) lazy var mediaBrowserView: MediaBrowserView = {
-        return MediaBrowserView()
+    public private(set) lazy var singleTapRecognizer: UITapGestureRecognizer = {
+        let gesture = UITapGestureRecognizer(target: self, action: #selector(self.handleSingleTap))
+        gesture.numberOfTapsRequired = 1
+        gesture.numberOfTouchesRequired = 1
+        gesture.delegate = self
+        return gesture
+    }()
+    
+    public private(set) lazy var doubleTapRecognizer: UITapGestureRecognizer = {
+        let gesture = UITapGestureRecognizer(target: self, action: #selector(self.handleDoubleTap))
+        gesture.numberOfTapsRequired = 2
+        gesture.numberOfTouchesRequired = 1
+        gesture.delegate = self
+        return gesture
+    }()
+    
+    public private(set) lazy var longPressRecognizer: UILongPressGestureRecognizer = {
+        let gesture = UILongPressGestureRecognizer(target: self, action: #selector(self.handleLongPress))
+        gesture.minimumPressDuration = 0.5
+        gesture.delegate = self
+        return gesture
+    }()
+    
+    public private(set) lazy var dismissingRecognizer: UIPanGestureRecognizer = {
+        let gesture = UIPanGestureRecognizer(target: self, action: #selector(self.handleDismissing))
+        gesture.minimumNumberOfTouches = 1
+        gesture.maximumNumberOfTouches = 1
+        gesture.delegate = self
+        return gesture
+    }()
+    
+    private lazy var contentView: MediaBrowserView = {
+        let view = MediaBrowserView()
+        view.dataSource = self
+        view.delegate = self
+        return view
     }()
     
     private lazy var transitionAnimator: TransitionAnimator = {
@@ -101,11 +135,14 @@ open class MediaBrowserViewController: UIViewController {
     open override func viewDidLoad() {
         super.viewDidLoad()
         self.view.backgroundColor = nil
-        self.view.addSubview(self.mediaBrowserView)
+        self.view.addSubview(self.contentView)
         
-        self.mediaBrowserView.dataSource = self
-        self.mediaBrowserView.delegate = self
-        self.mediaBrowserView.gestureDelegate = self
+        self.view.addGestureRecognizer(self.singleTapRecognizer)
+        self.view.addGestureRecognizer(self.doubleTapRecognizer)
+        self.view.addGestureRecognizer(self.longPressRecognizer)
+        self.view.addGestureRecognizer(self.dismissingRecognizer)
+        
+        self.singleTapRecognizer.require(toFail: self.doubleTapRecognizer)
     }
     
     open override func viewWillAppear(_ animated: Bool) {
@@ -123,7 +160,7 @@ open class MediaBrowserViewController: UIViewController {
     
     open override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
-        self.mediaBrowserView.js_frameApplyTransform = self.view.bounds
+        self.contentView.js_frameApplyTransform = self.view.bounds
         
         if let cell = self.currentPageCell as? PhotoCell {
             self.configViewportInsets(for: cell)
@@ -135,45 +172,47 @@ open class MediaBrowserViewController: UIViewController {
 extension MediaBrowserViewController {
     
     public var currentPage: Int {
-        return self.mediaBrowserView.currentPage
+        return self.contentView.currentPage
     }
     
     public var totalUnitPage: Int {
-        return self.mediaBrowserView.totalUnitPage
+        return self.contentView.totalUnitPage
     }
     
     public var currentPageCell: UICollectionViewCell? {
-        return self.mediaBrowserView.currentPageCell
+        return self.contentView.currentPageCell
     }
     
     public func pageCellForItem<Cell: UICollectionViewCell>(at index: Int) -> Cell? {
-        return self.mediaBrowserView.pageCellForItem(at: index)
+        return self.contentView.pageCellForItem(at: index)
     }
     
     public func setCurrentPage(_ index: Int, animated: Bool, completion: (() -> Void)? = nil) {
-        self.mediaBrowserView.setCurrentPage(index, animated: animated, completion: completion)
+        self.contentView.setCurrentPage(index, animated: animated, completion: completion)
     }
     
     public var isTracking: Bool {
-        return self.mediaBrowserView.isTracking
+        return self.contentView.isTracking
     }
     
     public var isDragging: Bool {
-        return self.mediaBrowserView.isDragging
+        return self.contentView.isDragging
     }
     
     public var isDecelerating: Bool {
-        return self.mediaBrowserView.isDecelerating
+        return self.contentView.isDecelerating
     }
     
     public var isScrollAnimating: Bool {
-        return self.mediaBrowserView.isScrollAnimating
+        return self.contentView.isScrollAnimating
     }
     
-    public func show(from sender: UIViewController,
-                     navigationController: UINavigationController? = nil,
-                     animated: Bool,
-                     completion: (() -> Void)? = nil) {
+    public func show(
+        from sender: UIViewController,
+        navigationController: UINavigationController? = nil,
+        animated: Bool,
+        completion: (() -> Void)? = nil
+    ) {
         self.presentedFromViewController = sender
         self.isPresented = true
         
@@ -213,7 +252,14 @@ extension MediaBrowserViewController {
         if self.isPresented {
             self.dismiss(animated: animated, completion: completion)
         } else {
-            self.navigationController?.popViewController(animated: animated)
+            guard let navigationController = self.navigationController else {
+                return
+            }
+            guard navigationController.viewControllers.first != self else {
+                return
+            }
+            navigationController.popViewController(animated: animated)
+            
             if let transitionCoordinator = self.transitionCoordinator {
                 transitionCoordinator.animate(alongsideTransition: nil) { context in
                     completion?()
@@ -225,7 +271,7 @@ extension MediaBrowserViewController {
     }
     
     public func reloadData() {
-        self.mediaBrowserView.reloadData()
+        self.contentView.reloadData()
     }
     
 }
@@ -408,10 +454,10 @@ extension MediaBrowserViewController: MediaBrowserViewDelegate {
     
 }
 
-extension MediaBrowserViewController: MediaBrowserViewGestureDelegate {
+extension MediaBrowserViewController: UIGestureRecognizerDelegate {
     
-    public func mediaBrowserView(_ mediaBrowserView: MediaBrowserView, shouldBegin gestureRecognizer: UIGestureRecognizer) -> Bool? {
-        if gestureRecognizer == mediaBrowserView.dismissingGesture, let gestureRecognizer = gestureRecognizer as? UIPanGestureRecognizer {
+    public func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
+        if gestureRecognizer == self.dismissingRecognizer, let gestureRecognizer = gestureRecognizer as? UIPanGestureRecognizer {
             guard self.isPresented else {
                 return false
             }
@@ -435,45 +481,42 @@ extension MediaBrowserViewController: MediaBrowserViewGestureDelegate {
                 return false
             }
         } else {
-            return nil
+            return true
         }
     }
     
-    public func mediaBrowserView(_ mediaBrowserView: MediaBrowserView, gestureRecognizer: UIGestureRecognizer, shouldBeRequiredToFailBy otherGestureRecognizer: UIGestureRecognizer) -> Bool? {
-        if gestureRecognizer == mediaBrowserView.dismissingGesture {
+    public func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldBeRequiredToFailBy otherGestureRecognizer: UIGestureRecognizer) -> Bool {
+        if gestureRecognizer == self.dismissingRecognizer {
             guard let scrollView = otherGestureRecognizer.view as? UIScrollView else {
-                return nil
+                return false
             }
             guard otherGestureRecognizer == scrollView.panGestureRecognizer || otherGestureRecognizer == scrollView.pinchGestureRecognizer else {
-                return nil
+                return false
             }
             return true
         }
-        return nil
+        return false
     }
     
-    public func mediaBrowserView(_ mediaBrowserView: MediaBrowserView, gestureRecognizer: UIGestureRecognizer, shouldReceive touch: UITouch) -> Bool? {
-        if gestureRecognizer == mediaBrowserView.singleTapGesture || gestureRecognizer == mediaBrowserView.doubleTapGesture {
+    public func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldReceive touch: UITouch) -> Bool {
+        if gestureRecognizer == self.singleTapRecognizer || gestureRecognizer == self.doubleTapRecognizer {
             guard touch.view is UIControl else {
-                return nil
+                return true
             }
             return false
         }
-        return nil
+        return true
     }
     
-    public func mediaBrowserView(_ mediaBrowserView: MediaBrowserView, singleTouch gestureRecognizer: UITapGestureRecognizer) {
+    @objc private func handleSingleTap(_ gestureRecognizer: UITapGestureRecognizer) {
         defer {
             self.eventHandler?.didSingleTouch()
         }
         
-        guard self.isPresented else {
-            return
-        }
         self.hide(animated: true)
     }
     
-    public func mediaBrowserView(_ mediaBrowserView: MediaBrowserView, doubleTouch gestureRecognizer: UITapGestureRecognizer) {
+    @objc private func handleDoubleTap(_ gestureRecognizer: UITapGestureRecognizer) {
         guard let photoCell = self.currentPageCell as? PhotoCell, let zoomView = photoCell.zoomView else {
             return
         }
@@ -486,15 +529,19 @@ extension MediaBrowserViewController: MediaBrowserViewGestureDelegate {
         }
     }
     
-    public func mediaBrowserView(_ mediaBrowserView: MediaBrowserView, longPressTouch gestureRecognizer: UILongPressGestureRecognizer) {
+    @objc private func handleLongPress(_ gestureRecognizer: UILongPressGestureRecognizer) {
+        guard gestureRecognizer.state == .began else {
+            return
+        }
         self.eventHandler?.didLongPressTouch()
     }
     
-    public func mediaBrowserView(_ mediaBrowserView: MediaBrowserView, dismissingChanged gestureRecognizer: UIPanGestureRecognizer) {
+    @objc private func handleDismissing(_ gestureRecognizer: UIPanGestureRecognizer) {
         guard self.isPresented else {
             return
         }
-        let gestureRecognizerView: UIView = gestureRecognizer.view ?? mediaBrowserView
+        let gestureRecognizerView = gestureRecognizer.view ?? self.contentView
+        
         switch gestureRecognizer.state {
         case .possible:
             break
@@ -629,11 +676,11 @@ extension MediaBrowserViewController: UIViewControllerTransitioningDelegate, Tra
     
     public var transitionAnimatorViews: [UIView]? {
         var animatorViews: [UIView] = []
-        if let dimmingView = self.mediaBrowserView.dimmingView {
+        if let dimmingView = self.contentView.dimmingView {
             animatorViews.append(dimmingView)
         }
         self.view.subviews.forEach { (subview) in
-            if subview != self.mediaBrowserView {
+            if subview != self.contentView {
                 animatorViews.append(subview)
             }
         }
@@ -641,7 +688,7 @@ extension MediaBrowserViewController: UIViewControllerTransitioningDelegate, Tra
     }
     
     public func transitionViewWillMoveToSuperview(_ transitionView: UIView) {
-        self.mediaBrowserView.addSubview(transitionView)
+        self.contentView.addSubview(transitionView)
     }
     
 }
