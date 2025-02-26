@@ -166,9 +166,8 @@ extension TransitionAnimator {
             currentView?.alpha = isEntering ? 0 : 1
         } else if style == .zoom, let imageView = self.imageView {
             let zoomView = self.delegate?.transitionTargetView
-            let zoomContentViewFrame = self.delegate?.transitionTargetFrame ?? CGRect.zero
-            let zoomContentViewFrameInView = currentView?.convert(zoomContentViewFrame, from: zoomView) ?? CGRect.zero
-            let zoomContentViewBoundsInView = CGRect(origin: CGPoint.zero, size: zoomContentViewFrameInView.size)
+            let zoomContentViewFrameInView = currentView?.convert(self.delegate?.transitionTargetFrame ?? .zero, from: zoomView) ?? .zero
+            let zoomContentViewBoundsInView = CGRect(origin: .zero, size: zoomContentViewFrameInView.size)
             /// 隐藏目标视图
             zoomView?.isHidden = true
             /// 设置下Frame
@@ -182,7 +181,7 @@ extension TransitionAnimator {
             positionAnimation.fromValue = NSValue(cgPoint: isEntering ? sourceCenter : zoomContentViewCenterInView)
             positionAnimation.toValue = NSValue(cgPoint: isEntering ? zoomContentViewCenterInView : sourceCenter)
             /// 计算bounds
-            let sourceBounds = CGRect(origin: CGPoint.zero, size: sourceRect.size)
+            let sourceBounds = CGRect(origin: .zero, size: sourceRect.size)
             let boundsAnimation: CABasicAnimation = CABasicAnimation(keyPath: "bounds")
             boundsAnimation.fromValue = NSValue(cgRect: isEntering ? sourceBounds : zoomContentViewBoundsInView)
             boundsAnimation.toValue = NSValue(cgRect: isEntering ? zoomContentViewBoundsInView : sourceBounds)
