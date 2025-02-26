@@ -91,6 +91,10 @@ class BrowserViewController: MediaBrowserViewController {
         self.updatePageControl()
     }
     
+    override func forceEnableInteractivePopGestureRecognizer() -> Bool {
+        return true
+    }
+    
 }
 
 extension BrowserViewController {

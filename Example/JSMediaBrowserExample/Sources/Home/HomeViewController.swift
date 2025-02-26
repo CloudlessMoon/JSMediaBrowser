@@ -105,6 +105,22 @@ class HomeViewController: UIViewController {
         self.collectionView.frame = self.view.bounds
     }
     
+    override var prefersStatusBarHidden: Bool {
+        return false
+    }
+    
+    override var preferredStatusBarStyle: UIStatusBarStyle {
+        return UIStatusBarStyle.lightContent
+    }
+    
+    override var shouldAutorotate: Bool {
+        return true
+    }
+    
+    override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
+        return .allButUpsideDown
+    }
+    
 }
 
 extension HomeViewController: UICollectionViewDataSource {
@@ -166,7 +182,21 @@ extension HomeViewController: UICollectionViewDelegateFlowLayout {
             return cell.imageView
         })
         browserVC.setCurrentPage(indexPath.item, animated: false)
-        browserVC.show(from: self, navigationController: QMUINavigationController(rootViewController: browserVC), animated: true)
+        
+        // normal
+        // browserVC.show(from: self, animated: true)
+        // browserVC.show(from: self, navigationController: QMUINavigationController(rootViewController: browserVC), animated: true)
+        
+        // present
+        // self.present(QMUINavigationController(rootViewController: browserVC), animated: true, completion: nil)
+        
+        // navigation
+        // self.navigationController?.pushViewController(browserVC, animated: true)
+        
+        // addSubview
+        self.addChild(browserVC)
+        browserVC.view.frame = CGRect(x: 0, y: self.view.safeAreaInsets.top, width: self.view.bounds.width, height: 700)
+        self.view.addSubview(browserVC.view)
     }
     
 }
@@ -185,26 +215,6 @@ extension HomeViewController {
         SDImageCache.shared.clearDisk(onCompletion: nil)
         
         self.collectionView.reloadData()
-    }
-    
-}
-
-extension HomeViewController {
-    
-    override var prefersStatusBarHidden: Bool {
-        return false
-    }
-    
-    override var preferredStatusBarStyle: UIStatusBarStyle {
-        return UIStatusBarStyle.lightContent
-    }
-    
-    override var shouldAutorotate: Bool {
-        return true
-    }
-    
-    override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
-        return .allButUpsideDown
     }
     
 }

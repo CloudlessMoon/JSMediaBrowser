@@ -141,7 +141,7 @@ open class ZoomView: BasisMediaView {
         self.revertZoomIfNeeded()
     }
     
-    public override var contentView: UIView? {
+    open override var contentView: UIView? {
         if self.asset != nil {
             return self.assetView
         } else if self.thumbnail != nil {
@@ -151,7 +151,7 @@ open class ZoomView: BasisMediaView {
         }
     }
     
-    public override var contentViewFrame: CGRect {
+    open override var contentViewFrame: CGRect {
         guard let contentView = self.contentView else {
             return .zero
         }

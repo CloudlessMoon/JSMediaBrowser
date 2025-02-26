@@ -147,15 +147,17 @@ open class MediaBrowserViewController: UIViewController {
     
     open override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        /// 外部可能设置导航栏, 这里需要隐藏
-        self.navigationController?.setNavigationBarHidden(true, animated: false)
-        
-        if let transitionCoordinator = self.transitionCoordinator, !self.isTransitionFinished {
+        if let transitionCoordinator = self.transitionCoordinator {
             transitionCoordinator.animate(alongsideTransition: nil, completion: { [weak self] _ in
                 guard let self = self else { return }
                 self.isTransitionFinished = true
             })
+        } else {
+            self.isTransitionFinished = true
         }
+        
+        /// 外部可能设置导航栏, 这里需要隐藏
+        self.navigationController?.setNavigationBarHidden(true, animated: false)
     }
     
     open override func viewDidLayoutSubviews() {
@@ -165,6 +167,32 @@ open class MediaBrowserViewController: UIViewController {
         if let cell = self.currentPageCell as? PhotoCell {
             self.configViewportInsets(for: cell)
         }
+    }
+    
+    open override var prefersStatusBarHidden: Bool {
+        return false
+    }
+    
+    open override var preferredStatusBarStyle: UIStatusBarStyle {
+        return .lightContent
+    }
+    
+    open override var preferredStatusBarUpdateAnimation: UIStatusBarAnimation {
+        return .fade
+    }
+    
+    open override var shouldAutorotate: Bool {
+        guard let orientationViewController = self.orientationViewController else {
+            return true
+        }
+        return orientationViewController.shouldAutorotate
+    }
+    
+    open override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
+        guard let orientationViewController = self.orientationViewController else {
+            return .allButUpsideDown
+        }
+        return orientationViewController.supportedInterfaceOrientations
     }
     
 }
@@ -213,8 +241,8 @@ extension MediaBrowserViewController {
         animated: Bool,
         completion: (() -> Void)? = nil
     ) {
-        self.presentedFromViewController = sender
         self.isPresented = true
+        self.presentedFromViewController = sender
         
         let viewController = navigationController ?? self
         viewController.modalPresentationCapturesStatusBarAppearance = true
@@ -240,34 +268,14 @@ extension MediaBrowserViewController {
         if let presentedViewController = presenter.presentedViewController {
             presenter = presentedViewController
         }
-        presenter.present(viewController, animated: animated) { [weak self] in
-            guard let self = self else { return }
-            self.isTransitionFinished = true
-            
-            completion?()
-        }
+        presenter.present(viewController, animated: animated, completion: completion)
     }
     
     public func hide(animated: Bool, completion: (() -> Void)? = nil) {
-        if self.isPresented {
-            self.dismiss(animated: animated, completion: completion)
-        } else {
-            guard let navigationController = self.navigationController else {
-                return
-            }
-            guard navigationController.viewControllers.first != self else {
-                return
-            }
-            navigationController.popViewController(animated: animated)
-            
-            if let transitionCoordinator = self.transitionCoordinator {
-                transitionCoordinator.animate(alongsideTransition: nil) { context in
-                    completion?()
-                }
-            } else {
-                completion?()
-            }
+        guard self.isPresented else {
+            return
         }
+        self.dismiss(animated: animated, completion: completion)
     }
     
     public func reloadData() {
@@ -457,11 +465,14 @@ extension MediaBrowserViewController: MediaBrowserViewDelegate {
 extension MediaBrowserViewController: UIGestureRecognizerDelegate {
     
     public func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
-        if gestureRecognizer == self.dismissingRecognizer, let gestureRecognizer = gestureRecognizer as? UIPanGestureRecognizer {
+        if gestureRecognizer == self.dismissingRecognizer {
+            guard self.isPresented else {
+                return false
+            }
             guard let photoCell = self.currentPageCell as? PhotoCell, let zoomView = photoCell.zoomView else {
                 return true
             }
-            let velocity = gestureRecognizer.velocity(in: gestureRecognizer.view)
+            let velocity = self.dismissingRecognizer.velocity(in: self.dismissingRecognizer.view)
             let minY = ceil(zoomView.scrollView.js_minimumContentOffset.y)
             let maxY = floor(zoomView.scrollView.js_maximumContentOffset.y)
             let scrollView = zoomView.scrollView
@@ -542,9 +553,7 @@ extension MediaBrowserViewController: UIGestureRecognizerDelegate {
         case .began:
             self.gestureBeganLocation = gestureRecognizer.location(in: gestureRecognizerView)
             self.transitionInteractiver.begin()
-            if self.isPresented {
-                self.hide(animated: true)
-            }
+            self.hide(animated: true)
         case .changed:
             let location = gestureRecognizer.location(in: gestureRecognizerView)
             let height = NSNumber(value: Double(gestureRecognizerView.bounds.height / 2))
@@ -692,45 +701,14 @@ extension MediaBrowserViewController: UIViewControllerTransitioningDelegate, Tra
 
 extension MediaBrowserViewController {
     
-    public override var prefersStatusBarHidden: Bool {
-        return false
-    }
-    
-    public override var preferredStatusBarStyle: UIStatusBarStyle {
-        return .lightContent
-    }
-    
-    public override var preferredStatusBarUpdateAnimation: UIStatusBarAnimation {
-        return .fade
-    }
-    
-}
-
-extension MediaBrowserViewController {
-    
-    public override var shouldAutorotate: Bool {
-        guard let orientationViewController = self.orientationViewController else {
-            return true
-        }
-        
-        return orientationViewController.shouldAutorotate
-    }
-    
-    public override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
-        guard let orientationViewController = self.orientationViewController else {
-            return .allButUpsideDown
-        }
-        
-        return orientationViewController.supportedInterfaceOrientations
-    }
-    
     private var orientationViewController: UIViewController? {
         if let presentedFromViewController = self.presentedFromViewController {
             return presentedFromViewController
         } else if let viewControllers = self.navigationController?.viewControllers, let index = viewControllers.firstIndex(of: self) {
             return index > 0 ? viewControllers[index - 1] : nil
+        } else {
+            return nil
         }
-        return nil
     }
     
 }
