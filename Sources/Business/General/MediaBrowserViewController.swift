@@ -40,6 +40,15 @@ open class MediaBrowserViewController: UIViewController {
         }
     }
     
+    public var dimmingView: UIView? {
+        get {
+            return self.contentView.dimmingView
+        }
+        set {
+            self.contentView.dimmingView = newValue
+        }
+    }
+    
     public private(set) lazy var singleTapRecognizer: UITapGestureRecognizer = {
         let gesture = UITapGestureRecognizer(target: self, action: #selector(self.handleSingleTap))
         gesture.numberOfTapsRequired = 1
