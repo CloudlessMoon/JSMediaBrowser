@@ -185,7 +185,7 @@ extension HomeViewController: UICollectionViewDelegateFlowLayout {
         
         // normal
         // browserVC.show(from: self, animated: true)
-        // browserVC.show(from: self, navigationController: QMUINavigationController(rootViewController: browserVC), animated: true)
+        browserVC.show(from: self, navigationController: QMUINavigationController(rootViewController: browserVC), animated: true)
         
         // present
         // self.present(QMUINavigationController(rootViewController: browserVC), animated: true, completion: nil)
@@ -194,9 +194,9 @@ extension HomeViewController: UICollectionViewDelegateFlowLayout {
         // self.navigationController?.pushViewController(browserVC, animated: true)
         
         // addSubview
-        self.addChild(browserVC)
-        browserVC.view.frame = CGRect(x: 0, y: self.view.safeAreaInsets.top, width: self.view.bounds.width, height: 700)
-        self.view.addSubview(browserVC.view)
+        // self.addChild(browserVC)
+        // browserVC.view.frame = CGRect(x: 0, y: self.view.safeAreaInsets.top, width: self.view.bounds.width, height: 700)
+        // self.view.addSubview(browserVC.view)
     }
     
 }
