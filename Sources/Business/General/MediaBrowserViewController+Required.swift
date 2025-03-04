@@ -12,9 +12,29 @@ public struct MediaBrowserViewControllerConfiguration {
     public typealias BuildZoomView = (Int) -> ZoomView
     
     public var zoomView: BuildZoomView
-    
-    public init(zoomView: @escaping BuildZoomView) {
+    public var enteringStyle: TransitioningStyle
+    public var exitingStyle: TransitioningStyle
+    public var hideWhenSingleTap: Bool
+    public var hideWhenSliding: Bool
+    public var hideWhenSlidingDistance: CGFloat
+    public var zoomWhenDoubleTap: Bool
+
+    public init(
+        zoomView: @escaping BuildZoomView,
+        enteringStyle: TransitioningStyle = .zoom,
+        exitingStyle: TransitioningStyle = .zoom,
+        hideWhenSingleTap: Bool = true,
+        hideWhenSliding: Bool = true,
+        hideWhenSlidingDistance: CGFloat = 70,
+        zoomWhenDoubleTap: Bool = true
+    ) {
         self.zoomView = zoomView
+        self.enteringStyle = enteringStyle
+        self.exitingStyle = exitingStyle
+        self.hideWhenSingleTap = hideWhenSingleTap
+        self.hideWhenSliding = hideWhenSliding
+        self.hideWhenSlidingDistance = hideWhenSlidingDistance
+        self.zoomWhenDoubleTap = zoomWhenDoubleTap
     }
     
 }
@@ -48,8 +68,9 @@ public protocol MediaBrowserViewControllerEventHandler {
     func willScrollHalf(from sourceIndex: Int, to targetIndex: Int)
     func didScroll(to index: Int)
     
-    func didSingleTouch()
-    func didLongPressTouch()
+    func didSingleTap(at index: Int, point: CGPoint)
+    func didDoubleTap(at index: Int, point: CGPoint)
+    func didLongPress(at index: Int, point: CGPoint)
     
 }
 
@@ -65,8 +86,9 @@ public extension MediaBrowserViewControllerEventHandler {
     func willScrollHalf(from sourceIndex: Int, to targetIndex: Int) {}
     func didScroll(to index: Int) {}
     
-    func didSingleTouch() {}
-    func didLongPressTouch() {}
+    func didSingleTap(at index: Int, point: CGPoint) {}
+    func didDoubleTap(at index: Int, point: CGPoint) {}
+    func didLongPress(at index: Int, point: CGPoint) {}
     
 }
 
@@ -78,7 +100,7 @@ public struct DefaultMediaBrowserViewControllerEventHandler: MediaBrowserViewCon
     public typealias DisplayEmptyView = (EmptyView, NSError, Int) -> Void
     public typealias WillScroll = (Int, Int) -> Void
     public typealias DidScroll = (Int) -> Void
-    public typealias Touch = () -> Void
+    public typealias DidTouch = (Int, CGPoint) -> Void
     
     private let _didChangedData: ChangedDataSource?
     private let _willDisplayZoomView: DisplayZoomView?
@@ -86,8 +108,9 @@ public struct DefaultMediaBrowserViewControllerEventHandler: MediaBrowserViewCon
     private let _shouldStartPlaying: ShouldPlaying?
     private let _willScrollHalf: WillScroll?
     private let _didScroll: DidScroll?
-    private let _didSingleTouch: Touch?
-    private let _didLongPressTouch: Touch?
+    private let _didSingleTap: DidTouch?
+    private let _didDoubleTap: DidTouch?
+    private let _didLongPress: DidTouch?
     
     public init(
         didChangedData: ChangedDataSource? = nil,
@@ -96,8 +119,9 @@ public struct DefaultMediaBrowserViewControllerEventHandler: MediaBrowserViewCon
         shouldStartPlaying: ShouldPlaying? = nil,
         willScrollHalf: WillScroll? = nil,
         didScroll: DidScroll? = nil,
-        didSingleTouch: Touch? = nil,
-        didLongPressTouch: Touch? = nil
+        didSingleTap: DidTouch? = nil,
+        didDoubleTap: DidTouch? = nil,
+        didLongPress: DidTouch? = nil
     ) {
         self._didChangedData = didChangedData
         self._willDisplayZoomView = willDisplayZoomView
@@ -105,8 +129,9 @@ public struct DefaultMediaBrowserViewControllerEventHandler: MediaBrowserViewCon
         self._shouldStartPlaying = shouldStartPlaying
         self._willScrollHalf = willScrollHalf
         self._didScroll = didScroll
-        self._didSingleTouch = didSingleTouch
-        self._didLongPressTouch = didLongPressTouch
+        self._didSingleTap = didSingleTap
+        self._didDoubleTap = didDoubleTap
+        self._didLongPress = didLongPress
     }
     
     public func didChangedData(current: [any AssetItem], previous: [any AssetItem]) {
@@ -121,14 +146,6 @@ public struct DefaultMediaBrowserViewControllerEventHandler: MediaBrowserViewCon
         self._didScroll?(index)
     }
     
-    public func didSingleTouch() {
-        self._didSingleTouch?()
-    }
-    
-    public func didLongPressTouch() {
-        self._didLongPressTouch?()
-    }
-    
     public func willDisplayZoomView(_ zoomView: ZoomView, at index: Int) {
         self._willDisplayZoomView?(zoomView, index)
     }
@@ -139,6 +156,18 @@ public struct DefaultMediaBrowserViewControllerEventHandler: MediaBrowserViewCon
     
     public func shouldStartPlaying(at index: Int) -> Bool {
         return self._shouldStartPlaying?(index) ?? true
+    }
+    
+    public func didSingleTap(at index: Int, point: CGPoint) {
+        self._didSingleTap?(index, point)
+    }
+    
+    public func didDoubleTap(at index: Int, point: CGPoint) {
+        self._didDoubleTap?(index, point)
+    }
+    
+    public func didLongPress(at index: Int, point: CGPoint) {
+        self._didLongPress?(index, point)
     }
     
 }

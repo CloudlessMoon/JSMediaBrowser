@@ -16,18 +16,6 @@ open class MediaBrowserViewController: UIViewController {
     
     public var eventHandler: MediaBrowserViewControllerEventHandler?
     
-    public var enteringStyle: TransitioningStyle = .zoom {
-        didSet {
-            self.transitionAnimator.enteringStyle = enteringStyle
-        }
-    }
-    
-    public var exitingStyle: TransitioningStyle = .zoom {
-        didSet {
-            self.transitionAnimator.exitingStyle = exitingStyle
-        }
-    }
-    
     public var dataSource: [any AssetItem] = [] {
         didSet {
             guard self.isViewLoaded else {
@@ -49,36 +37,25 @@ open class MediaBrowserViewController: UIViewController {
         }
     }
     
-    public private(set) lazy var singleTapRecognizer: UITapGestureRecognizer = {
-        let gesture = UITapGestureRecognizer(target: self, action: #selector(self.handleSingleTap))
-        gesture.numberOfTapsRequired = 1
-        gesture.numberOfTouchesRequired = 1
-        gesture.delegate = self
-        return gesture
-    }()
+    public var enteringStyle: TransitioningStyle {
+        didSet {
+            self.transitionAnimator.enteringStyle = self.enteringStyle
+        }
+    }
     
-    public private(set) lazy var doubleTapRecognizer: UITapGestureRecognizer = {
-        let gesture = UITapGestureRecognizer(target: self, action: #selector(self.handleDoubleTap))
-        gesture.numberOfTapsRequired = 2
-        gesture.numberOfTouchesRequired = 1
-        gesture.delegate = self
-        return gesture
-    }()
+    public var exitingStyle: TransitioningStyle {
+        didSet {
+            self.transitionAnimator.exitingStyle = self.exitingStyle
+        }
+    }
     
-    public private(set) lazy var longPressRecognizer: UILongPressGestureRecognizer = {
-        let gesture = UILongPressGestureRecognizer(target: self, action: #selector(self.handleLongPress))
-        gesture.minimumPressDuration = 0.5
-        gesture.delegate = self
-        return gesture
-    }()
+    public var hideWhenSingleTap: Bool
     
-    public private(set) lazy var dismissingRecognizer: UIPanGestureRecognizer = {
-        let gesture = UIPanGestureRecognizer(target: self, action: #selector(self.handleDismissing))
-        gesture.minimumNumberOfTouches = 1
-        gesture.maximumNumberOfTouches = 1
-        gesture.delegate = self
-        return gesture
-    }()
+    public var hideWhenSliding: Bool
+    
+    public var hideWhenSlidingDistance: CGFloat
+    
+    public var zoomWhenDoubleTap: Bool
     
     private lazy var contentView: MediaBrowserView = {
         let view = MediaBrowserView()
@@ -98,9 +75,15 @@ open class MediaBrowserViewController: UIViewController {
         return interactiver
     }()
     
-    private var gestureBeganLocation = CGPoint.zero
+    private lazy var dismissRecognizer: UIPanGestureRecognizer = {
+        let gesture = UIPanGestureRecognizer(target: self, action: #selector(self.handleDismiss))
+        gesture.minimumNumberOfTouches = 1
+        gesture.maximumNumberOfTouches = 1
+        gesture.delegate = self
+        return gesture
+    }()
     
-    private var dismissWhenSlidingDistance: CGFloat = 70
+    private var gestureBeganLocation = CGPoint.zero
     
     private weak var presentedFromViewController: UIViewController?
     private var isPresented: Bool = false
@@ -121,6 +104,13 @@ open class MediaBrowserViewController: UIViewController {
     
     public init(configuration: MediaBrowserViewControllerConfiguration) {
         self.configuration = configuration
+        self.enteringStyle = configuration.enteringStyle
+        self.exitingStyle = configuration.exitingStyle
+        self.hideWhenSingleTap = configuration.hideWhenSingleTap
+        self.hideWhenSliding = configuration.hideWhenSliding
+        self.hideWhenSliding = configuration.hideWhenSliding
+        self.hideWhenSlidingDistance = configuration.hideWhenSlidingDistance
+        self.zoomWhenDoubleTap = configuration.zoomWhenDoubleTap
         
         super.init(nibName: nil, bundle: nil)
         
@@ -135,6 +125,9 @@ open class MediaBrowserViewController: UIViewController {
     open func didInitialize() {
         self.extendedLayoutIncludesOpaqueBars = true
         self.accessibilityViewIsModal = true
+        
+        self.transitionAnimator.enteringStyle = self.enteringStyle
+        self.transitionAnimator.exitingStyle = self.exitingStyle
     }
     
     deinit {
@@ -146,12 +139,7 @@ open class MediaBrowserViewController: UIViewController {
         self.view.backgroundColor = nil
         self.view.addSubview(self.contentView)
         
-        self.view.addGestureRecognizer(self.singleTapRecognizer)
-        self.view.addGestureRecognizer(self.doubleTapRecognizer)
-        self.view.addGestureRecognizer(self.longPressRecognizer)
         self.view.addGestureRecognizer(self.dismissingRecognizer)
-        
-        self.singleTapRecognizer.require(toFail: self.doubleTapRecognizer)
     }
     
     open override func viewWillAppear(_ animated: Bool) {
@@ -218,8 +206,8 @@ extension MediaBrowserViewController {
         return self.contentView.currentPageCell
     }
     
-    public func pageCellForItem<Cell: UICollectionViewCell>(at index: Int) -> Cell? {
-        return self.contentView.pageCellForItem(at: index)
+    public func cellForPage<Cell: UICollectionViewCell>(at index: Int) -> Cell? {
+        return self.contentView.cellForPage(at: index)
     }
     
     public func setCurrentPage(_ index: Int, animated: Bool, completion: (() -> Void)? = nil) {
@@ -240,6 +228,22 @@ extension MediaBrowserViewController {
     
     public var isScrollAnimating: Bool {
         return self.contentView.isScrollAnimating
+    }
+    
+    public var singleTapRecognizer: UITapGestureRecognizer {
+        return self.contentView.singleTapRecognizer
+    }
+    
+    public var doubleTapRecognizer: UITapGestureRecognizer {
+        return self.contentView.doubleTapRecognizer
+    }
+    
+    public var longPressRecognizer: UILongPressGestureRecognizer {
+        return self.contentView.longPressRecognizer
+    }
+    
+    public var dismissingRecognizer: UIPanGestureRecognizer {
+        return self.dismissRecognizer
     }
     
     public func show(
@@ -467,13 +471,47 @@ extension MediaBrowserViewController: MediaBrowserViewDelegate {
         self.eventHandler?.didScroll(to: index)
     }
     
+    public func mediaBrowserView(_ mediaBrowserView: MediaBrowserView, didSingleTapAt index: Int, point: CGPoint) {
+        defer {
+            self.eventHandler?.didSingleTap(at: index, point: point)
+        }
+        
+        guard self.hideWhenSingleTap else {
+            return
+        }
+        self.hide(animated: true)
+    }
+    
+    public func mediaBrowserView(_ mediaBrowserView: MediaBrowserView, didDoubleTapAt index: Int, point: CGPoint) {
+        defer {
+            self.eventHandler?.didDoubleTap(at: index, point: point)
+        }
+        
+        guard self.zoomWhenDoubleTap else {
+            return
+        }
+        guard let photoCell = self.currentPageCell as? PhotoCell, let zoomView = photoCell.zoomView else {
+            return
+        }
+        let minimumZoomScale = zoomView.minimumZoomScale
+        if zoomView.zoomScale != minimumZoomScale {
+            zoomView.setZoom(scale: minimumZoomScale, animated: true)
+        } else {
+            zoomView.zoom(to: point, scale: zoomView.maximumZoomScale, animated: true)
+        }
+    }
+    
+    public func mediaBrowserView(_ mediaBrowserView: MediaBrowserView, didLongPressAt index: Int, point: CGPoint) {
+        self.eventHandler?.didLongPress(at: index, point: point)
+    }
+    
 }
 
 extension MediaBrowserViewController: UIGestureRecognizerDelegate {
     
     public func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
         if gestureRecognizer == self.dismissingRecognizer {
-            guard self.isPresented else {
+            guard self.isPresented && self.hideWhenSliding else {
                 return false
             }
             guard let photoCell = self.currentPageCell as? PhotoCell, let zoomView = photoCell.zoomView else {
@@ -513,45 +551,7 @@ extension MediaBrowserViewController: UIGestureRecognizerDelegate {
         return false
     }
     
-    public func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldReceive touch: UITouch) -> Bool {
-        if gestureRecognizer == self.singleTapRecognizer || gestureRecognizer == self.doubleTapRecognizer {
-            guard touch.view is UIControl else {
-                return true
-            }
-            return false
-        }
-        return true
-    }
-    
-    @objc private func handleSingleTap(_ gestureRecognizer: UITapGestureRecognizer) {
-        defer {
-            self.eventHandler?.didSingleTouch()
-        }
-        
-        self.hide(animated: true)
-    }
-    
-    @objc private func handleDoubleTap(_ gestureRecognizer: UITapGestureRecognizer) {
-        guard let photoCell = self.currentPageCell as? PhotoCell, let zoomView = photoCell.zoomView else {
-            return
-        }
-        let minimumZoomScale = zoomView.minimumZoomScale
-        if zoomView.zoomScale != minimumZoomScale {
-            zoomView.setZoom(scale: minimumZoomScale, animated: true)
-        } else {
-            let location = gestureRecognizer.location(in: zoomView.contentView)
-            zoomView.zoom(to: location, scale: zoomView.maximumZoomScale, animated: true)
-        }
-    }
-    
-    @objc private func handleLongPress(_ gestureRecognizer: UILongPressGestureRecognizer) {
-        guard gestureRecognizer.state == .began else {
-            return
-        }
-        self.eventHandler?.didLongPressTouch()
-    }
-    
-    @objc private func handleDismissing(_ gestureRecognizer: UIPanGestureRecognizer) {
+    @objc private func handleDismiss(_ gestureRecognizer: UIPanGestureRecognizer) {
         let gestureRecognizerView = gestureRecognizer.view ?? self.contentView
         
         switch gestureRecognizer.state {
@@ -588,7 +588,7 @@ extension MediaBrowserViewController: UIGestureRecognizerDelegate {
         case .ended, .cancelled, .failed:
             let location = gestureRecognizer.location(in: gestureRecognizer.view)
             let verticalDistance = location.y - self.gestureBeganLocation.y
-            if abs(verticalDistance) > self.dismissWhenSlidingDistance {
+            if abs(verticalDistance) > self.hideWhenSlidingDistance {
                 self.beginDismissingAnimation()
             } else {
                 self.resetDismissingAnimation()

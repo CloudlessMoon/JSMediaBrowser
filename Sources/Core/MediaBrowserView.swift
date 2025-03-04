@@ -28,6 +28,29 @@ open class MediaBrowserView: UIView {
         }
     }
     
+    public private(set) lazy var singleTapRecognizer: UITapGestureRecognizer = {
+        let gesture = UITapGestureRecognizer(target: self, action: #selector(self.handleSingleTap))
+        gesture.numberOfTapsRequired = 1
+        gesture.numberOfTouchesRequired = 1
+        gesture.delegate = self
+        return gesture
+    }()
+    
+    public private(set) lazy var doubleTapRecognizer: UITapGestureRecognizer = {
+        let gesture = UITapGestureRecognizer(target: self, action: #selector(self.handleDoubleTap))
+        gesture.numberOfTapsRequired = 2
+        gesture.numberOfTouchesRequired = 1
+        gesture.delegate = self
+        return gesture
+    }()
+    
+    public private(set) lazy var longPressRecognizer: UILongPressGestureRecognizer = {
+        let gesture = UILongPressGestureRecognizer(target: self, action: #selector(self.handleLongPress))
+        gesture.minimumPressDuration = 0.5
+        gesture.delegate = self
+        return gesture
+    }()
+    
     public private(set) var currentPage: Int = 0
     
     public var totalUnitPage: Int {
@@ -69,6 +92,10 @@ open class MediaBrowserView: UIView {
         
         self.addSubview(self.collectionView)
         
+        self.addGestureRecognizer(self.singleTapRecognizer)
+        self.addGestureRecognizer(self.doubleTapRecognizer)
+        self.addGestureRecognizer(self.longPressRecognizer)
+        
         if UIAccessibility.isVoiceOverRunning {
             UIAccessibility.post(notification: UIAccessibility.Notification.layoutChanged, argument: "轻点两下退出预览")
         }
@@ -89,7 +116,7 @@ open class MediaBrowserView: UIView {
 extension MediaBrowserView {
     
     public var currentPageCell: UICollectionViewCell? {
-        if let cell = self.pageCellForItem(at: self.currentPage) {
+        if let cell = self.cellForPage(at: self.currentPage) {
             return cell
         } else {
             return self.collectionView.visibleCells.first
@@ -153,18 +180,18 @@ extension MediaBrowserView {
         }
     }
     
-    public func indexForItem(in point: CGPoint) -> Int? {
+    public func indexForPage(in point: CGPoint) -> Int? {
         return self.collectionView.indexPathForItem(at: point)?.item
     }
     
-    public func pageCellForItem<Cell: UICollectionViewCell>(at index: Int) -> Cell? {
+    public func cellForPage<Cell: UICollectionViewCell>(at index: Int) -> Cell? {
         let indexPath = IndexPath(item: index, section: 0)
         return self.collectionView.cellForItem(at: indexPath) as? Cell
     }
     
-    public func pageCellForItem<Cell: UICollectionViewCell>(in point: CGPoint) -> Cell? {
-        if let index = self.indexForItem(in: point) {
-            return self.pageCellForItem(at: index)
+    public func cellForPage<Cell: UICollectionViewCell>(in point: CGPoint) -> Cell? {
+        if let index = self.indexForPage(in: point) {
+            return self.cellForPage(at: index)
         } else {
             return nil
         }
@@ -173,7 +200,7 @@ extension MediaBrowserView {
     public func dequeueReusableCell<Cell: UICollectionViewCell>(_ cellClass: Cell.Type,
                                                                 reuseIdentifier: String? = nil,
                                                                 at index: Int) -> Cell {
-        let identifier = reuseIdentifier ?? "Item_\(cellClass)"
+        let identifier = reuseIdentifier ?? "Page_\(cellClass)"
         if !self.registeredCellIdentifiers.contains(identifier) {
             self.registeredCellIdentifiers.add(identifier)
             self.collectionView.register(cellClass, forCellWithReuseIdentifier: identifier)
@@ -189,7 +216,7 @@ extension MediaBrowserView {
                                                                 bundle: Bundle? = Bundle.main,
                                                                 reuseIdentifier: String? = nil,
                                                                 at index: Int) -> Cell {
-        let identifier = reuseIdentifier ?? "Item_Nib_\(nibName)"
+        let identifier = reuseIdentifier ?? "Page_Nib_\(nibName)"
         if !self.registeredCellIdentifiers.contains(identifier) {
             self.registeredCellIdentifiers.add(identifier)
             let nib = UINib(nibName: nibName, bundle: bundle)
@@ -200,6 +227,49 @@ extension MediaBrowserView {
             fatalError()
         }
         return cell
+    }
+    
+}
+
+extension MediaBrowserView: UIGestureRecognizerDelegate {
+    
+    public func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRequireFailureOf otherGestureRecognizer: UIGestureRecognizer) -> Bool {
+        if gestureRecognizer == self.singleTapRecognizer {
+            return otherGestureRecognizer == self.doubleTapRecognizer && self.doubleTapRecognizer.isEnabled
+        } else {
+            return false
+        }
+    }
+    
+    public func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldReceive touch: UITouch) -> Bool {
+        if gestureRecognizer == self.singleTapRecognizer || gestureRecognizer == self.doubleTapRecognizer {
+            guard touch.view is UIControl else {
+                return true
+            }
+            return false
+        }
+        return true
+    }
+    
+    @objc private func handleSingleTap(_ gestureRecognizer: UITapGestureRecognizer) {
+        let location = gestureRecognizer.location(in: self)
+        let index = self.indexForPage(in: location) ?? self.currentPage
+        self.delegate?.mediaBrowserView(self, didSingleTapAt: index, point: location)
+    }
+    
+    @objc private func handleDoubleTap(_ gestureRecognizer: UITapGestureRecognizer) {
+        let location = gestureRecognizer.location(in: self)
+        let index = self.indexForPage(in: location) ?? self.currentPage
+        self.delegate?.mediaBrowserView(self, didDoubleTapAt: index, point: location)
+    }
+    
+    @objc private func handleLongPress(_ gestureRecognizer: UILongPressGestureRecognizer) {
+        guard gestureRecognizer.state == .began else {
+            return
+        }
+        let location = gestureRecognizer.location(in: self)
+        let index = self.indexForPage(in: location) ?? self.currentPage
+        self.delegate?.mediaBrowserView(self, didLongPressAt: index, point: location)
     }
     
 }
@@ -216,6 +286,10 @@ extension MediaBrowserView: UICollectionViewDataSource {
     
     public func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         return self.dataSource?.mediaBrowserView(self, cellForPageAt: indexPath.item) ?? self.dequeueReusableCell(UICollectionViewCell.self, at: indexPath.item)
+    }
+    
+    public func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        collectionView.deselectItem(at: indexPath, animated: false)
     }
     
 }

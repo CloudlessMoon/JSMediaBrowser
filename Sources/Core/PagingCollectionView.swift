@@ -43,11 +43,10 @@ open class PagingCollectionView: UICollectionView {
 extension PagingCollectionView: UIGestureRecognizerDelegate {
     
     public func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldReceive touch: UITouch) -> Bool {
-        if touch.view is UISlider {
-            return false
-        } else {
+        guard touch.view is UISlider else {
             return true
         }
+        return false
     }
     
 }

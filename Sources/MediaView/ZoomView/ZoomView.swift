@@ -72,14 +72,8 @@ open class ZoomView: BasisMediaView {
         }
     }
     
-    public private(set) lazy var scrollView: UIScrollView = {
-        let scrollView = UIScrollView()
-        scrollView.showsHorizontalScrollIndicator = false
-        scrollView.showsVerticalScrollIndicator = false
-        scrollView.alwaysBounceVertical = false
-        scrollView.alwaysBounceHorizontal = false
-        scrollView.scrollsToTop = false
-        scrollView.contentInsetAdjustmentBehavior = .never
+    public private(set) lazy var scrollView: ZoomScrollView = {
+        let scrollView = ZoomScrollView()
         scrollView.minimumZoomScale = self.minimumZoomScale
         scrollView.maximumZoomScale = self.maximumZoomScale
         scrollView.delegate = self
