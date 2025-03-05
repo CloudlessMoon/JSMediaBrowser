@@ -66,7 +66,7 @@ class BrowserViewController: MediaBrowserViewController {
                 guard let self = self else { return }
                 self.updatePageControl(for: $1)
             },
-            didLongPressTouch: {
+            didLongPress: { _, _ in
                 QMUITips.show(withText: "长按")
             }
         )
