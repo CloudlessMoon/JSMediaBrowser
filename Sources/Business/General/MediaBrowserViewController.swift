@@ -18,12 +18,13 @@ open class MediaBrowserViewController: UIViewController {
     
     public var dataSource: [any AssetItem] = [] {
         didSet {
+            defer {
+                self.eventHandler?.didChangedData(current: self.dataSource, previous: oldValue)
+            }
+            
             guard self.isViewLoaded else {
                 return
             }
-            
-            self.eventHandler?.didChangedData(current: self.dataSource, previous: oldValue)
-            
             self.reloadData()
         }
     }
