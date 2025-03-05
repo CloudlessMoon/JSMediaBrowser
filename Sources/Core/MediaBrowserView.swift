@@ -319,25 +319,31 @@ extension MediaBrowserView: UIScrollViewDelegate {
         guard !self.collectionView.bounds.isEmpty && !self.isPossiblyRotating else {
             return
         }
+        let offsetIndex = self.offsetIndex
+        defer {
+            self.previousOffsetIndex = offsetIndex
+        }
+        guard !self.isScrollingToPage else {
+            return
+        }
         let betweenOrEqual = { (minimumValue: CGFloat, value: CGFloat, maximumValue: CGFloat) -> Bool in
             return minimumValue <= value && value <= maximumValue
         }
-        let offsetIndex = self.offsetIndex
         let fastToRight = (floor(offsetIndex) - floor(self.previousOffsetIndex) >= 1.0) && (floor(offsetIndex) - self.previousOffsetIndex > 0.5)
         let turnPageToRight = fastToRight || betweenOrEqual(self.previousOffsetIndex, floor(offsetIndex) + 0.5, offsetIndex)
         let fastToLeft = (floor(self.previousOffsetIndex) - floor(offsetIndex) >= 1.0) && (self.previousOffsetIndex - ceil(offsetIndex) > 0.5)
         let turnPageToLeft = fastToLeft || betweenOrEqual(offsetIndex, floor(offsetIndex) + 0.5, self.previousOffsetIndex)
-        
-        if turnPageToRight || turnPageToLeft {
-            let index = Int(round(offsetIndex))
-            if index >= 0 && index < self.totalUnitPage && self.currentPage != index {
-                let previousPage = self.currentPage
-                self.currentPage = index
-                
-                self.callWillScrollHalf(from: previousPage, to: index)
-            }
-            self.previousOffsetIndex = offsetIndex
+        guard turnPageToRight || turnPageToLeft else {
+            return
         }
+        let index = Int(round(offsetIndex))
+        guard index >= 0 && index < self.totalUnitPage && self.currentPage != index else {
+            return
+        }
+        let previousPage = self.currentPage
+        self.currentPage = index
+        
+        self.callWillScrollHalf(from: previousPage, to: index)
     }
     
     public func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {

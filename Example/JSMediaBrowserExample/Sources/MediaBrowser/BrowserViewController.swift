@@ -66,8 +66,9 @@ class BrowserViewController: MediaBrowserViewController {
                 guard let self = self else { return }
                 self.updatePageControl(for: $1)
             },
-            didLongPress: { _, _ in
-                QMUITips.show(withText: "长按")
+            didLongPress: { [weak self] _, _ in
+                guard let self = self else { return }
+                self.setCurrentPage(Int.random(in: 0..<self.dataSource.count), animated: true)
             }
         )
     }
