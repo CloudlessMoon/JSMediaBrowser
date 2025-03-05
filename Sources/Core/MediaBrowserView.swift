@@ -341,30 +341,18 @@ extension MediaBrowserView: UIScrollViewDelegate {
     }
     
     public func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
-        self.draggingPage = self.currentPage
+        self.handleBeginDragging()
     }
     
     public func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
         guard !decelerate else {
             return
         }
-        if self.draggingPage != self.currentPage {
-            self.draggingPage = nil
-            
-            self.callDidScrollToIndex()
-        } else {
-            self.draggingPage = nil
-        }
+        self.handleEndDecelerating()
     }
     
     public func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
-        if self.draggingPage != self.currentPage {
-            self.draggingPage = nil
-            
-            self.callDidScrollToIndex()
-        } else {
-            self.draggingPage = nil
-        }
+        self.handleEndDecelerating()
     }
     
     public func scrollViewDidEndScrollingAnimation(_ scrollView: UIScrollView) {
@@ -414,6 +402,20 @@ extension MediaBrowserView: UIScrollViewDelegate {
             }
         } else {
             completion?()
+        }
+    }
+    
+    private func handleBeginDragging() {
+        self.draggingPage = self.currentPage
+    }
+    
+    private func handleEndDecelerating() {
+        if self.draggingPage != self.currentPage {
+            self.draggingPage = nil
+            
+            self.callDidScrollToIndex()
+        } else {
+            self.draggingPage = nil
         }
     }
     
