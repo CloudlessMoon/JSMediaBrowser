@@ -375,22 +375,14 @@ extension MediaBrowserView: UIScrollViewDelegate {
     }
     
     private var offsetIndex: CGFloat {
-        let maximumPage = CGFloat(self.totalUnitPage - 1)
+        let maximumIndex = CGFloat(self.totalUnitPage - 1)
         let pageWidth = self.collectionView.bounds.width
-        guard pageWidth > 0 && maximumPage >= 0 else {
+        guard pageWidth > 0 && maximumIndex >= 0 else {
             return 0
         }
-        
         let contentOffsetX = self.collectionView.contentOffset.x
         let offsetIndex = contentOffsetX / pageWidth
-        guard offsetIndex >= 0 else {
-            return 0
-        }
-        
-        guard offsetIndex <= maximumPage else {
-            return maximumPage
-        }
-        return offsetIndex
+        return max(min(offsetIndex, maximumIndex), 0)
     }
     
     private var isPossiblyRotating: Bool {
