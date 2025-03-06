@@ -34,6 +34,8 @@ open class ZoomView: BasisMediaView {
         }
     }
     
+    public private(set) var assetView: (any ZoomAssetView)?
+    
     public var thumbnail: UIImage? {
         didSet {
             if self.thumbnail != nil {
@@ -54,11 +56,9 @@ open class ZoomView: BasisMediaView {
         }
     }
     
-    public private(set) var assetView: (any ZoomAssetView)?
-    
     public private(set) var thumbnailView: UIImageView?
     
-    public var assetMode: ZoomViewAssetMode = .aspectFill {
+    public var assetMode: ZoomViewAssetMode = .automatic {
         didSet {
             guard oldValue != self.assetMode else {
                 return
@@ -244,10 +244,10 @@ extension ZoomView {
     }
     
     public func contentSizeThatFits(_ size: CGSize) -> CGSize {
-        let scale = self.assetScale(with: size)
+        let size = self.assetSize(with: size)
         return CGSize(
-            width: JSFloorPixelValue(size.width * scale),
-            height: JSFloorPixelValue(size.height * scale)
+            width: JSFloorPixelValue(size.width),
+            height: JSFloorPixelValue(size.height)
         )
     }
     
@@ -298,26 +298,47 @@ extension ZoomView {
         thumbnailView.isHidden = self.thumbnail == nil || self.asset != nil
     }
     
-    private func assetScale(with size: CGSize) -> CGFloat {
+    private func assetSize(with size: CGSize) -> CGSize {
         guard JSCGSizeIsValidated(size) else {
-            return 0
+            return .zero
         }
         let viewport = self.viewportRect
-        let height = size.width > viewport.width ? viewport.width * (size.height / size.width) : size.height
-        if height > viewport.height {
-            // AspectFill
-            if size.width / size.height < viewport.width / viewport.height {
-                return viewport.width / size.width
-            } else {
-                return viewport.height / size.height
+        guard JSCGSizeIsValidated(viewport.size) else {
+            return .zero
+        }
+        let sizeRatio = size.width / size.height
+        let aspectFill = {
+            return CGSize(
+                width: viewport.width,
+                height: viewport.width / sizeRatio
+            )
+        }
+        let aspectFit = {
+            guard size.width > viewport.width || size.height > viewport.height else {
+                return size
             }
-        } else {
-            // AspectFit
-            if size.width / size.height < viewport.width / viewport.height {
-                return viewport.height / size.height
+            let viewportRatio = viewport.width / viewport.height
+            if sizeRatio < viewportRatio {
+                return CGSize(
+                    width: viewport.height * sizeRatio,
+                    height: viewport.height
+                )
             } else {
-                return viewport.width / size.width
+                return aspectFill()
             }
+        }
+        switch self.assetMode {
+        case .automatic:
+            let height = size.width > viewport.width ? aspectFill().height : size.height
+            if height > viewport.height {
+                return aspectFill()
+            } else {
+                return aspectFit()
+            }
+        case .aspectFill:
+            return aspectFill()
+        case .aspectFit:
+            return aspectFit()
         }
     }
     
@@ -326,18 +347,23 @@ extension ZoomView {
             return .zero
         }
         let viewport = self.viewportRect
-        var contentInset = UIEdgeInsets.zero
-        contentInset.top = viewport.minY
-        contentInset.left = viewport.minX
-        contentInset.right = self.bounds.width - viewport.maxX
-        contentInset.bottom = self.bounds.height - viewport.maxY
-        if viewport.height >= size.height {
-            contentInset.top = viewport.midY - size.height / 2.0
-            contentInset.bottom = self.bounds.height - viewport.midY - size.height / 2.0
+        guard JSCGSizeIsValidated(viewport.size) else {
+            return .zero
         }
+        var contentInset = UIEdgeInsets.zero
         if viewport.width >= size.width {
             contentInset.left = viewport.midX - size.width / 2.0
             contentInset.right = self.bounds.width - viewport.midX - size.width / 2.0
+        } else {
+            contentInset.left = viewport.minX
+            contentInset.right = self.bounds.width - viewport.maxX
+        }
+        if viewport.height >= size.height {
+            contentInset.top = viewport.midY - size.height / 2.0
+            contentInset.bottom = self.bounds.height - viewport.midY - size.height / 2.0
+        } else {
+            contentInset.top = viewport.minY
+            contentInset.bottom = self.bounds.height - viewport.maxY
         }
         return contentInset
     }

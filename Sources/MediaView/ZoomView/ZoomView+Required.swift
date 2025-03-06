@@ -11,7 +11,7 @@ public struct ZoomViewConfiguration {
     
     public typealias BuildAssetView = (any ZoomAsset) -> (any ZoomAssetView)?
     public typealias BuildThumbnailView = () -> UIImageView?
-
+    
     public var assetView: BuildAssetView
     public var thumbnailView: BuildThumbnailView
     
@@ -46,6 +46,7 @@ public extension ZoomViewEventHandler {
 }
 
 public enum ZoomViewAssetMode: Equatable {
+    case automatic
     case aspectFill
     case aspectFit
 }
