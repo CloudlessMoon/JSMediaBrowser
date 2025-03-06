@@ -403,6 +403,9 @@ extension MediaBrowserView: UIScrollViewDelegate {
     }
     
     private func handleBeginDragging() {
+        guard self.draggingPage == nil else {
+            return
+        }
         self.draggingPage = self.currentPage
     }
     
