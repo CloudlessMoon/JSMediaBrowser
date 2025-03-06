@@ -103,12 +103,12 @@ open class MediaBrowserView: UIView {
     
     open override func layoutSubviews() {
         super.layoutSubviews()
-        self.dimmingView?.frame = self.bounds
-        
         if self.collectionView.bounds.size != self.bounds.size {
             self.collectionView.frame = self.bounds
             self.scrollToPage(at: self.currentPage, animated: false)
         }
+        
+        self.dimmingView?.frame = self.bounds
     }
     
 }
@@ -315,15 +315,14 @@ extension MediaBrowserView: UICollectionViewDelegateFlowLayout {
 extension MediaBrowserView: UIScrollViewDelegate {
     
     public func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        /// 横竖屏旋转会触发scrollViewDidScroll, 会导致self.currentPage被改变, 所以这里加个isPossiblyRotating控制下。
-        guard !self.collectionView.bounds.isEmpty && !self.isPossiblyRotating else {
+        guard !self.collectionView.bounds.isEmpty else {
             return
         }
         let offsetIndex = self.offsetIndex
         defer {
             self.previousOffsetIndex = offsetIndex
         }
-        guard !self.isScrollingToPage else {
+        guard self.isDragging || self.isDecelerating || self.isTracking else {
             return
         }
         let betweenOrEqual = { (minimumValue: CGFloat, value: CGFloat, maximumValue: CGFloat) -> Bool in
@@ -377,14 +376,6 @@ extension MediaBrowserView: UIScrollViewDelegate {
         let contentOffsetX = self.collectionView.contentOffset.x
         let offsetIndex = contentOffsetX / pageWidth
         return max(min(offsetIndex, maximumIndex), 0)
-    }
-    
-    private var isPossiblyRotating: Bool {
-        guard let animationKeys = self.collectionView.layer.animationKeys() else {
-            return false
-        }
-        let rotationAnimationKeys = ["position", "bounds.origin", "bounds.size"]
-        return animationKeys.contains(where: { rotationAnimationKeys.contains($0) })
     }
     
     private func scrollToPage(at index: Int, animated: Bool, completion: (() -> Void)? = nil) {
