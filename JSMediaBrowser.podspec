@@ -1,7 +1,7 @@
 
 Pod::Spec.new do |s|
   s.name         = "JSMediaBrowser"
-  s.version      = "2.1.0"
+  s.version      = "2.1.2"
   s.summary      = "图片、视频浏览器"
   s.homepage     = "https://github.com/CloudlessMoon/JSMediaBrowser"
   s.author       = "CloudlessMoon"
