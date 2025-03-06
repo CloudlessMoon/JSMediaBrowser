@@ -145,8 +145,10 @@ open class MediaBrowserViewController: UIViewController {
     
     open override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        /// 外部可能设置导航栏, 这里需要隐藏
-        self.navigationController?.setNavigationBarHidden(true, animated: false)
+        if self.isPresented {
+            /// 外部可能设置导航栏, 这里需要隐藏
+            self.navigationController?.setNavigationBarHidden(true, animated: false)
+        }
     }
     
     open override func viewDidAppear(_ animated: Bool) {

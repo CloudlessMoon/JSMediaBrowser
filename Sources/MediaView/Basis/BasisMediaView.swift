@@ -50,7 +50,7 @@ extension BasisMediaView {
     
     public var viewportRect: CGRect {
         guard !self.bounds.isEmpty else {
-            return CGRect.zero
+            return .zero
         }
         let viewportInsets = self.viewportInsets
         let size = CGSize(width: min(self.bounds.width, self.viewportRectMaxWidth), height: self.bounds.height)

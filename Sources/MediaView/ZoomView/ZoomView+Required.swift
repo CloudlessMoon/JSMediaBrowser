@@ -45,6 +45,11 @@ public extension ZoomViewEventHandler {
     
 }
 
+public enum ZoomViewAssetMode: Equatable {
+    case aspectFill
+    case aspectFit
+}
+
 public struct DefaultZoomViewEventHandler: ZoomViewEventHandler {
     
     public typealias DidZoom = (any ZoomAssetView) -> Void
