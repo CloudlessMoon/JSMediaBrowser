@@ -294,10 +294,11 @@ extension ZoomView {
 extension ZoomView {
     
     private func createAssetView(for asset: any ZoomAsset) {
-        guard self.assetView == nil else {
-            return
+        if let assetView = self.assetView, !assetView.isAsset(asset) {
+            assetView.removeFromSuperview()
+            self.assetView = nil
         }
-        guard let assetView = self.configuration.assetView(asset) else {
+        guard self.assetView == nil, let assetView = self.configuration.assetView(asset) else {
             return
         }
         assetView.isAccessibilityElement = true

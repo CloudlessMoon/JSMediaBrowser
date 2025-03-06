@@ -10,8 +10,6 @@ import UIKit
 import JSMediaBrowser
 import SnapKit
 import QMUIKit
-import SDWebImage
-import PhotosUI
 
 class BrowserViewController: MediaBrowserViewController {
     
@@ -28,31 +26,7 @@ class BrowserViewController: MediaBrowserViewController {
     }()
     
     init() {
-        super.init(configuration: .init(
-            zoomView: { _ in
-                return ZoomView(configuration: .init(
-                    assetView: {
-                        if $0 is UIImage {
-                            let imageView = SDAnimatedImageView()
-                            imageView.autoPlayAnimatedImage = false
-                            if #available(iOS 17.0, *) {
-                                imageView.preferredImageDynamicRange = .high
-                            }
-                            return imageView
-                        } else if $0 is PHLivePhoto {
-                            return PHLivePhotoView()
-                        } else {
-                            return nil
-                        }
-                    },
-                    thumbnailView: {
-                        let imageView = SDAnimatedImageView()
-                        imageView.autoPlayAnimatedImage = false
-                        return imageView
-                    }
-                ))
-            }
-        ))
+        super.init(configuration: .default)
         
         self.eventHandler = DefaultMediaBrowserViewControllerEventHandler(
             didChangedData: { [weak self] _, _ in

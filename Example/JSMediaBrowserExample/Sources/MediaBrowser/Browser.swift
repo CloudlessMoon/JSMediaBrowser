@@ -8,6 +8,42 @@
 import UIKit
 import SDWebImage
 import JSMediaBrowser
+import PhotosUI
+
+extension MediaBrowserViewControllerConfiguration {
+    
+    static let `default` = MediaBrowserViewControllerConfiguration(
+        zoomView: { index in
+            return ZoomView(configuration: .default)
+        }
+    )
+    
+}
+
+extension ZoomViewConfiguration {
+    
+    static let `default` = ZoomViewConfiguration(
+        assetView: {
+            if $0 is UIImage {
+                let imageView = SDAnimatedImageView()
+                imageView.autoPlayAnimatedImage = false
+                if #available(iOS 17.0, *) {
+                    imageView.preferredImageDynamicRange = .high
+                }
+                return imageView
+            } else if $0 is PHLivePhoto {
+                return PHLivePhotoView()
+            } else {
+                return nil
+            }
+        },
+        thumbnailView: {
+            let imageView = SDAnimatedImageView()
+            imageView.autoPlayAnimatedImage = false
+            return imageView
+        }
+    )
+}
 
 struct ImageItem: ImageAssetItem {
     

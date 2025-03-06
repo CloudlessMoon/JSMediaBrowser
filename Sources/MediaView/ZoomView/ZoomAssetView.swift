@@ -30,7 +30,7 @@ internal extension ZoomAssetView {
     
     func isEqual(_ asset: (any ZoomAsset)?) -> Bool {
         let lhs = self.asset
-        let rhs = asset as? ZoomAssetType
+        let rhs = self.asAsset(asset)
         return lhs == rhs
     }
     
@@ -39,8 +39,16 @@ internal extension ZoomAssetView {
             self.asset = nil
             return
         }
-        assert(asset is ZoomAssetType, "类型不匹配")
-        self.asset = asset as? ZoomAssetType
+        assert(self.isAsset(asset), "类型不匹配")
+        self.asset = self.asAsset(asset)
+    }
+    
+    func asAsset(_ asset: (any ZoomAsset)?) -> ZoomAssetType? {
+        return asset as? ZoomAssetType
+    }
+    
+    func isAsset(_ asset: any ZoomAsset) -> Bool {
+        return asset is ZoomAssetType
     }
     
 }
