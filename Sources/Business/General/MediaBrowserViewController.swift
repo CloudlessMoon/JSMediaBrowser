@@ -500,6 +500,7 @@ extension MediaBrowserViewController: MediaBrowserViewDelegate {
         if zoomView.zoomScale != minimumZoomScale {
             zoomView.setZoom(scale: minimumZoomScale, animated: true)
         } else {
+            let point = zoomView.assetView?.convert(point, from: mediaBrowserView) ?? point
             zoomView.zoom(to: point, scale: zoomView.maximumZoomScale, animated: true)
         }
     }
