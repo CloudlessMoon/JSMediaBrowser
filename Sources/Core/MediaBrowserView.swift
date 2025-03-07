@@ -183,6 +183,11 @@ extension MediaBrowserView {
         return self.collectionView.indexPathForItem(at: point)?.item
     }
     
+    private func index(of gestureRecognizer: UIGestureRecognizer) -> Int? {
+        let location = gestureRecognizer.location(in: self.collectionView)
+        return self.indexForPage(in: location)
+    }
+    
     public func cellForPage<Cell: UICollectionViewCell>(at index: Int) -> Cell? {
         let indexPath = IndexPath(item: index, section: 0)
         return self.collectionView.cellForItem(at: indexPath) as? Cell
@@ -251,24 +256,30 @@ extension MediaBrowserView: UIGestureRecognizerDelegate {
     }
     
     @objc private func handleSingleTap(_ gestureRecognizer: UITapGestureRecognizer) {
-        let location = gestureRecognizer.location(in: self.collectionView)
-        let index = self.indexForPage(in: location) ?? self.currentPage
-        self.delegate?.mediaBrowserView(self, didSingleTapAt: index, point: gestureRecognizer.location(in: self))
+        self.delegate?.mediaBrowserView(
+            _: self,
+            didSingleTapAt: self.index(of: gestureRecognizer) ?? self.currentPage,
+            point: gestureRecognizer.location(in: self)
+        )
     }
     
     @objc private func handleDoubleTap(_ gestureRecognizer: UITapGestureRecognizer) {
-        let location = gestureRecognizer.location(in: self.collectionView)
-        let index = self.indexForPage(in: location) ?? self.currentPage
-        self.delegate?.mediaBrowserView(self, didDoubleTapAt: index, point: gestureRecognizer.location(in: self))
+        self.delegate?.mediaBrowserView(
+            _: self,
+            didDoubleTapAt: self.index(of: gestureRecognizer) ?? self.currentPage,
+            point: gestureRecognizer.location(in: self)
+        )
     }
     
     @objc private func handleLongPress(_ gestureRecognizer: UILongPressGestureRecognizer) {
         guard gestureRecognizer.state == .began else {
             return
         }
-        let location = gestureRecognizer.location(in: self.collectionView)
-        let index = self.indexForPage(in: location) ?? self.currentPage
-        self.delegate?.mediaBrowserView(self, didLongPressAt: index, point: gestureRecognizer.location(in: self))
+        self.delegate?.mediaBrowserView(
+            _: self,
+            didLongPressAt: self.index(of: gestureRecognizer) ?? self.currentPage,
+            point: gestureRecognizer.location(in: self)
+        )
     }
     
 }
