@@ -74,6 +74,10 @@ open class BasisCell: UICollectionViewCell {
         self.pieProgressView.frame = CGRect(origin: progressPoint, size: progressSize)
     }
     
+}
+
+extension BasisCell {
+    
     public func setProgress(_ progress: Progress) {
         self.progress = progress
         
