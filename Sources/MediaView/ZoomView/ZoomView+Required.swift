@@ -14,13 +14,25 @@ public struct ZoomViewConfiguration {
     
     public var assetView: BuildAssetView
     public var thumbnailView: BuildThumbnailView
+    public var assetMode: ZoomViewAssetMode
+    public var isEnabledZoom: Bool
+    public var minimumZoomScale: CGFloat
+    public var maximumZoomScale: CGFloat
     
     public init(
         assetView: @escaping BuildAssetView,
-        thumbnailView: @escaping BuildThumbnailView
+        thumbnailView: @escaping BuildThumbnailView,
+        assetMode: ZoomViewAssetMode = .automatic,
+        isEnabledZoom: Bool = true,
+        minimumZoomScale: CGFloat = 1.0,
+        maximumZoomScale: CGFloat = 2.0
     ) {
         self.assetView = assetView
         self.thumbnailView = thumbnailView
+        self.assetMode = assetMode
+        self.isEnabledZoom = isEnabledZoom
+        self.minimumZoomScale = minimumZoomScale
+        self.maximumZoomScale = maximumZoomScale
     }
     
 }

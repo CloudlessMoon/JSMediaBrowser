@@ -58,7 +58,7 @@ open class ZoomView: BasisMediaView {
     
     public private(set) var thumbnailView: UIImageView?
     
-    public var assetMode: ZoomViewAssetMode = .automatic {
+    public var assetMode: ZoomViewAssetMode {
         didSet {
             guard oldValue != self.assetMode else {
                 return
@@ -67,15 +67,22 @@ open class ZoomView: BasisMediaView {
         }
     }
     
-    public var isEnabledZoom: Bool = true
+    public var isEnabledZoom: Bool {
+        didSet {
+            guard oldValue != self.isEnabledZoom else {
+                return
+            }
+            self.setNeedsRevertZoom()
+        }
+    }
     
-    public var minimumZoomScale: CGFloat = 1.0 {
+    public var minimumZoomScale: CGFloat {
         didSet {
             self.scrollView.minimumZoomScale = self.minimumZoomScale
         }
     }
     
-    public var maximumZoomScale: CGFloat = 2.0 {
+    public var maximumZoomScale: CGFloat {
         didSet {
             self.scrollView.maximumZoomScale = self.maximumZoomScale
         }
@@ -93,6 +100,11 @@ open class ZoomView: BasisMediaView {
     
     public init(configuration: ZoomViewConfiguration, eventHandler: ZoomViewEventHandler? = nil) {
         self.configuration = configuration
+        self.assetMode = configuration.assetMode
+        self.isEnabledZoom = configuration.isEnabledZoom
+        self.minimumZoomScale = configuration.minimumZoomScale
+        self.maximumZoomScale = configuration.maximumZoomScale
+        
         self.eventHandler = eventHandler
         
         super.init()
