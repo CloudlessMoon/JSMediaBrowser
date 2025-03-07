@@ -476,7 +476,7 @@ extension MediaBrowserViewController: MediaBrowserViewDelegate {
     
     public func mediaBrowserView(_ mediaBrowserView: MediaBrowserView, didSingleTapAt index: Int, point: CGPoint) {
         defer {
-            self.eventHandler?.didSingleTap(at: index, point: point)
+            self.eventHandler?.didSingleTap(at: index, point: self.view.convert(point, from: mediaBrowserView))
         }
         
         guard self.hideWhenSingleTap else {
@@ -487,7 +487,7 @@ extension MediaBrowserViewController: MediaBrowserViewDelegate {
     
     public func mediaBrowserView(_ mediaBrowserView: MediaBrowserView, didDoubleTapAt index: Int, point: CGPoint) {
         defer {
-            self.eventHandler?.didDoubleTap(at: index, point: point)
+            self.eventHandler?.didDoubleTap(at: index, point: self.view.convert(point, from: mediaBrowserView))
         }
         
         guard self.zoomWhenDoubleTap else {
@@ -506,7 +506,7 @@ extension MediaBrowserViewController: MediaBrowserViewDelegate {
     }
     
     public func mediaBrowserView(_ mediaBrowserView: MediaBrowserView, didLongPressAt index: Int, point: CGPoint) {
-        self.eventHandler?.didLongPress(at: index, point: point)
+        self.eventHandler?.didLongPress(at: index, point: self.view.convert(point, from: mediaBrowserView))
     }
     
 }

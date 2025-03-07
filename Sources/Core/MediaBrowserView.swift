@@ -251,24 +251,24 @@ extension MediaBrowserView: UIGestureRecognizerDelegate {
     }
     
     @objc private func handleSingleTap(_ gestureRecognizer: UITapGestureRecognizer) {
-        let location = gestureRecognizer.location(in: self)
+        let location = gestureRecognizer.location(in: self.collectionView)
         let index = self.indexForPage(in: location) ?? self.currentPage
-        self.delegate?.mediaBrowserView(self, didSingleTapAt: index, point: location)
+        self.delegate?.mediaBrowserView(self, didSingleTapAt: index, point: gestureRecognizer.location(in: self))
     }
     
     @objc private func handleDoubleTap(_ gestureRecognizer: UITapGestureRecognizer) {
-        let location = gestureRecognizer.location(in: self)
+        let location = gestureRecognizer.location(in: self.collectionView)
         let index = self.indexForPage(in: location) ?? self.currentPage
-        self.delegate?.mediaBrowserView(self, didDoubleTapAt: index, point: location)
+        self.delegate?.mediaBrowserView(self, didDoubleTapAt: index, point: gestureRecognizer.location(in: self))
     }
     
     @objc private func handleLongPress(_ gestureRecognizer: UILongPressGestureRecognizer) {
         guard gestureRecognizer.state == .began else {
             return
         }
-        let location = gestureRecognizer.location(in: self)
+        let location = gestureRecognizer.location(in: self.collectionView)
         let index = self.indexForPage(in: location) ?? self.currentPage
-        self.delegate?.mediaBrowserView(self, didLongPressAt: index, point: location)
+        self.delegate?.mediaBrowserView(self, didLongPressAt: index, point: gestureRecognizer.location(in: self))
     }
     
 }
