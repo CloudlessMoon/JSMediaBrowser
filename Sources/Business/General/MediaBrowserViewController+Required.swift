@@ -60,7 +60,9 @@ public protocol MediaBrowserViewControllerEventHandler {
     
     func didChangedData(current: [any AssetItem], previous: [any AssetItem])
     
-    func willDisplayZoomView(_ zoomView: ZoomView, at index: Int)
+    func willDisplayPhotoCell(_ cell: PhotoCell, zoomView: ZoomView, at index: Int)
+    func didEndDisplayingPhotoCell(_ cell: PhotoCell, zoomView: ZoomView, at index: Int)
+
     func willDisplayEmptyView(_ emptyView: EmptyView, with error: NSError, at index: Int)
     
     func shouldStartPlaying(at index: Int) -> Bool
@@ -78,7 +80,10 @@ public extension MediaBrowserViewControllerEventHandler {
     
     func didChangedData(current: [any AssetItem], previous: [any AssetItem]) {}
     
-    func willDisplayZoomView(_ zoomView: ZoomView, at index: Int) {}
+    func willDisplayPhotoCell(_ cell: PhotoCell, zoomView: ZoomView, at index: Int) {}
+    
+    func didEndDisplayingPhotoCell(_ cell: PhotoCell, zoomView: ZoomView, at index: Int) {}
+    
     func willDisplayEmptyView(_ emptyView: EmptyView, with error: NSError, at index: Int) {}
     
     func shouldStartPlaying(at index: Int) -> Bool { true }
@@ -96,14 +101,15 @@ public struct DefaultMediaBrowserViewControllerEventHandler: MediaBrowserViewCon
     
     public typealias ChangedDataSource = ([any AssetItem], [any AssetItem]) -> Void
     public typealias ShouldPlaying = (Int) -> Bool
-    public typealias DisplayZoomView = (ZoomView, Int) -> Void
+    public typealias DisplayCell = (PhotoCell, ZoomView, Int) -> Void
     public typealias DisplayEmptyView = (EmptyView, NSError, Int) -> Void
     public typealias WillScroll = (Int, Int) -> Void
     public typealias DidScroll = (Int) -> Void
     public typealias DidTouch = (Int, CGPoint) -> Void
     
     private let _didChangedData: ChangedDataSource?
-    private let _willDisplayZoomView: DisplayZoomView?
+    private let _willDisplayPhotoCell: DisplayCell?
+    private let _didEndDisplayingPhotoCell: DisplayCell?
     private let _willDisplayEmptyView: DisplayEmptyView?
     private let _shouldStartPlaying: ShouldPlaying?
     private let _willScrollHalf: WillScroll?
@@ -114,7 +120,8 @@ public struct DefaultMediaBrowserViewControllerEventHandler: MediaBrowserViewCon
     
     public init(
         didChangedData: ChangedDataSource? = nil,
-        willDisplayZoomView: DisplayZoomView? = nil,
+        willDisplayPhotoCell: DisplayCell? = nil,
+        didEndDisplayingPhotoCell: DisplayCell? = nil,
         willDisplayEmptyView: DisplayEmptyView? = nil,
         shouldStartPlaying: ShouldPlaying? = nil,
         willScrollHalf: WillScroll? = nil,
@@ -124,7 +131,8 @@ public struct DefaultMediaBrowserViewControllerEventHandler: MediaBrowserViewCon
         didLongPress: DidTouch? = nil
     ) {
         self._didChangedData = didChangedData
-        self._willDisplayZoomView = willDisplayZoomView
+        self._willDisplayPhotoCell = willDisplayPhotoCell
+        self._didEndDisplayingPhotoCell = didEndDisplayingPhotoCell
         self._willDisplayEmptyView = willDisplayEmptyView
         self._shouldStartPlaying = shouldStartPlaying
         self._willScrollHalf = willScrollHalf
@@ -146,8 +154,12 @@ public struct DefaultMediaBrowserViewControllerEventHandler: MediaBrowserViewCon
         self._didScroll?(index)
     }
     
-    public func willDisplayZoomView(_ zoomView: ZoomView, at index: Int) {
-        self._willDisplayZoomView?(zoomView, index)
+    public func willDisplayPhotoCell(_ cell: PhotoCell, zoomView: ZoomView, at index: Int) {
+        self._willDisplayPhotoCell?(cell, zoomView, index)
+    }
+    
+    public func didEndDisplayingPhotoCell(_ cell: PhotoCell, zoomView: ZoomView, at index: Int) {
+        self._didEndDisplayingPhotoCell?(cell, zoomView, index)
     }
     
     public func willDisplayEmptyView(_ emptyView: EmptyView, with error: NSError, at index: Int) {

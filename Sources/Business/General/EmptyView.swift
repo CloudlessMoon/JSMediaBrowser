@@ -73,8 +73,8 @@ open class EmptyView: UIView {
         return button
     }()
     
-    public override init(frame: CGRect) {
-        super.init(frame: frame)
+    public init() {
+        super.init(frame: .zero)
         self.didInitialize()
     }
     
@@ -92,18 +92,50 @@ open class EmptyView: UIView {
     
     open override func layoutSubviews() {
         super.layoutSubviews()
-        let imageSize = self.imageView.sizeThatFits(CGSize(width: min(self.frame.width * 0.4, 120), height: 0))
-        let titleSize = self.titleLabel.sizeThatFits(CGSize(width: min(self.frame.width * 0.6, 280), height: 0))
-        let subtitleSize = self.subtitleLabel.sizeThatFits(CGSize(width: min(self.frame.width * 0.75, 350), height: 0))
-        let buttonSize = self.actionButton.sizeThatFits(CGSize(width: subtitleSize.width * 0.6, height: 0))
+        let imageSize = self.imageView.sizeThatFits(CGSize(
+            width: min(self.bounds.width * 0.4, 120),
+            height: 0
+        ))
+        let titleSize = self.titleLabel.sizeThatFits(CGSize(
+            width: min(self.bounds.width * 0.6, 280),
+            height: 0
+        ))
+        let subtitleSize = self.subtitleLabel.sizeThatFits(CGSize(
+            width: min(self.bounds.width * 0.75, 350),
+            height: 0
+        ))
+        let buttonSize = self.actionButton.sizeThatFits(CGSize(
+            width: subtitleSize.width * 0.6,
+            height: 0
+        ))
         
         let margin = 12.0
         let buttonMarginTop = 15.0
         let subviewsHeight = imageSize.height + titleSize.height + subtitleSize.height + buttonSize.height + margin * 2 + buttonMarginTop
-        self.imageView.frame = CGRect(x: (self.frame.width - imageSize.width) / 2, y: (self.frame.height - subviewsHeight) / 2, width: imageSize.width, height: imageSize.height)
-        self.titleLabel.frame = CGRect(origin: CGPoint(x: (self.frame.width - titleSize.width) / 2, y: self.imageView.frame.maxY + margin), size: titleSize)
-        self.subtitleLabel.frame = CGRect(origin: CGPoint(x: (self.frame.width - subtitleSize.width) / 2, y: self.titleLabel.frame.maxY + margin), size: subtitleSize)
-        self.actionButton.frame = CGRect(origin: CGPoint(x: (self.frame.width - buttonSize.width) / 2, y: self.subtitleLabel.frame.maxY + buttonMarginTop), size: buttonSize)
+        self.imageView.frame = CGRect(
+            x: (self.bounds.width - imageSize.width) / 2,
+            y: (self.bounds.height - subviewsHeight) / 2,
+            width: imageSize.width,
+            height: imageSize.height
+        )
+        self.titleLabel.frame = CGRect(
+            x: (self.bounds.width - titleSize.width) / 2,
+            y: self.imageView.frame.maxY + margin,
+            width: titleSize.width,
+            height: titleSize.height
+        )
+        self.subtitleLabel.frame = CGRect(
+            x: (self.bounds.width - subtitleSize.width) / 2,
+            y: self.titleLabel.frame.maxY + margin,
+            width: subtitleSize.width,
+            height: subtitleSize.height
+        )
+        self.actionButton.frame = CGRect(
+            x: (self.bounds.width - buttonSize.width) / 2,
+            y: self.subtitleLabel.frame.maxY + buttonMarginTop,
+            width: buttonSize.width,
+            height: buttonSize.height
+        )
         
         self.imageView.isHidden = imageSize == CGSize.zero
         self.titleLabel.isHidden = titleSize.height == 0

@@ -15,14 +15,14 @@ open class BasisCell: UICollectionViewCell {
         return view
     }()
     
-    public private(set) lazy var pieProgressView: PieProgressView = {
+    public private(set) lazy var progressView: PieProgressView = {
         let view = PieProgressView()
         view.tintColor = .white
         return view
     }()
     
-    public var onPressEmpty: ((UICollectionViewCell) -> Void)?
-    public var willDisplayEmptyView: ((UICollectionViewCell, EmptyView, NSError) -> Void)?
+    public var onPressEmpty: (() -> Void)?
+    public var willDisplayEmptyView: ((EmptyView, NSError) -> Void)?
     
     private var error: NSError? {
         didSet {
@@ -54,13 +54,11 @@ open class BasisCell: UICollectionViewCell {
     
     open func didInitialize() {
         self.contentView.addSubview(self.emptyView)
-        self.contentView.addSubview(self.pieProgressView)
+        self.contentView.addSubview(self.progressView)
         
-        self.emptyView.onPressAction = { [weak self] (sender: UIButton) in
-            guard let self = self else {
-                return
-            }
-            self.onPressEmpty?(self)
+        self.emptyView.onPressAction = { [weak self] _ in
+            guard let self = self else { return }
+            self.onPressEmpty?()
         }
     }
     
@@ -71,7 +69,7 @@ open class BasisCell: UICollectionViewCell {
         let width = min(self.bounds.width * 0.12, 60)
         let progressSize = CGSize(width: width, height: width)
         let progressPoint = CGPoint(x: (self.bounds.width - progressSize.width) / 2, y: (self.bounds.height - progressSize.height) / 2)
-        self.pieProgressView.frame = CGRect(origin: progressPoint, size: progressSize)
+        self.progressView.frame = CGRect(origin: progressPoint, size: progressSize)
     }
     
 }
@@ -81,7 +79,7 @@ extension BasisCell {
     public func setProgress(_ progress: Progress) {
         self.progress = progress
         
-        self.pieProgressView.setProgress(Float(progress.fractionCompleted), animated: true)
+        self.progressView.setProgress(Float(progress.fractionCompleted), animated: true)
     }
     
     public func setError(_ error: NSError?) {
@@ -89,7 +87,7 @@ extension BasisCell {
         
         if let error = error {
             self.emptyView.title = NSAttributedString(string: error.localizedDescription, attributes: nil)
-            self.willDisplayEmptyView?(self, self.emptyView, error)
+            self.willDisplayEmptyView?(self.emptyView, error)
             self.emptyView.isHidden = false
         } else {
             self.emptyView.isHidden = true
@@ -102,9 +100,9 @@ extension BasisCell {
     
     private func updateProgress() {
         if self.error != nil || self.progress.fractionCompleted == 1.0 || self.progress.totalUnitCount == 0 {
-            self.pieProgressView.isHidden = true
+            self.progressView.isHidden = true
         } else {
-            self.pieProgressView.isHidden = false
+            self.progressView.isHidden = false
         }
     }
     

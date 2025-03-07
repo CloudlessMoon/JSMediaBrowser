@@ -320,14 +320,12 @@ extension MediaBrowserViewController: MediaBrowserViewDataSource {
     }
     
     private func configCell(_ cell: BasisCell, at index: Int) {
-        cell.onPressEmpty = { [weak self] (cell: UICollectionViewCell) in
+        cell.onPressEmpty = { [weak self] in
             guard let self = self else { return }
             self.reloadData()
         }
-        cell.willDisplayEmptyView = { [weak self] (cell: UICollectionViewCell, emptyView: EmptyView, error: NSError) in
-            guard let self = self else {
-                return
-            }
+        cell.willDisplayEmptyView = { [weak self] (emptyView: EmptyView, error: NSError) in
+            guard let self = self else { return }
             self.eventHandler?.willDisplayEmptyView(emptyView, with: error, at: index)
         }
         
@@ -452,13 +450,15 @@ extension MediaBrowserViewController: MediaBrowserViewDelegate {
         if let photoCell = cell as? PhotoCell, let zoomView = photoCell.zoomView {
             self.startPlaying(for: photoCell, at: index)
             
-            self.eventHandler?.willDisplayZoomView(zoomView, at: index)
+            self.eventHandler?.willDisplayPhotoCell(photoCell, zoomView: zoomView, at: index)
         }
     }
     
     public func mediaBrowserView(_ mediaBrowserView: MediaBrowserView, didEndDisplaying cell: UICollectionViewCell, forPageAt index: Int) {
         if let photoCell = cell as? PhotoCell, let zoomView = photoCell.zoomView {
             zoomView.stopPlaying()
+            
+            self.eventHandler?.didEndDisplayingPhotoCell(photoCell, zoomView: zoomView, at: index)
         }
     }
     
