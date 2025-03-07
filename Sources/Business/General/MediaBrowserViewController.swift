@@ -38,6 +38,12 @@ open class MediaBrowserViewController: UIViewController {
         }
     }
     
+    public var pageSpacing: CGFloat {
+        didSet {
+            self.contentView.pageSpacing = self.pageSpacing
+        }
+    }
+    
     public var enteringStyle: TransitioningStyle {
         didSet {
             self.transitionAnimator.enteringStyle = self.enteringStyle
@@ -62,12 +68,15 @@ open class MediaBrowserViewController: UIViewController {
         let view = MediaBrowserView()
         view.dataSource = self
         view.delegate = self
+        view.pageSpacing = self.pageSpacing
         return view
     }()
     
     private lazy var transitionAnimator: TransitionAnimator = {
         let animator = TransitionAnimator()
         animator.delegate = self
+        animator.enteringStyle = self.enteringStyle
+        animator.exitingStyle = self.exitingStyle
         return animator
     }()
     
@@ -112,6 +121,7 @@ open class MediaBrowserViewController: UIViewController {
         self.hideWhenSliding = configuration.hideWhenSliding
         self.hideWhenSlidingDistance = configuration.hideWhenSlidingDistance
         self.zoomWhenDoubleTap = configuration.zoomWhenDoubleTap
+        self.pageSpacing = configuration.pageSpacing
         
         super.init(nibName: nil, bundle: nil)
         
@@ -126,9 +136,6 @@ open class MediaBrowserViewController: UIViewController {
     open func didInitialize() {
         self.extendedLayoutIncludesOpaqueBars = true
         self.accessibilityViewIsModal = true
-        
-        self.transitionAnimator.enteringStyle = self.enteringStyle
-        self.transitionAnimator.exitingStyle = self.exitingStyle
     }
     
     deinit {

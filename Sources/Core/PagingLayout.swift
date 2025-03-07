@@ -9,9 +9,11 @@ import UIKit
 
 open class PagingLayout: UICollectionViewFlowLayout {
     
-    public var pageSpacing: CGFloat = 10
+    public var pageSpacing: CGFloat
     
-    public override init() {
+    public init(pageSpacing: CGFloat) {
+        self.pageSpacing = pageSpacing
+        
         super.init()
         self.didInitialize()
     }

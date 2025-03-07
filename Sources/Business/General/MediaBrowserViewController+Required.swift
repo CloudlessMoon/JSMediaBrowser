@@ -18,6 +18,7 @@ public struct MediaBrowserViewControllerConfiguration {
     public var hideWhenSliding: Bool
     public var hideWhenSlidingDistance: CGFloat
     public var zoomWhenDoubleTap: Bool
+    public var pageSpacing: CGFloat
 
     public init(
         zoomView: @escaping BuildZoomView,
@@ -26,7 +27,8 @@ public struct MediaBrowserViewControllerConfiguration {
         hideWhenSingleTap: Bool = true,
         hideWhenSliding: Bool = true,
         hideWhenSlidingDistance: CGFloat = 70,
-        zoomWhenDoubleTap: Bool = true
+        zoomWhenDoubleTap: Bool = true,
+        pageSpacing: CGFloat = 10
     ) {
         self.zoomView = zoomView
         self.enteringStyle = enteringStyle
@@ -35,6 +37,7 @@ public struct MediaBrowserViewControllerConfiguration {
         self.hideWhenSliding = hideWhenSliding
         self.hideWhenSlidingDistance = hideWhenSlidingDistance
         self.zoomWhenDoubleTap = zoomWhenDoubleTap
+        self.pageSpacing = pageSpacing
     }
     
 }

@@ -57,6 +57,16 @@ open class MediaBrowserView: UIView {
         return self.dataSource?.numberOfPages(in: self) ?? 0
     }
     
+    public var pageSpacing: CGFloat = 10 {
+        didSet {
+            guard oldValue != self.pageSpacing else {
+                return
+            }
+            self.collectionViewLayout.pageSpacing = self.pageSpacing
+            self.collectionViewLayout.invalidateLayout()
+        }
+    }
+    
     private lazy var collectionView: PagingCollectionView = {
         let view = PagingCollectionView(frame: CGRect.zero, collectionViewLayout: self.collectionViewLayout)
         view.dataSource = self
@@ -65,7 +75,7 @@ open class MediaBrowserView: UIView {
     }()
     
     private lazy var collectionViewLayout: PagingLayout = {
-        return PagingLayout()
+        return PagingLayout(pageSpacing: self.pageSpacing)
     }()
     
     private var registeredCellIdentifiers = NSMutableSet()
