@@ -10,9 +10,9 @@ import JSCoreKit
 
 open class ZoomView: BasisMediaView {
     
-    public var configuration: ZoomViewConfiguration
-    
     public var eventHandler: ZoomViewEventHandler?
+    
+    public var buildAssetView: ZoomViewConfiguration.BuildAssetView
     
     public var asset: (any ZoomAsset)? {
         didSet {
@@ -35,6 +35,8 @@ open class ZoomView: BasisMediaView {
     }
     
     public private(set) var assetView: (any ZoomAssetView)?
+    
+    public var buildThumbnailView: ZoomViewConfiguration.BuildThumbnailView
     
     public var thumbnail: UIImage? {
         didSet {
@@ -96,10 +98,14 @@ open class ZoomView: BasisMediaView {
         return scrollView
     }()
     
+    public let configuration: ZoomViewConfiguration
+    
     private var isNeededRevertZoom: Bool = false
     
     public init(configuration: ZoomViewConfiguration, eventHandler: ZoomViewEventHandler? = nil) {
         self.configuration = configuration
+        self.buildAssetView = configuration.assetView
+        self.buildThumbnailView = configuration.thumbnailView
         self.assetMode = configuration.assetMode
         self.isEnabledZoom = configuration.isEnabledZoom
         self.minimumZoomScale = configuration.minimumZoomScale
@@ -281,7 +287,7 @@ extension ZoomView {
             assetView.removeFromSuperview()
             self.assetView = nil
         }
-        guard self.assetView == nil, let assetView = self.configuration.assetView(asset) else {
+        guard self.assetView == nil, let assetView = self.buildAssetView(asset) else {
             return
         }
         assetView.isAccessibilityElement = true
@@ -294,7 +300,7 @@ extension ZoomView {
         guard self.thumbnailView == nil else {
             return
         }
-        guard let thumbnailView = self.configuration.thumbnailView() else {
+        guard let thumbnailView = self.buildThumbnailView() else {
             return
         }
         thumbnailView.isAccessibilityElement = true

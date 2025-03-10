@@ -10,8 +10,6 @@ import JSCoreKit
 
 open class MediaBrowserViewController: UIViewController {
     
-    public var configuration: MediaBrowserViewControllerConfiguration
-    
     public var sourceProvider: MediaBrowserViewControllerSourceProvider?
     
     public var eventHandler: MediaBrowserViewControllerEventHandler?
@@ -28,6 +26,8 @@ open class MediaBrowserViewController: UIViewController {
             self.reloadData()
         }
     }
+    
+    public var buildZoomView: MediaBrowserViewControllerConfiguration.BuildZoomView
     
     public var dimmingView: UIView? {
         get {
@@ -63,6 +63,8 @@ open class MediaBrowserViewController: UIViewController {
     public var hideWhenSlidingDistance: CGFloat
     
     public var zoomWhenDoubleTap: Bool
+    
+    public let configuration: MediaBrowserViewControllerConfiguration
     
     private lazy var contentView: MediaBrowserView = {
         let view = MediaBrowserView()
@@ -114,6 +116,7 @@ open class MediaBrowserViewController: UIViewController {
     
     public init(configuration: MediaBrowserViewControllerConfiguration) {
         self.configuration = configuration
+        self.buildZoomView = configuration.zoomView
         self.enteringStyle = configuration.enteringStyle
         self.exitingStyle = configuration.exitingStyle
         self.hideWhenSingleTap = configuration.hideWhenSingleTap
@@ -347,7 +350,7 @@ extension MediaBrowserViewController: MediaBrowserViewDataSource {
         }
         /// 初始化zoomView
         if cell.zoomView == nil {
-            cell.zoomView = self.configuration.zoomView(index)
+            cell.zoomView = self.buildZoomView(index)
         }
         
         let updateAsset = { [weak self] (cell: PhotoCell, asset: (any ZoomAsset)?, thumbnail: UIImage?) in
