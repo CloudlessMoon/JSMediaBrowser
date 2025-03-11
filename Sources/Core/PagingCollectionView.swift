@@ -9,8 +9,8 @@ import UIKit
 
 open class PagingCollectionView: UICollectionView {
     
-    public override init(frame: CGRect, collectionViewLayout layout: UICollectionViewLayout) {
-        super.init(frame: frame, collectionViewLayout: layout)
+    public init(layout: UICollectionViewLayout) {
+        super.init(frame: .zero, collectionViewLayout: layout)
         self.didInitialize()
     }
     

@@ -163,8 +163,9 @@ extension HomeViewController: UICollectionViewDelegateFlowLayout {
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let browserVC = BrowserViewController()
+        browserVC.setCurrentPage(indexPath.item, animated: false)
         browserVC.dataSource = self.dataSource.enumerated().map {
-            let cell = collectionView.cellForItem(at: IndexPath(item: $0.offset, section: 0)) as? HomePictureCell
+            let cell = self.pictureCell(at: $0.offset)
             var item: any AssetItem
             if $0.element.contains("LivePhoto") {
                 let video = Bundle.main.url(forResource: "LivePhoto", withExtension: "MOV")!
@@ -181,8 +182,6 @@ extension HomeViewController: UICollectionViewDelegateFlowLayout {
             }
             return cell.imageView
         })
-        browserVC.setCurrentPage(indexPath.item, animated: false)
-        
         // normal
         // browserVC.show(from: self, animated: true)
         browserVC.show(from: self, navigationController: QMUINavigationController(rootViewController: browserVC), animated: true)

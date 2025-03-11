@@ -151,6 +151,10 @@ open class MediaBrowserViewController: UIViewController {
         self.view.addSubview(self.contentView)
         
         self.view.addGestureRecognizer(self.dismissingRecognizer)
+        
+        /// 当contentView未布局且dataSource为空时，调用collectionView.cellForItem(at:)会导致代理不回调，应该是UIKit的bug
+        /// 这里加上reloadData可以解决，保证标记一次刷新
+        self.reloadData()
     }
     
     open override func viewWillAppear(_ animated: Bool) {
@@ -259,6 +263,10 @@ extension MediaBrowserViewController {
         return self.dismissRecognizer
     }
     
+    public func reloadData() {
+        self.contentView.reloadData()
+    }
+    
     public func show(
         from sender: UIViewController,
         navigationController: UINavigationController? = nil,
@@ -300,10 +308,6 @@ extension MediaBrowserViewController {
             return
         }
         self.dismiss(animated: animated, completion: completion)
-    }
-    
-    public func reloadData() {
-        self.contentView.reloadData()
     }
     
 }

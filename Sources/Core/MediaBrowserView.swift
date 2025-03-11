@@ -68,7 +68,7 @@ open class MediaBrowserView: UIView {
     }
     
     private lazy var collectionView: PagingCollectionView = {
-        let view = PagingCollectionView(frame: CGRect.zero, collectionViewLayout: self.collectionViewLayout)
+        let view = PagingCollectionView(layout: self.collectionViewLayout)
         view.dataSource = self
         view.delegate = self
         return view
@@ -126,11 +126,7 @@ open class MediaBrowserView: UIView {
 extension MediaBrowserView {
     
     public var currentPageCell: UICollectionViewCell? {
-        if let cell = self.cellForPage(at: self.currentPage) {
-            return cell
-        } else {
-            return self.collectionView.visibleCells.first
-        }
+        return self.cellForPage(at: self.currentPage)
     }
     
     public var visiblePageCells: [UICollectionViewCell] {
@@ -182,18 +178,14 @@ extension MediaBrowserView {
     }
     
     public func index(for pageCell: UICollectionViewCell) -> Int? {
-        if let indexPath = self.collectionView.indexPath(for: pageCell) {
-            return indexPath.item
-        } else {
-            return nil
-        }
+        return self.collectionView.indexPath(for: pageCell)?.item
     }
     
     public func indexForPage(in point: CGPoint) -> Int? {
         return self.collectionView.indexPathForItem(at: point)?.item
     }
     
-    private func index(of gestureRecognizer: UIGestureRecognizer) -> Int? {
+    public func index(of gestureRecognizer: UIGestureRecognizer) -> Int? {
         let location = gestureRecognizer.location(in: self.collectionView)
         return self.indexForPage(in: location)
     }
@@ -209,6 +201,13 @@ extension MediaBrowserView {
         } else {
             return nil
         }
+    }
+    
+    public func cellForPage<Cell: UICollectionViewCell>(of gestureRecognizer: UIGestureRecognizer) -> Cell? {
+        guard let index = self.index(of: gestureRecognizer) else {
+            return nil
+        }
+        return self.cellForPage(at: index)
     }
     
     public func dequeueReusableCell<Cell: UICollectionViewCell>(_ cellClass: Cell.Type,
