@@ -410,8 +410,10 @@ extension MediaBrowserView: UIScrollViewDelegate {
         }
         /// iOS 14, 当isPagingEnabled为true, scrollToItem有bug
         /// https://stackoverflow.com/questions/41884645/uicollectionview-scroll-to-item-not-working-with-horizontal-direction
-        let contentOffset = CGPoint(x: self.collectionView.bounds.width * CGFloat(index),
-                                    y: self.collectionView.contentOffset.y)
+        let contentOffset = CGPoint(
+            x: self.collectionView.bounds.width * CGFloat(index),
+            y: self.collectionView.contentOffset.y
+        )
         self.collectionView.setContentOffset(contentOffset, animated: animated)
         
         if animated {
