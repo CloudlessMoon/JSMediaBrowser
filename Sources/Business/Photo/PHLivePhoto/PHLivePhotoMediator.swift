@@ -31,15 +31,14 @@ public struct PHLivePhotoMediator: AssetMediator {
     public func request(
         source: Source,
         progress: @escaping AssetMediatorProgress,
-        completed: @escaping AssetMediatorCompleted
+        completed: @escaping AssetMediatorCompletion<PHLivePhoto>
     ) -> AssetMediatorRequestToken? {
         let handler = { (livePhoto: PHLivePhoto?, info: [AnyHashable: Any]?) in
             guard let isCancelled = info?[PHLivePhotoInfoCancelledKey] as? Bool else {
                 return
             }
             if let livePhoto = livePhoto {
-                let result = AssetMediatorResult(asset: livePhoto)
-                completed(.success(result))
+                completed(.success(livePhoto))
             } else {
                 guard let error = info?[PHLivePhotoInfoErrorKey] as? NSError else {
                     completed(.failure(AssetMediatorError(error: .init(), isCancelled: isCancelled)))

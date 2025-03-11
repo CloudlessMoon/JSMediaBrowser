@@ -319,16 +319,8 @@ extension MediaBrowserViewController: MediaBrowserViewDataSource {
     }
     
     public func mediaBrowserView(_ mediaBrowserView: MediaBrowserView, cellForPageAt index: Int) -> UICollectionViewCell {
-        var cell: BasisCell?
         let dataItem = self.dataSource[index]
-        if dataItem is any ImageAssetItem {
-            cell = mediaBrowserView.dequeueReusableCell(PhotoCell.self, reuseIdentifier: "Image", at: index)
-        } else if dataItem is any LivePhotoAssetItem {
-            cell = mediaBrowserView.dequeueReusableCell(PhotoCell.self, reuseIdentifier: "LivePhoto", at: index)
-        }
-        guard let cell = cell else {
-            return mediaBrowserView.dequeueReusableCell(UICollectionViewCell.self, at: index)
-        }
+        let cell = mediaBrowserView.dequeueReusableCell(PhotoCell.self, reuseIdentifier: "\(dataItem.targetType)", at: index)
         self.configCell(cell, at: index)
         return cell
     }
@@ -408,8 +400,8 @@ extension MediaBrowserViewController: MediaBrowserViewDataSource {
                         return
                     }
                     switch result {
-                    case .success(let value):
-                        updateAsset(cell, value.asset, nil)
+                    case .success(let asset):
+                        updateAsset(cell, asset, nil)
                     case .failure(let error):
                         if !error.isCancelled {
                             updateAsset(cell, nil, nil)

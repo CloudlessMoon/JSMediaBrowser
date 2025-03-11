@@ -45,7 +45,7 @@ extension ZoomViewConfiguration {
     )
 }
 
-struct ImageItem: ImageAssetItem {
+struct ImageItem: AssetItem {
     
     var source: SDWebImagePhotosAssetMediator.Source
     
@@ -64,7 +64,7 @@ struct ImageItem: ImageAssetItem {
     
 }
 
-struct LivePhotoItem: LivePhotoAssetItem {
+struct LivePhotoItem: AssetItem {
     
     var source: PHLivePhotoMediator.Source
     

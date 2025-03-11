@@ -8,16 +8,17 @@
 import Foundation
 
 public typealias AssetMediatorProgress = (_ receivedSize: Int, _ expectedSize: Int) -> Void
-public typealias AssetMediatorCompleted = (Result<AssetMediatorResult, AssetMediatorError>) -> Void
+public typealias AssetMediatorCompletion<Target: ZoomAsset> = (Result<Target?, AssetMediatorError>) -> Void
 
 public protocol AssetMediator {
     
     associatedtype Source
+    associatedtype Target: ZoomAsset
     
     func request(
         source: Source,
         progress: @escaping AssetMediatorProgress,
-        completed: @escaping AssetMediatorCompleted
+        completed: @escaping AssetMediatorCompletion<Target>
     ) -> AssetMediatorRequestToken?
     
 }
@@ -27,16 +28,6 @@ public protocol AssetMediatorRequestToken {
     var isCancelled: Bool { get }
     
     func cancel()
-    
-}
-
-public struct AssetMediatorResult {
-    
-    public let asset: (any ZoomAsset)?
-    
-    public init(asset: (any ZoomAsset)?) {
-        self.asset = asset
-    }
     
 }
 

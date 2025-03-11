@@ -33,7 +33,7 @@ public struct SDWebImagePhotosAssetMediator: AssetMediator {
     public func request(
         source: Source,
         progress: @escaping AssetMediatorProgress,
-        completed: @escaping AssetMediatorCompleted
+        completed: @escaping AssetMediatorCompletion<UIImage>
     ) -> AssetMediatorRequestToken? {
         switch source {
         case .url(let url):

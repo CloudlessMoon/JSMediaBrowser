@@ -26,7 +26,7 @@ public struct SDWebImageAssetMediator: AssetMediator {
     public func request(
         source: URL?,
         progress: @escaping AssetMediatorProgress,
-        completed: @escaping AssetMediatorCompleted
+        completed: @escaping AssetMediatorCompletion<UIImage>
     ) -> AssetMediatorRequestToken? {
         return self.manager.loadImage(
             with: source,
@@ -41,8 +41,7 @@ public struct SDWebImageAssetMediator: AssetMediator {
                     let error = AssetMediatorError(error: nsError, isCancelled: nsError.code == SDWebImageError.cancelled.rawValue)
                     completed(.failure(error))
                 } else {
-                    let result = AssetMediatorResult(asset: image)
-                    completed(.success(result))
+                    completed(.success(image))
                 }
             }
         )
