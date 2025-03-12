@@ -166,7 +166,7 @@ extension HomeViewController: UICollectionViewDelegateFlowLayout {
         browserVC.setCurrentPage(indexPath.item, animated: false)
         browserVC.dataSource = self.dataSource.enumerated().map {
             let cell = self.pictureCell(at: $0.offset)
-            var item: any PhotoAssetItem
+            var item: any PhotoItem
             if $0.element.contains("LivePhoto") {
                 let video = Bundle.main.url(forResource: "LivePhoto", withExtension: "MOV")!
                 item = LivePhotoItem(source: .url(image: URL(string: $0.element), video: video), thumbnail: cell?.imageView.image)

@@ -1,5 +1,5 @@
 //
-//  PhotoAssetView+Private.swift
+//  PhotoView+Private.swift
 //  JSMediaBrowser
 //
 //  Created by jiasong on 2025/3/12.
@@ -7,7 +7,7 @@
 
 import UIKit
 
-internal extension PhotoAssetView {
+internal extension PhotoView {
     
     var asset: (any ZoomAsset)? {
         return self.zoomView.asset
@@ -76,12 +76,12 @@ internal extension PhotoAssetView {
         }
     }
     
-    private func asAsset(_ asset: any ZoomAsset) -> View.Asset? {
-        return asset as? View.Asset
+    private func asAsset(_ asset: any ZoomAsset) -> AssetView.Asset? {
+        return asset as? AssetView.Asset
     }
     
     private func isAsset(_ asset: any ZoomAsset) -> Bool {
-        return asset is View.Asset
+        return asset is AssetView.Asset
     }
     
 }

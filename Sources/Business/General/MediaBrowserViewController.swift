@@ -14,7 +14,7 @@ open class MediaBrowserViewController: UIViewController {
     
     public var eventHandler: MediaBrowserViewControllerEventHandler?
     
-    public var dataSource: [any PhotoAssetItem] = [] {
+    public var dataSource: [any PhotoItem] = [] {
         didSet {
             defer {
                 self.eventHandler?.didChangedData(current: self.dataSource, previous: oldValue)
@@ -344,7 +344,7 @@ extension MediaBrowserViewController: MediaBrowserViewDataSource {
         let dataItem = self.dataSource[index]
         
         if cell.photoView == nil {
-            cell.photoView = dataItem.builder.createAssetView()
+            cell.photoView = dataItem.builder.createView()
         }
         
         let updateAsset = { [weak self] (cell: PhotoCell, asset: (any ZoomAsset)?, thumbnail: UIImage?) in
@@ -633,7 +633,7 @@ extension MediaBrowserViewController: UIViewControllerTransitioningDelegate, Tra
     public var transitionThumbnailView: UIImageView? {
         if self.currentPage < self.dataSource.count {
             let item = self.dataSource[self.currentPage]
-            return item.builder.createAssetView().thumbnailView
+            return item.builder.createView().thumbnailView
         }
         return nil
     }

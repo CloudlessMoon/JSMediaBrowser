@@ -10,7 +10,7 @@ import SDWebImage
 import JSMediaBrowser
 import PhotosUI
 
-struct ImageBuilder: PhotoAssetBuilder {
+struct ImageBuilder: PhotoBuilder {
     
     func createMediator() -> SDWebImagePhotosAssetMediator {
         return .init(
@@ -23,7 +23,7 @@ struct ImageBuilder: PhotoAssetBuilder {
         )
     }
     
-    func createAssetView() -> ZoomView<SDAnimatedImageView> {
+    func createView() -> ZoomView<SDAnimatedImageView> {
         let assetView = SDAnimatedImageView()
         assetView.autoPlayAnimatedImage = false
         if #available(iOS 17.0, *) {
@@ -40,7 +40,7 @@ struct ImageBuilder: PhotoAssetBuilder {
     
 }
 
-struct ImageItem: PhotoAssetItem {
+struct ImageItem: PhotoItem {
     
     var source: SDWebImagePhotosAssetMediator.Source
     
@@ -52,13 +52,13 @@ struct ImageItem: PhotoAssetItem {
     
 }
 
-struct LivePhotoBuilder: PhotoAssetBuilder {
+struct LivePhotoBuilder: PhotoBuilder {
     
     func createMediator() -> PHLivePhotoMediator {
         return .init()
     }
     
-    func createAssetView() -> ZoomView<PHLivePhotoView> {
+    func createView() -> ZoomView<PHLivePhotoView> {
         let thumbnailView = SDAnimatedImageView()
         thumbnailView.autoPlayAnimatedImage = false
         return .init(
@@ -70,7 +70,7 @@ struct LivePhotoBuilder: PhotoAssetBuilder {
     
 }
 
-struct LivePhotoItem: PhotoAssetItem {
+struct LivePhotoItem: PhotoItem {
     
     var source: PHLivePhotoMediator.Source
     

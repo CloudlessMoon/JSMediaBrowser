@@ -56,7 +56,7 @@ public struct MediaBrowserViewControllerSourceProvider {
 
 public protocol MediaBrowserViewControllerEventHandler {
     
-    func didChangedData(current: [any PhotoAssetItem], previous: [any PhotoAssetItem])
+    func didChangedData(current: [any PhotoItem], previous: [any PhotoItem])
     
     func willDisplayPhotoCell(_ cell: PhotoCell, at index: Int)
     func didEndDisplayingPhotoCell(_ cell: PhotoCell, at index: Int)
@@ -76,7 +76,7 @@ public protocol MediaBrowserViewControllerEventHandler {
 
 public extension MediaBrowserViewControllerEventHandler {
     
-    func didChangedData(current: [any PhotoAssetItem], previous: [any PhotoAssetItem]) {}
+    func didChangedData(current: [any PhotoItem], previous: [any PhotoItem]) {}
     
     func willDisplayPhotoCell(_ cell: PhotoCell, at index: Int) {}
     
@@ -97,7 +97,7 @@ public extension MediaBrowserViewControllerEventHandler {
 
 public struct DefaultMediaBrowserViewControllerEventHandler: MediaBrowserViewControllerEventHandler {
     
-    public typealias ChangedDataSource = ([any PhotoAssetItem], [any PhotoAssetItem]) -> Void
+    public typealias ChangedDataSource = ([any PhotoItem], [any PhotoItem]) -> Void
     public typealias ShouldPlaying = (Int) -> Bool
     public typealias DisplayCell = (PhotoCell, Int) -> Void
     public typealias DisplayEmptyView = (EmptyView, NSError, Int) -> Void
@@ -140,7 +140,7 @@ public struct DefaultMediaBrowserViewControllerEventHandler: MediaBrowserViewCon
         self._didLongPress = didLongPress
     }
     
-    public func didChangedData(current: [any PhotoAssetItem], previous: [any PhotoAssetItem]) {
+    public func didChangedData(current: [any PhotoItem], previous: [any PhotoItem]) {
         self._didChangedData?(current, previous)
     }
     

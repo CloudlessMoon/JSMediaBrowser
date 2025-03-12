@@ -24,9 +24,9 @@ internal extension PhotoCell {
         
     }
     
-    var mb_requestToken: PhotoAssetMediatorRequestToken? {
+    var mb_requestToken: PhotoMediatorRequestToken? {
         get {
-            return objc_getAssociatedObject(self, &AssociatedKeys.token) as? PhotoAssetMediatorRequestToken
+            return objc_getAssociatedObject(self, &AssociatedKeys.token) as? PhotoMediatorRequestToken
         }
         set {
             objc_setAssociatedObject(self, &AssociatedKeys.token, newValue, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
