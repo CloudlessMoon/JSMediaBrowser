@@ -1,5 +1,5 @@
 //
-//  SDWebImagePhotosAssetMediator.swift
+//  SDWebImagePhotosMediator.swift
 //  JSMediaBrowser
 //
 //  Created by jiasong on 2020/12/13.
@@ -9,7 +9,7 @@ import SDWebImage
 import SDWebImagePhotosPlugin
 import Photos
 
-public struct SDWebImagePhotosAssetMediator: PhotoMediator {
+public struct SDWebImagePhotosMediator: PhotoMediator {
     
     public enum Source {
         case url(URL?)
@@ -49,7 +49,7 @@ public struct SDWebImagePhotosAssetMediator: PhotoMediator {
     ) -> PhotoMediatorRequestToken? {
         switch source {
         case .url:
-            let mediator = SDWebImageAssetMediator(
+            let mediator = SDWebImageMediator(
                 manager: self.manager,
                 options: self.options,
                 context: self.context
@@ -60,7 +60,7 @@ public struct SDWebImagePhotosAssetMediator: PhotoMediator {
                 let context = [.imageLoader: SDImagePhotosLoader.shared] as [SDWebImageContextOption: Any]
                 return context.merging(self.context ?? [:], uniquingKeysWith: { $1 })
             }()
-            let mediator = SDWebImageAssetMediator(
+            let mediator = SDWebImageMediator(
                 manager: self.manager,
                 options: self.options,
                 context: context

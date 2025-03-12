@@ -1,5 +1,5 @@
 //
-//  SDWebImageAssetMediator.swift
+//  SDWebImageMediator.swift
 //  JSMediaBrowser
 //
 //  Created by jiasong on 2020/12/13.
@@ -7,7 +7,7 @@
 
 import SDWebImage
 
-public struct SDWebImageAssetMediator: PhotoMediator {
+public struct SDWebImageMediator: PhotoMediator {
     
     public var manager: SDWebImageManager
     public var options: SDWebImageOptions

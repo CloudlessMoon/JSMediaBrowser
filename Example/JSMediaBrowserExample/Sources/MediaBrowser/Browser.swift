@@ -12,7 +12,7 @@ import PhotosUI
 
 struct ImageBuilder: PhotoBuilder {
     
-    func createMediator() -> SDWebImagePhotosAssetMediator {
+    func createMediator() -> SDWebImagePhotosMediator {
         return .init(
             options: [.retryFailed],
             context: [
@@ -42,7 +42,7 @@ struct ImageBuilder: PhotoBuilder {
 
 struct ImageItem: PhotoItem {
     
-    var source: SDWebImagePhotosAssetMediator.Source
+    var source: SDWebImagePhotosMediator.Source
     
     var thumbnail: UIImage?
     
