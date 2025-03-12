@@ -9,9 +9,6 @@ import UIKit
 
 public struct MediaBrowserViewControllerConfiguration {
     
-    public typealias BuildZoomView = (any AssetItem, Int) -> (any PhotoContentView)?
-    
-    public var zoomView: BuildZoomView
     public var enteringStyle: TransitioningStyle
     public var exitingStyle: TransitioningStyle
     public var hideWhenSingleTap: Bool
@@ -19,9 +16,8 @@ public struct MediaBrowserViewControllerConfiguration {
     public var hideWhenSlidingDistance: CGFloat
     public var zoomWhenDoubleTap: Bool
     public var pageSpacing: CGFloat
-
+    
     public init(
-        zoomView: @escaping BuildZoomView,
         enteringStyle: TransitioningStyle = .zoom,
         exitingStyle: TransitioningStyle = .zoom,
         hideWhenSingleTap: Bool = true,
@@ -30,7 +26,6 @@ public struct MediaBrowserViewControllerConfiguration {
         zoomWhenDoubleTap: Bool = true,
         pageSpacing: CGFloat = 10
     ) {
-        self.zoomView = zoomView
         self.enteringStyle = enteringStyle
         self.exitingStyle = exitingStyle
         self.hideWhenSingleTap = hideWhenSingleTap
@@ -61,11 +56,11 @@ public struct MediaBrowserViewControllerSourceProvider {
 
 public protocol MediaBrowserViewControllerEventHandler {
     
-    func didChangedData(current: [any AssetItem], previous: [any AssetItem])
+    func didChangedData(current: [any PhotoAssetItem], previous: [any PhotoAssetItem])
     
     func willDisplayPhotoCell(_ cell: PhotoCell, at index: Int)
     func didEndDisplayingPhotoCell(_ cell: PhotoCell, at index: Int)
-
+    
     func willDisplayEmptyView(_ emptyView: EmptyView, with error: NSError, at index: Int)
     
     func shouldStartPlaying(at index: Int) -> Bool
@@ -81,7 +76,7 @@ public protocol MediaBrowserViewControllerEventHandler {
 
 public extension MediaBrowserViewControllerEventHandler {
     
-    func didChangedData(current: [any AssetItem], previous: [any AssetItem]) {}
+    func didChangedData(current: [any PhotoAssetItem], previous: [any PhotoAssetItem]) {}
     
     func willDisplayPhotoCell(_ cell: PhotoCell, at index: Int) {}
     
@@ -102,7 +97,7 @@ public extension MediaBrowserViewControllerEventHandler {
 
 public struct DefaultMediaBrowserViewControllerEventHandler: MediaBrowserViewControllerEventHandler {
     
-    public typealias ChangedDataSource = ([any AssetItem], [any AssetItem]) -> Void
+    public typealias ChangedDataSource = ([any PhotoAssetItem], [any PhotoAssetItem]) -> Void
     public typealias ShouldPlaying = (Int) -> Bool
     public typealias DisplayCell = (PhotoCell, Int) -> Void
     public typealias DisplayEmptyView = (EmptyView, NSError, Int) -> Void
@@ -145,7 +140,7 @@ public struct DefaultMediaBrowserViewControllerEventHandler: MediaBrowserViewCon
         self._didLongPress = didLongPress
     }
     
-    public func didChangedData(current: [any AssetItem], previous: [any AssetItem]) {
+    public func didChangedData(current: [any PhotoAssetItem], previous: [any PhotoAssetItem]) {
         self._didChangedData?(current, previous)
     }
     

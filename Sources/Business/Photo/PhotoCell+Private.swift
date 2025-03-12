@@ -1,5 +1,5 @@
 //
-//  AssetMediator+Private.swift
+//  PhotoCell+Private.swift
 //  JSMediaBrowser
 //
 //  Created by jiasong on 2025/1/16.
@@ -7,7 +7,7 @@
 
 import UIKit
 
-internal extension UIView {
+internal extension PhotoCell {
     
     struct AtomicInt: Equatable {
         
@@ -24,9 +24,9 @@ internal extension UIView {
         
     }
     
-    var mb_requestToken: AssetMediatorRequestToken? {
+    var mb_requestToken: PhotoAssetMediatorRequestToken? {
         get {
-            return objc_getAssociatedObject(self, &AssociatedKeys.token) as? AssetMediatorRequestToken
+            return objc_getAssociatedObject(self, &AssociatedKeys.token) as? PhotoAssetMediatorRequestToken
         }
         set {
             objc_setAssociatedObject(self, &AssociatedKeys.token, newValue, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)

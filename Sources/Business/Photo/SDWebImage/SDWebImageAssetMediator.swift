@@ -7,7 +7,7 @@
 
 import SDWebImage
 
-public struct SDWebImageAssetMediator: AssetMediator {
+public struct SDWebImageAssetMediator: PhotoAssetMediator {
     
     public var manager: SDWebImageManager
     public var options: SDWebImageOptions
@@ -25,9 +25,9 @@ public struct SDWebImageAssetMediator: AssetMediator {
     
     public func request(
         source: URL?,
-        progress: @escaping AssetMediatorProgress,
-        completed: @escaping AssetMediatorCompletion<UIImage>
-    ) -> AssetMediatorRequestToken? {
+        progress: @escaping PhotoAssetMediatorProgress,
+        completed: @escaping PhotoAssetMediatorCompletion<UIImage>
+    ) -> PhotoAssetMediatorRequestToken? {
         return self.manager.loadImage(
             with: source,
             options: self.options,
@@ -38,7 +38,7 @@ public struct SDWebImageAssetMediator: AssetMediator {
             completed: { image, data, error, cacheType, finished, url in
                 let nsError = error as? NSError
                 if let nsError = nsError {
-                    let error = AssetMediatorError(error: nsError, isCancelled: nsError.code == SDWebImageError.cancelled.rawValue)
+                    let error = PhotoAssetMediatorError(error: nsError, isCancelled: nsError.code == SDWebImageError.cancelled.rawValue)
                     completed(.failure(error))
                 } else {
                     completed(.success(image))
@@ -49,4 +49,4 @@ public struct SDWebImageAssetMediator: AssetMediator {
     
 }
 
-extension SDWebImageCombinedOperation: AssetMediatorRequestToken {}
+extension SDWebImageCombinedOperation: PhotoAssetMediatorRequestToken {}

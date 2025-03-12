@@ -7,7 +7,7 @@
 
 import PhotosUI
 
-public struct PHLivePhotoMediator: AssetMediator {
+public struct PHLivePhotoMediator: PhotoAssetMediator {
     
     public enum Source {
         case url(image: URL?, video: URL?)
@@ -30,9 +30,9 @@ public struct PHLivePhotoMediator: AssetMediator {
     
     public func request(
         source: Source,
-        progress: @escaping AssetMediatorProgress,
-        completed: @escaping AssetMediatorCompletion<PHLivePhoto>
-    ) -> AssetMediatorRequestToken? {
+        progress: @escaping PhotoAssetMediatorProgress,
+        completed: @escaping PhotoAssetMediatorCompletion<PHLivePhoto>
+    ) -> PhotoAssetMediatorRequestToken? {
         let handler = { (livePhoto: PHLivePhoto?, info: [AnyHashable: Any]?) in
             guard let isCancelled = info?[PHLivePhotoInfoCancelledKey] as? Bool else {
                 return
@@ -41,10 +41,10 @@ public struct PHLivePhotoMediator: AssetMediator {
                 completed(.success(livePhoto))
             } else {
                 guard let error = info?[PHLivePhotoInfoErrorKey] as? NSError else {
-                    completed(.failure(AssetMediatorError(error: .init(), isCancelled: isCancelled)))
+                    completed(.failure(PhotoAssetMediatorError(error: .init(), isCancelled: isCancelled)))
                     return
                 }
-                let error1 = AssetMediatorError(error: error, isCancelled: isCancelled)
+                let error1 = PhotoAssetMediatorError(error: error, isCancelled: isCancelled)
                 completed(.failure(error1))
             }
         }
@@ -79,7 +79,7 @@ public struct PHLivePhotoMediator: AssetMediator {
     
 }
 
-public final class PHLivePhotoRequestToken: AssetMediatorRequestToken {
+public final class PHLivePhotoRequestToken: PhotoAssetMediatorRequestToken {
     
     public private(set) var isCancelled: Bool = false
     

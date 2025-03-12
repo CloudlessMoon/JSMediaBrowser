@@ -9,7 +9,7 @@ import SDWebImage
 import SDWebImagePhotosPlugin
 import Photos
 
-public struct SDWebImagePhotosAssetMediator: AssetMediator {
+public struct SDWebImagePhotosAssetMediator: PhotoAssetMediator {
     
     public enum Source {
         case url(URL?)
@@ -32,9 +32,9 @@ public struct SDWebImagePhotosAssetMediator: AssetMediator {
     
     public func request(
         source: Source,
-        progress: @escaping AssetMediatorProgress,
-        completed: @escaping AssetMediatorCompletion<UIImage>
-    ) -> AssetMediatorRequestToken? {
+        progress: @escaping PhotoAssetMediatorProgress,
+        completed: @escaping PhotoAssetMediatorCompletion<UIImage>
+    ) -> PhotoAssetMediatorRequestToken? {
         switch source {
         case .url(let url):
             let mediator = SDWebImageAssetMediator(

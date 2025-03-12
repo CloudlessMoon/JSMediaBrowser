@@ -14,7 +14,7 @@ open class MediaBrowserViewController: UIViewController {
     
     public var eventHandler: MediaBrowserViewControllerEventHandler?
     
-    public var dataSource: [any AssetItem] = [] {
+    public var dataSource: [any PhotoAssetItem] = [] {
         didSet {
             defer {
                 self.eventHandler?.didChangedData(current: self.dataSource, previous: oldValue)
@@ -26,8 +26,6 @@ open class MediaBrowserViewController: UIViewController {
             self.reloadData()
         }
     }
-    
-    public var buildZoomView: MediaBrowserViewControllerConfiguration.BuildZoomView
     
     public var dimmingView: UIView? {
         get {
@@ -112,11 +110,10 @@ open class MediaBrowserViewController: UIViewController {
         }
     }
     
-    private var atomicInt = UIView.AtomicInt()
+    private var photoAtomicInt = PhotoCell.AtomicInt()
     
     public init(configuration: MediaBrowserViewControllerConfiguration) {
         self.configuration = configuration
-        self.buildZoomView = configuration.zoomView
         self.enteringStyle = configuration.enteringStyle
         self.exitingStyle = configuration.exitingStyle
         self.hideWhenSingleTap = configuration.hideWhenSingleTap
@@ -345,8 +342,9 @@ extension MediaBrowserViewController: MediaBrowserViewDataSource {
             return
         }
         let dataItem = self.dataSource[index]
+        
         if cell.photoView == nil {
-            cell.photoView = self.buildZoomView(dataItem, index)
+            cell.photoView = dataItem.builder.createAssetView()
         }
         
         let updateAsset = { [weak self] (cell: PhotoCell, asset: (any ZoomAsset)?, thumbnail: UIImage?) in
@@ -380,7 +378,7 @@ extension MediaBrowserViewController: MediaBrowserViewDataSource {
         if let token = cell.mb_requestToken, !token.isCancelled {
             token.cancel()
         }
-        let identifier = self.atomicInt.increment()
+        let identifier = self.photoAtomicInt.increment()
         cell.mb_requestIdentifier = identifier
         cell.mb_requestToken = dataItem.request(
             source: dataItem.source,
@@ -633,8 +631,9 @@ extension MediaBrowserViewController: UIViewControllerTransitioningDelegate, Tra
     }
     
     public var transitionThumbnailView: UIImageView? {
-        if let photoCell = self.currentPageCell as? PhotoCell, let photoView = photoCell.photoView {
-            return self.buildZoomView(self.dataSource[self.currentPage], self.currentPage)?.thumbnailView
+        if self.currentPage < self.dataSource.count {
+            let item = self.dataSource[self.currentPage]
+            return item.builder.createAssetView().thumbnailView
         }
         return nil
     }

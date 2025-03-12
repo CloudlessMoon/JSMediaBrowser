@@ -9,7 +9,7 @@ import UIKit
 
 open class PhotoCell: BasisCell {
     
-    public var photoView: (any PhotoContentView)? {
+    public var photoView: (any PhotoAssetView)? {
         didSet {
             if let oldValue = oldValue, oldValue.superview == self.contentView {
                 oldValue.removeFromSuperview()

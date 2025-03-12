@@ -1,5 +1,5 @@
 //
-//  PhotoContentView+Private.swift
+//  PhotoAssetView+Private.swift
 //  JSMediaBrowser
 //
 //  Created by jiasong on 2025/3/12.
@@ -7,14 +7,18 @@
 
 import UIKit
 
-internal extension PhotoContentView {
+internal extension PhotoAssetView {
+    
+    var asset: (any ZoomAsset)? {
+        return self.zoomView.asset
+    }
     
     var thumbnail: UIImage? {
         return self.zoomView.thumbnail
     }
     
-    var asset: (any ZoomAsset)? {
-        return self.zoomView.asset
+    var thumbnailView: UIImageView {
+        return self.zoomView.thumbnailView
     }
     
     var contentViewFrame: CGRect {
@@ -72,12 +76,12 @@ internal extension PhotoContentView {
         }
     }
     
-    private func asAsset(_ asset: any ZoomAsset) -> AssetView.Asset? {
-        return asset as? AssetView.Asset
+    private func asAsset(_ asset: any ZoomAsset) -> View.Asset? {
+        return asset as? View.Asset
     }
     
     private func isAsset(_ asset: any ZoomAsset) -> Bool {
-        return asset is AssetView.Asset
+        return asset is View.Asset
     }
     
 }

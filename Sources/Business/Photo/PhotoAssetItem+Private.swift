@@ -1,5 +1,5 @@
 //
-//  AssetItem+Private.swift
+//  PhotoAssetItem+Private.swift
 //  JSMediaBrowser
 //
 //  Created by jiasong on 2025/2/14.
@@ -7,18 +7,18 @@
 
 import UIKit
 
-internal extension AssetItem {
+internal extension PhotoAssetItem {
     
     func request(
         source: Any?,
-        progress: @escaping AssetMediatorProgress,
-        completed: @escaping (Result<(any ZoomAsset)?, AssetMediatorError>) -> Void
-    ) -> AssetMediatorRequestToken? {
-        guard let source = source as? Mediator.Source else {
+        progress: @escaping PhotoAssetMediatorProgress,
+        completed: @escaping (Result<(any ZoomAsset)?, PhotoAssetMediatorError>) -> Void
+    ) -> PhotoAssetMediatorRequestToken? {
+        guard let source = source as? Builder.Mediator.Source else {
             assertionFailure("type mismatch")
             return nil
         }
-        return self.mediator.request(
+        return self.builder.createMediator().request(
             source: source,
             progress: progress,
             completed: { result in
@@ -32,8 +32,8 @@ internal extension AssetItem {
         )
     }
     
-    var targetType: Mediator.Target.Type {
-        return Mediator.Target.self
+    var targetType: Target {
+        return Target.self
     }
     
 }
