@@ -16,7 +16,7 @@ open class ZoomView<AssetView: ZoomAssetView>: BasisMediaView {
     
     public let assetView: AssetView
     
-    public var asset: AssetView.ZoomAssetType? {
+    public var asset: AssetView.Asset? {
         didSet {
             guard self.assetView.asset != self.asset else {
                 return
@@ -78,8 +78,12 @@ open class ZoomView<AssetView: ZoomAssetView>: BasisMediaView {
         let scrollView = ZoomScrollView()
         scrollView.minimumZoomScale = self.minimumZoomScale
         scrollView.maximumZoomScale = self.maximumZoomScale
-        scrollView.delegate = self
+        scrollView.delegate = self.delegator
         return scrollView
+    }()
+    
+    private lazy var delegator: ScrollViewDelegator<AssetView> = {
+        return ScrollViewDelegator(owner: self)
     }()
     
     private var isNeededRevertZoom: Bool = false
@@ -266,6 +270,30 @@ extension ZoomView {
             right: JSFloorPixelValue(contentInset.right))
     }
     
+    public var contentOffset: CGPoint {
+        return self.scrollView.contentOffset
+    }
+    
+    public var minimumContentOffset: CGPoint {
+        return self.scrollView.js_minimumContentOffset
+    }
+    
+    public var maximumContentOffset: CGPoint {
+        return self.scrollView.js_maximumContentOffset
+    }
+    
+    public var isTracking: Bool {
+        return self.scrollView.isTracking
+    }
+    
+    public var isDragging: Bool {
+        return self.scrollView.isDragging
+    }
+    
+    public var isDecelerating: Bool {
+        return self.scrollView.isDecelerating
+    }
+    
 }
 
 extension ZoomView {
@@ -365,42 +393,56 @@ extension ZoomView {
         self.scrollView.contentOffset = self.scrollView.js_minimumContentOffset
     }
     
-    private func callWillBeginZooming() {
+    fileprivate func callWillBeginZooming() {
         self.eventHandler?.willBeginZooming()
     }
     
-    private func callDidEndZooming(at scale: CGFloat? = nil) {
+    fileprivate func callDidEndZooming(at scale: CGFloat? = nil) {
         self.eventHandler?.didEndZooming(at: scale ?? self.zoomScale)
     }
     
-    private func callDidZoom() {
+    fileprivate func callDidZoom() {
         self.eventHandler?.didZoom()
     }
     
 }
 
-//extension ZoomView: UIScrollViewDelegate {
-//    
-//    public func viewForZooming(in scrollView: UIScrollView) -> UIView? {
-//        guard self.isEnabledZoom else {
-//            return nil
-//        }
-//        return self.contentView
-//    }
-//    
-//    public func scrollViewWillBeginZooming(_ scrollView: UIScrollView, with view: UIView?) {
-//        self.callWillBeginZooming()
-//    }
-//    
-//    public func scrollViewDidEndZooming(_ scrollView: UIScrollView, with view: UIView?, atScale scale: CGFloat) {
-//        self.callDidEndZooming(at: scale)
-//    }
-//    
-//    public func scrollViewDidZoom(_ scrollView: UIScrollView) {
-//        self.setNeedsLayout()
-//        self.layoutIfNeeded()
-//        
-//        self.callDidZoom()
-//    }
-//    
-//}
+private final class ScrollViewDelegator<View: ZoomAssetView>: NSObject, UIScrollViewDelegate {
+    
+    private weak var owner: ZoomView<View>?
+    
+    init(owner: ZoomView<View>) {
+        self.owner = owner
+        
+        super.init()
+    }
+    
+    func viewForZooming(in scrollView: UIScrollView) -> UIView? {
+        guard let owner = self.owner else {
+            return nil
+        }
+        guard owner.isEnabledZoom else {
+            return nil
+        }
+        return owner.contentView
+    }
+    
+    func scrollViewWillBeginZooming(_ scrollView: UIScrollView, with view: UIView?) {
+        self.owner?.callWillBeginZooming()
+    }
+    
+    func scrollViewDidEndZooming(_ scrollView: UIScrollView, with view: UIView?, atScale scale: CGFloat) {
+        self.owner?.callDidEndZooming(at: scale)
+    }
+    
+    func scrollViewDidZoom(_ scrollView: UIScrollView) {
+        guard let owner = self.owner else {
+            return
+        }
+        owner.setNeedsLayout()
+        owner.layoutIfNeeded()
+        
+        owner.callDidZoom()
+    }
+    
+}

@@ -9,7 +9,7 @@ import UIKit
 
 public struct MediaBrowserViewControllerConfiguration {
     
-    public typealias BuildZoomView = (any AssetItem, Int) -> (any ZoomViewProtocol)?
+    public typealias BuildZoomView = (any AssetItem, Int) -> (any PhotoContentView)?
     
     public var zoomView: BuildZoomView
     public var enteringStyle: TransitioningStyle

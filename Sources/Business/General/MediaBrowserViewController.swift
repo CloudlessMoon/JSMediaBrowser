@@ -345,40 +345,38 @@ extension MediaBrowserViewController: MediaBrowserViewDataSource {
             return
         }
         let dataItem = self.dataSource[index]
-        /// 初始化zoomView
-        if cell.zoomView == nil {
-            cell.zoomView = self.buildZoomView(dataItem, index)
+        if cell.photoView == nil {
+            cell.photoView = self.buildZoomView(dataItem, index)
         }
         
         let updateAsset = { [weak self] (cell: PhotoCell, asset: (any ZoomAsset)?, thumbnail: UIImage?) in
             guard let self = self else { return }
-            guard let zoomView = cell.zoomView else {
+            guard let photoView = cell.photoView else {
                 return
             }
-//            zoomView.setAsset(asset)
-//            zoomView.zoomView.thumbnail = thumbnail
+            photoView.setAsset(asset, thumbnail: thumbnail)
             /// 解决资源下载完成后不播放的问题
             self.startPlaying(for: cell, at: index)
         }
         let updateError = { (cell: PhotoCell, error: NSError?, isCancelled: Bool) in
-//            if isCancelled && (cell.zoomView?.asset != nil || cell.zoomView?.thumbnail != nil) {
-//                cell.setError(nil)
-//            } else {
-//                cell.setError(error)
-//            }
+            guard let photoView = cell.photoView else {
+                return
+            }
+            if isCancelled && (photoView.asset != nil || photoView.thumbnail != nil) {
+                cell.setError(nil)
+            } else {
+                cell.setError(error)
+            }
         }
         let updateProgress = { (cell: PhotoCell, receivedSize: Int, expectedSize: Int) in
             let progress = Progress(totalUnitCount: Int64(expectedSize))
             progress.completedUnitCount = Int64(receivedSize)
             cell.setProgress(progress)
         }
-        
-        /// 重置下数据
         updateAsset(cell, nil, dataItem.thumbnail)
         updateProgress(cell, 0, 0)
         updateError(cell, nil, false)
         
-        /// 取消请求
         if let token = cell.mb_requestToken, !token.isCancelled {
             token.cancel()
         }
@@ -416,10 +414,10 @@ extension MediaBrowserViewController: MediaBrowserViewDataSource {
     }
     
     private func configViewportInsets(for cell: PhotoCell) {
-        guard let zoomView = cell.zoomView else {
+        guard let photoView = cell.photoView else {
             return
         }
-        zoomView.setviewportInsets({
+        photoView.setViewportInsets({
             let insets = self.view.safeAreaInsets
             if JSCoreHelper.isMac {
                 return insets
@@ -427,32 +425,21 @@ extension MediaBrowserViewController: MediaBrowserViewDataSource {
                 return UIEdgeInsets(top: 0, left: insets.left, bottom: 0, right: insets.right)
             }
         }())
-//        zoomView.zoomView.viewportInsets = {
-//            let insets = self.view.safeAreaInsets
-//            if JSCoreHelper.isMac {
-//                return insets
-//            } else {
-//                return UIEdgeInsets(top: 0, left: insets.left, bottom: 0, right: insets.right)
-//            }
-//        }()
     }
     
     private func startPlaying(for cell: PhotoCell, at index: Int) {
-        guard self.isTransitionFinished else {
+        guard self.isTransitionFinished && !self.isDragging && !self.isDecelerating && !self.isScrollAnimating else {
             return
         }
-        guard !self.isDragging && !self.isDecelerating && !self.isScrollAnimating else {
-            return
-        }
-        guard !cell.isHidden && cell.window != nil, let zoomView = cell.zoomView else {
+        guard !cell.isHidden && cell.window != nil, let photoView = cell.photoView else {
             return
         }
         if let eventHandler = self.eventHandler {
             if eventHandler.shouldStartPlaying(at: index) {
-               // zoomView.zoomView.startPlaying()
+                photoView.startPlaying()
             }
         } else {
-           // zoomView.startPlaying()
+            photoView.startPlaying()
         }
     }
     
@@ -461,18 +448,20 @@ extension MediaBrowserViewController: MediaBrowserViewDataSource {
 extension MediaBrowserViewController: MediaBrowserViewDelegate {
     
     public func mediaBrowserView(_ mediaBrowserView: MediaBrowserView, willDisplay cell: UICollectionViewCell, forPageAt index: Int) {
-        if let photoCell = cell as? PhotoCell, let zoomView = photoCell.zoomView {
+        if let photoCell = cell as? PhotoCell {
             self.startPlaying(for: photoCell, at: index)
             
-//            self.eventHandler?.willDisplayPhotoCell(photoCell, zoomView: zoomView, at: index)
+            self.eventHandler?.willDisplayPhotoCell(photoCell, at: index)
         }
     }
     
     public func mediaBrowserView(_ mediaBrowserView: MediaBrowserView, didEndDisplaying cell: UICollectionViewCell, forPageAt index: Int) {
-        if let photoCell = cell as? PhotoCell, let zoomView = photoCell.zoomView {
-//            zoomView.stopPlaying()
+        if let photoCell = cell as? PhotoCell {
+            if let photoView = photoCell.photoView {
+                photoView.stopPlaying()
+            }
             
-//            self.eventHandler?.didEndDisplayingPhotoCell(photoCell, zoomView: zoomView, at: index)
+            self.eventHandler?.didEndDisplayingPhotoCell(photoCell, at: index)
         }
     }
     
@@ -507,16 +496,10 @@ extension MediaBrowserViewController: MediaBrowserViewDelegate {
         guard self.zoomWhenDoubleTap else {
             return
         }
-        guard let photoCell = self.currentPageCell as? PhotoCell, let zoomView = photoCell.zoomView else {
+        guard let photoCell = self.currentPageCell as? PhotoCell, let photoView = photoCell.photoView else {
             return
         }
-        let minimumZoomScale = zoomView.minimumZoomScale
-        if zoomView.zoomScale != minimumZoomScale {
-            zoomView.setZoom(scale: minimumZoomScale, animated: true)
-        } else {
-            let point = zoomView.assetView.convert(point, from: mediaBrowserView)
-            zoomView.zoom(to: point, scale: zoomView.maximumZoomScale, animated: true)
-        }
+        photoView.doubleTap(at: point, from: mediaBrowserView)
     }
     
     public func mediaBrowserView(_ mediaBrowserView: MediaBrowserView, didLongPressAt index: Int, point: CGPoint) {
@@ -532,25 +515,11 @@ extension MediaBrowserViewController: UIGestureRecognizerDelegate {
             guard self.isPresented && self.hideWhenSliding else {
                 return false
             }
-            guard let photoCell = self.currentPageCell as? PhotoCell, let zoomView = photoCell.zoomView else {
+            guard let photoCell = self.currentPageCell as? PhotoCell, let photoView = photoCell.photoView else {
                 return true
             }
             let velocity = self.dismissingRecognizer.velocity(in: self.dismissingRecognizer.view)
-            let minY = ceil(zoomView.scrollView.js_minimumContentOffset.y)
-            let maxY = floor(zoomView.scrollView.js_maximumContentOffset.y)
-            let scrollView = zoomView.scrollView
-            /// 垂直触摸滑动
-            if abs(velocity.x) <= abs(velocity.y) {
-                if velocity.y > 0 {
-                    /// 手势向下
-                    return scrollView.contentOffset.y <= minY && !(scrollView.isDragging || scrollView.isDecelerating)
-                } else {
-                    /// 手势向上
-                    return scrollView.contentOffset.y >= maxY && !(scrollView.isDragging || scrollView.isDecelerating)
-                }
-            } else {
-                return false
-            }
+            return !photoView.isScrolling(with: velocity)
         } else {
             return true
         }
@@ -664,19 +633,19 @@ extension MediaBrowserViewController: UIViewControllerTransitioningDelegate, Tra
     }
     
     public var transitionThumbnailView: UIImageView? {
-        if let photoCell = self.currentPageCell as? PhotoCell, let zoomView = photoCell.zoomView {
-            return UIImageView()
+        if let photoCell = self.currentPageCell as? PhotoCell, let photoView = photoCell.photoView {
+            return self.buildZoomView(self.dataSource[self.currentPage], self.currentPage)?.thumbnailView
         }
         return nil
     }
     
     public var transitionThumbnail: UIImage? {
-        if let photoCell = self.currentPageCell as? PhotoCell, let zoomView = photoCell.zoomView {
-            if let image = zoomView.thumbnail {
+        if let photoCell = self.currentPageCell as? PhotoCell, let photoView = photoCell.photoView {
+            if let image = photoView.thumbnail {
                 return image
             } else if let thumbnail = self.dataSource[self.currentPage].thumbnail {
                 return thumbnail
-            } else if let image = zoomView.asset as? UIImage {
+            } else if let image = photoView.asset as? UIImage {
                 return image
             } else {
                 return nil
@@ -699,8 +668,8 @@ extension MediaBrowserViewController: UIViewControllerTransitioningDelegate, Tra
     }
     
     public var transitionTargetFrame: CGRect {
-        if let photoCell = self.currentPageCell as? PhotoCell, let zoomView = photoCell.zoomView {
-            return zoomView.contentViewFrame
+        if let photoCell = self.currentPageCell as? PhotoCell, let photoView = photoCell.photoView {
+            return photoView.contentViewFrame
         }
         return .zero
     }

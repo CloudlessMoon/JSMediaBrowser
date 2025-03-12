@@ -28,25 +28,25 @@ class ShareControl: UIButton {
     }
     
     @objc func onPress() {
-        guard let mediaBrowserVC = self.mediaBrowserVC else {
-            return
-        }
-        guard let photoCell = mediaBrowserVC.currentPageCell as? PhotoCell else {
-            return
-        }
-        guard let image = photoCell.zoomView?.asset as? UIImage else {
-            return
-        }
-        PHPhotoLibrary.shared().performChanges {
-            guard let imageData = image.sd_imageData() else {
-                return
-            }
-            PHAssetCreationRequest.forAsset().addResource(with: .photo, data: imageData, options: nil)
-        } completionHandler: { success, error in
-            DispatchQueue.main.async {
-                QMUITips.show(withText: success ? "保存成功" : error?.localizedDescription)
-            }
-        }
+//        guard let mediaBrowserVC = self.mediaBrowserVC else {
+//            return
+//        }
+//        guard let photoCell = mediaBrowserVC.currentPageCell as? PhotoCell else {
+//            return
+//        }
+//        guard let image = photoCell.photoView?.asset as? UIImage else {
+//            return
+//        }
+//        PHPhotoLibrary.shared().performChanges {
+//            guard let imageData = image.sd_imageData() else {
+//                return
+//            }
+//            PHAssetCreationRequest.forAsset().addResource(with: .photo, data: imageData, options: nil)
+//        } completionHandler: { success, error in
+//            DispatchQueue.main.async {
+//                QMUITips.show(withText: success ? "保存成功" : error?.localizedDescription)
+//            }
+//        }
     }
     
 }

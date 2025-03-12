@@ -15,9 +15,9 @@ public protocol ZoomAsset: Equatable {
 
 public protocol ZoomAssetView: UIView {
     
-    associatedtype ZoomAssetType: ZoomAsset
+    associatedtype Asset: ZoomAsset
     
-    var asset: ZoomAssetType? { get set }
+    var asset: Asset? { get set }
     
     var isPlaying: Bool { get }
     
