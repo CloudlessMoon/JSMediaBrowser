@@ -10,19 +10,16 @@ import UIKit
 import JSMediaBrowser
 import SnapKit
 import QMUIKit
+import SDWebImage
 
 class BrowserViewController: MediaBrowserViewController {
     
     lazy var shareControl: ShareControl = {
-        return ShareControl().then {
-            $0.mediaBrowserVC = self
-        }
+        return ShareControl()
     }()
     
     lazy var pageControl: PageControl = {
-        return PageControl().then {
-            $0.mediaBrowserVC = self
-        }
+        return PageControl()
     }()
     
     init() {
@@ -61,6 +58,36 @@ class BrowserViewController: MediaBrowserViewController {
             make.centerX.equalTo(self.view.snp.centerX)
             make.bottom.equalTo(self.view.safeAreaLayoutGuide.snp.bottom).offset(QMUIHelper.isNotchedScreen ? 0 : -20)
             make.height.equalTo(30)
+        }
+        
+        self.shareControl.onSave = { [weak self] in
+            guard let self = self else { return }
+            if let item = self.dataSource[self.currentPage] as? ImageItem {
+                SDWebImageManager.shared.loadImage(
+                    with: item.source.url,
+                    options: [.retryFailed],
+                    context: [
+                        .queryCacheType: SDImageCacheType.disk.rawValue
+                    ],
+                    progress: nil
+                ) { _, data, _, _, _, _ in
+                    guard let data = data else {
+                        return
+                    }
+                    PHPhotoLibrary.shared().performChanges {
+                        PHAssetCreationRequest.forAsset().addResource(with: .photo, data: data, options: nil)
+                    } completionHandler: { success, error in
+                        DispatchQueue.main.async {
+                            QMUITips.show(withText: success ? "保存成功" : error?.localizedDescription)
+                        }
+                    }
+                }
+            }
+            
+        }
+        self.pageControl.onValueChanged = { [weak self] in
+            guard let self = self else { return }
+            self.setCurrentPage($0, animated: true)
         }
     }
     

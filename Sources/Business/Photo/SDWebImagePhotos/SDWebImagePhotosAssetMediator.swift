@@ -14,6 +14,18 @@ public struct SDWebImagePhotosAssetMediator: PhotoAssetMediator {
     public enum Source {
         case url(URL?)
         case asset(localIdentifier: String?)
+        
+        public var url: URL? {
+            switch self {
+            case .url(let url):
+                return url
+            case .asset(let identifier):
+                guard let identifier = identifier else {
+                    return nil
+                }
+                return NSURL.sd_URL(withAssetLocalIdentifier: identifier) as URL
+            }
+        }
     }
     
     public var manager: SDWebImageManager
@@ -36,18 +48,14 @@ public struct SDWebImagePhotosAssetMediator: PhotoAssetMediator {
         completed: @escaping PhotoAssetMediatorCompletion<UIImage>
     ) -> PhotoAssetMediatorRequestToken? {
         switch source {
-        case .url(let url):
+        case .url:
             let mediator = SDWebImageAssetMediator(
                 manager: self.manager,
                 options: self.options,
                 context: self.context
             )
-            return mediator.request(source: url, progress: progress, completed: completed)
+            return mediator.request(source: source.url, progress: progress, completed: completed)
         case .asset(let identifier):
-            guard let identifier = identifier else {
-                return nil
-            }
-            let photosURL = NSURL.sd_URL(withAssetLocalIdentifier: identifier) as URL
             let context = {
                 let context = [.imageLoader: SDImagePhotosLoader.shared] as [SDWebImageContextOption: Any]
                 return context.merging(self.context ?? [:], uniquingKeysWith: { $1 })
@@ -57,7 +65,7 @@ public struct SDWebImagePhotosAssetMediator: PhotoAssetMediator {
                 options: self.options,
                 context: context
             )
-            return mediator.request(source: photosURL, progress: progress, completed: completed)
+            return mediator.request(source: source.url, progress: progress, completed: completed)
         }
     }
     

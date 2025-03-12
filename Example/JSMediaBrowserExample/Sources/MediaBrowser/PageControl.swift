@@ -13,22 +13,21 @@ import QMUIKit
 
 class PageControl: UIPageControl {
     
-    weak var mediaBrowserVC: BrowserViewController?
+    var onValueChanged: ((Int) -> Void)?
     
-    override init(frame: CGRect) {
-        super.init(frame: frame)
-        self.addTarget(self, action: #selector(self.handlePageControlEvent), for: .valueChanged)
+    init() {
+        super.init(frame: .zero)
+        
+        self.addTarget(self, action: #selector(self.handleValueChanged), for: .valueChanged)
     }
     
+    @available(*, unavailable, message: "use init()")
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-  
-    @objc func handlePageControlEvent() {
-        guard let mediaBrowserVC = self.mediaBrowserVC else {
-            return
-        }
-        mediaBrowserVC.setCurrentPage(self.currentPage, animated: true)
+    
+    @objc private func handleValueChanged() {
+        self.onValueChanged?(self.currentPage)
     }
     
 }
