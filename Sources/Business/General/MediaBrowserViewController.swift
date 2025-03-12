@@ -344,9 +344,10 @@ extension MediaBrowserViewController: MediaBrowserViewDataSource {
         guard index < self.dataSource.count else {
             return
         }
+        let dataItem = self.dataSource[index]
         /// 初始化zoomView
         if cell.zoomView == nil {
-            cell.zoomView = self.buildZoomView(index)
+            cell.zoomView = self.buildZoomView(dataItem, index)
         }
         
         let updateAsset = { [weak self] (cell: PhotoCell, asset: (any ZoomAsset)?, thumbnail: UIImage?) in
@@ -371,7 +372,6 @@ extension MediaBrowserViewController: MediaBrowserViewDataSource {
             progress.completedUnitCount = Int64(receivedSize)
             cell.setProgress(progress)
         }
-        let dataItem = self.dataSource[index]
         
         /// 重置下数据
         updateAsset(cell, nil, dataItem.thumbnail)
@@ -506,7 +506,7 @@ extension MediaBrowserViewController: MediaBrowserViewDelegate {
         if zoomView.zoomScale != minimumZoomScale {
             zoomView.setZoom(scale: minimumZoomScale, animated: true)
         } else {
-            let point = zoomView.assetView?.convert(point, from: mediaBrowserView) ?? point
+            let point = zoomView.assetView.convert(point, from: mediaBrowserView)
             zoomView.zoom(to: point, scale: zoomView.maximumZoomScale, animated: true)
         }
     }
@@ -657,7 +657,7 @@ extension MediaBrowserViewController: UIViewControllerTransitioningDelegate, Tra
     
     public var transitionThumbnailView: UIImageView? {
         if let photoCell = self.currentPageCell as? PhotoCell, let zoomView = photoCell.zoomView {
-            return zoomView.configuration.thumbnailView()
+            return UIImageView()
         }
         return nil
     }

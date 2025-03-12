@@ -13,36 +13,26 @@ import PhotosUI
 extension MediaBrowserViewControllerConfiguration {
     
     static let `default` = MediaBrowserViewControllerConfiguration(
-        zoomView: { index in
-            return ZoomView(configuration: .default)
-        }
-    )
-    
-}
-
-extension ZoomViewConfiguration {
-    
-    static let `default` = ZoomViewConfiguration(
-        assetView: {
-            if $0 is UIImage {
-                let imageView = SDAnimatedImageView()
-                imageView.autoPlayAnimatedImage = false
+        zoomView: { item, _ in
+            if item is ImageItem {
+                let assetView = SDAnimatedImageView()
+                assetView.autoPlayAnimatedImage = false
                 if #available(iOS 17.0, *) {
-                    imageView.preferredImageDynamicRange = .high
+                    assetView.preferredImageDynamicRange = .high
                 }
-                return imageView
-            } else if $0 is PHLivePhoto {
-                return PHLivePhotoView()
+                let thumbnailView = SDAnimatedImageView()
+                thumbnailView.autoPlayAnimatedImage = false
+                return ZoomView(assetView: assetView, thumbnailView: thumbnailView, configuration: .init())
+            } else if item is LivePhotoItem {
+                let thumbnailView = SDAnimatedImageView()
+                thumbnailView.autoPlayAnimatedImage = false
+                return ZoomView(assetView: PHLivePhotoView(), thumbnailView: thumbnailView, configuration: .init())
             } else {
                 return nil
             }
-        },
-        thumbnailView: {
-            let imageView = SDAnimatedImageView()
-            imageView.autoPlayAnimatedImage = false
-            return imageView
         }
     )
+    
 }
 
 struct ImageItem: AssetItem {
