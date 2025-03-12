@@ -84,8 +84,8 @@ open class ZoomView: BasisMediaView {
     
     private var isNeededRevertZoom: Bool = false
     
-    public init(
-        assetView: any ZoomAssetView,
+    public init<View: ZoomAssetView>(
+        assetView: View,
         thumbnailView: UIImageView,
         configuration: ZoomViewConfiguration,
         eventHandler: ZoomViewEventHandler? = nil

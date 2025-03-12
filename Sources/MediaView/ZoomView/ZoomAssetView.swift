@@ -43,11 +43,11 @@ internal extension ZoomAssetView {
         self.asset = self.asAsset(asset)
     }
     
-    func asAsset(_ asset: (any ZoomAsset)?) -> ZoomAssetType? {
+    private func asAsset(_ asset: (any ZoomAsset)?) -> ZoomAssetType? {
         return asset as? ZoomAssetType
     }
     
-    func isAsset(_ asset: any ZoomAsset) -> Bool {
+    private func isAsset(_ asset: any ZoomAsset) -> Bool {
         return asset is ZoomAssetType
     }
     
