@@ -9,11 +9,11 @@ import UIKit
 
 open class PhotoCell: BasisCell {
     
-    public var zoomView: ZoomView? {
+    public var zoomView: (any ZoomViewProtocol)? {
         didSet {
-            guard oldValue != self.zoomView else {
-                return
-            }
+//            guard oldValue != self.zoomView else {
+//                return
+//            }
             if let oldValue = oldValue, oldValue.superview == self.contentView {
                 oldValue.removeFromSuperview()
             }
@@ -31,5 +31,18 @@ open class PhotoCell: BasisCell {
         super.layoutSubviews()
         self.zoomView?.js_frameApplyTransform = self.contentView.bounds
     }
+    
+}
+
+public protocol ZoomViewProtocol: UIView {
+    
+    associatedtype AssetView: ZoomAssetView
+    
+}
+
+extension ZoomView: ZoomViewProtocol {
+    
+    public typealias AssetView = View11
+    
     
 }

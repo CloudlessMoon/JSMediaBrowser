@@ -9,7 +9,7 @@ import UIKit
 
 public struct MediaBrowserViewControllerConfiguration {
     
-    public typealias BuildZoomView = (any AssetItem, Int) -> ZoomView?
+    public typealias BuildZoomView = (any AssetItem, Int) -> (any ZoomViewProtocol)?
     
     public var zoomView: BuildZoomView
     public var enteringStyle: TransitioningStyle
@@ -63,8 +63,8 @@ public protocol MediaBrowserViewControllerEventHandler {
     
     func didChangedData(current: [any AssetItem], previous: [any AssetItem])
     
-    func willDisplayPhotoCell(_ cell: PhotoCell, zoomView: ZoomView, at index: Int)
-    func didEndDisplayingPhotoCell(_ cell: PhotoCell, zoomView: ZoomView, at index: Int)
+    func willDisplayPhotoCell(_ cell: PhotoCell, at index: Int)
+    func didEndDisplayingPhotoCell(_ cell: PhotoCell, at index: Int)
 
     func willDisplayEmptyView(_ emptyView: EmptyView, with error: NSError, at index: Int)
     
@@ -83,9 +83,9 @@ public extension MediaBrowserViewControllerEventHandler {
     
     func didChangedData(current: [any AssetItem], previous: [any AssetItem]) {}
     
-    func willDisplayPhotoCell(_ cell: PhotoCell, zoomView: ZoomView, at index: Int) {}
+    func willDisplayPhotoCell(_ cell: PhotoCell, at index: Int) {}
     
-    func didEndDisplayingPhotoCell(_ cell: PhotoCell, zoomView: ZoomView, at index: Int) {}
+    func didEndDisplayingPhotoCell(_ cell: PhotoCell, at index: Int) {}
     
     func willDisplayEmptyView(_ emptyView: EmptyView, with error: NSError, at index: Int) {}
     
@@ -104,7 +104,7 @@ public struct DefaultMediaBrowserViewControllerEventHandler: MediaBrowserViewCon
     
     public typealias ChangedDataSource = ([any AssetItem], [any AssetItem]) -> Void
     public typealias ShouldPlaying = (Int) -> Bool
-    public typealias DisplayCell = (PhotoCell, ZoomView, Int) -> Void
+    public typealias DisplayCell = (PhotoCell, Int) -> Void
     public typealias DisplayEmptyView = (EmptyView, NSError, Int) -> Void
     public typealias WillScroll = (Int, Int) -> Void
     public typealias DidScroll = (Int) -> Void
@@ -157,12 +157,12 @@ public struct DefaultMediaBrowserViewControllerEventHandler: MediaBrowserViewCon
         self._didScroll?(index)
     }
     
-    public func willDisplayPhotoCell(_ cell: PhotoCell, zoomView: ZoomView, at index: Int) {
-        self._willDisplayPhotoCell?(cell, zoomView, index)
+    public func willDisplayPhotoCell(_ cell: PhotoCell, at index: Int) {
+        self._willDisplayPhotoCell?(cell, index)
     }
     
-    public func didEndDisplayingPhotoCell(_ cell: PhotoCell, zoomView: ZoomView, at index: Int) {
-        self._didEndDisplayingPhotoCell?(cell, zoomView, index)
+    public func didEndDisplayingPhotoCell(_ cell: PhotoCell, at index: Int) {
+        self._didEndDisplayingPhotoCell?(cell, index)
     }
     
     public func willDisplayEmptyView(_ emptyView: EmptyView, with error: NSError, at index: Int) {

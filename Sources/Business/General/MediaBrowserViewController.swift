@@ -355,17 +355,17 @@ extension MediaBrowserViewController: MediaBrowserViewDataSource {
             guard let zoomView = cell.zoomView else {
                 return
             }
-            zoomView.asset = asset
-            zoomView.thumbnail = thumbnail
+//            zoomView.setAsset(asset)
+//            zoomView.zoomView.thumbnail = thumbnail
             /// 解决资源下载完成后不播放的问题
             self.startPlaying(for: cell, at: index)
         }
         let updateError = { (cell: PhotoCell, error: NSError?, isCancelled: Bool) in
-            if isCancelled && (cell.zoomView?.asset != nil || cell.zoomView?.thumbnail != nil) {
-                cell.setError(nil)
-            } else {
-                cell.setError(error)
-            }
+//            if isCancelled && (cell.zoomView?.asset != nil || cell.zoomView?.thumbnail != nil) {
+//                cell.setError(nil)
+//            } else {
+//                cell.setError(error)
+//            }
         }
         let updateProgress = { (cell: PhotoCell, receivedSize: Int, expectedSize: Int) in
             let progress = Progress(totalUnitCount: Int64(expectedSize))
@@ -419,14 +419,22 @@ extension MediaBrowserViewController: MediaBrowserViewDataSource {
         guard let zoomView = cell.zoomView else {
             return
         }
-        zoomView.viewportInsets = {
+        zoomView.setviewportInsets({
             let insets = self.view.safeAreaInsets
             if JSCoreHelper.isMac {
                 return insets
             } else {
                 return UIEdgeInsets(top: 0, left: insets.left, bottom: 0, right: insets.right)
             }
-        }()
+        }())
+//        zoomView.zoomView.viewportInsets = {
+//            let insets = self.view.safeAreaInsets
+//            if JSCoreHelper.isMac {
+//                return insets
+//            } else {
+//                return UIEdgeInsets(top: 0, left: insets.left, bottom: 0, right: insets.right)
+//            }
+//        }()
     }
     
     private func startPlaying(for cell: PhotoCell, at index: Int) {
@@ -441,10 +449,10 @@ extension MediaBrowserViewController: MediaBrowserViewDataSource {
         }
         if let eventHandler = self.eventHandler {
             if eventHandler.shouldStartPlaying(at: index) {
-                zoomView.startPlaying()
+               // zoomView.zoomView.startPlaying()
             }
         } else {
-            zoomView.startPlaying()
+           // zoomView.startPlaying()
         }
     }
     
@@ -456,15 +464,15 @@ extension MediaBrowserViewController: MediaBrowserViewDelegate {
         if let photoCell = cell as? PhotoCell, let zoomView = photoCell.zoomView {
             self.startPlaying(for: photoCell, at: index)
             
-            self.eventHandler?.willDisplayPhotoCell(photoCell, zoomView: zoomView, at: index)
+//            self.eventHandler?.willDisplayPhotoCell(photoCell, zoomView: zoomView, at: index)
         }
     }
     
     public func mediaBrowserView(_ mediaBrowserView: MediaBrowserView, didEndDisplaying cell: UICollectionViewCell, forPageAt index: Int) {
         if let photoCell = cell as? PhotoCell, let zoomView = photoCell.zoomView {
-            zoomView.stopPlaying()
+//            zoomView.stopPlaying()
             
-            self.eventHandler?.didEndDisplayingPhotoCell(photoCell, zoomView: zoomView, at: index)
+//            self.eventHandler?.didEndDisplayingPhotoCell(photoCell, zoomView: zoomView, at: index)
         }
     }
     
