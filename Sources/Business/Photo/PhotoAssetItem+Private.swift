@@ -32,7 +32,7 @@ internal extension PhotoAssetItem {
         )
     }
     
-    var targetType: Target {
+    var targetType: Target.Type {
         return Target.self
     }
     
