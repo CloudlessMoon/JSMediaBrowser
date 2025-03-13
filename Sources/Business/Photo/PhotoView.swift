@@ -9,8 +9,8 @@ import UIKit
 
 public protocol PhotoView: UIView {
     
-    associatedtype AssetView: ZoomAssetView
-    associatedtype ZoomViewType: ZoomView<AssetView>
+    associatedtype ZoomAssetViewType: ZoomAssetView
+    associatedtype ZoomViewType: ZoomView<ZoomAssetViewType>
     
     var zoomView: ZoomViewType { get }
     

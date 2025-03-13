@@ -23,7 +23,7 @@ class BrowserViewController: MediaBrowserViewController {
     }()
     
     init() {
-        super.init(configuration: .init())
+        super.init()
         
         self.eventHandler = DefaultMediaBrowserViewControllerEventHandler(
             didChangedData: { [weak self] _, _ in

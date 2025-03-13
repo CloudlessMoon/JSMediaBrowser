@@ -76,12 +76,12 @@ internal extension PhotoView {
         }
     }
     
-    private func asAsset(_ asset: any ZoomAsset) -> AssetView.Asset? {
-        return asset as? AssetView.Asset
+    private func asAsset(_ asset: any ZoomAsset) -> ZoomAssetViewType.Asset? {
+        return asset as? ZoomAssetViewType.Asset
     }
     
     private func isAsset(_ asset: any ZoomAsset) -> Bool {
-        return asset is AssetView.Asset
+        return asset is ZoomAssetViewType.Asset
     }
     
 }

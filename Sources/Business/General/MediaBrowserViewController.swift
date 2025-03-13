@@ -103,16 +103,16 @@ open class MediaBrowserViewController: UIViewController {
             guard oldValue != self.isTransitionFinished else {
                 return
             }
-            guard let photoCell = self.currentPageCell as? PhotoCell else {
+            guard let cell = self.currentPageCell as? PhotoCell else {
                 return
             }
-            self.startPlaying(for: photoCell, at: self.currentPage)
+            self.startPlaying(for: cell, at: self.currentPage)
         }
     }
     
     private var photoAtomicInt = PhotoCell.AtomicInt()
     
-    public init(configuration: MediaBrowserViewControllerConfiguration) {
+    public init(configuration: MediaBrowserViewControllerConfiguration = .init()) {
         self.configuration = configuration
         self.enteringStyle = configuration.enteringStyle
         self.exitingStyle = configuration.exitingStyle
@@ -332,8 +332,8 @@ extension MediaBrowserViewController: MediaBrowserViewDataSource {
             self.eventHandler?.willDisplayEmptyView(emptyView, with: error, at: index)
         }
         
-        if let photoCell = cell as? PhotoCell {
-            self.configPhotoCell(photoCell, at: index)
+        if let cell = cell as? PhotoCell {
+            self.configPhotoCell(cell, at: index)
         }
     }
     
@@ -343,24 +343,17 @@ extension MediaBrowserViewController: MediaBrowserViewDataSource {
         }
         let dataItem = self.dataSource[index]
         
-        if cell.photoView == nil {
-            cell.photoView = dataItem.builder.createView()
-        }
+        /// create
+        cell.createPhotoView(dataItem.builder.createView())
         
         let updateAsset = { [weak self] (cell: PhotoCell, asset: (any ZoomAsset)?, thumbnail: UIImage?) in
             guard let self = self else { return }
-            guard let photoView = cell.photoView else {
-                return
-            }
-            photoView.setAsset(asset, thumbnail: thumbnail)
+            cell.photoView.setAsset(asset, thumbnail: thumbnail)
             /// 解决资源下载完成后不播放的问题
             self.startPlaying(for: cell, at: index)
         }
         let updateError = { (cell: PhotoCell, error: NSError?, isCancelled: Bool) in
-            guard let photoView = cell.photoView else {
-                return
-            }
-            if isCancelled && (photoView.asset != nil || photoView.thumbnail != nil) {
+            if isCancelled && (cell.photoView.asset != nil || cell.photoView.thumbnail != nil) {
                 cell.setError(nil)
             } else {
                 cell.setError(error)
@@ -412,10 +405,7 @@ extension MediaBrowserViewController: MediaBrowserViewDataSource {
     }
     
     private func configViewportInsets(for cell: PhotoCell) {
-        guard let photoView = cell.photoView else {
-            return
-        }
-        photoView.setViewportInsets({
+        cell.photoView.setViewportInsets({
             let insets = self.view.safeAreaInsets
             if JSCoreHelper.isMac {
                 return insets
@@ -429,15 +419,15 @@ extension MediaBrowserViewController: MediaBrowserViewDataSource {
         guard self.isTransitionFinished && !self.isDragging && !self.isDecelerating && !self.isScrollAnimating else {
             return
         }
-        guard !cell.isHidden && cell.window != nil, let photoView = cell.photoView else {
+        guard !cell.isHidden && cell.window != nil else {
             return
         }
         if let eventHandler = self.eventHandler {
             if eventHandler.shouldStartPlaying(at: index) {
-                photoView.startPlaying()
+                cell.photoView.startPlaying()
             }
         } else {
-            photoView.startPlaying()
+            cell.photoView.startPlaying()
         }
     }
     
@@ -446,20 +436,18 @@ extension MediaBrowserViewController: MediaBrowserViewDataSource {
 extension MediaBrowserViewController: MediaBrowserViewDelegate {
     
     public func mediaBrowserView(_ mediaBrowserView: MediaBrowserView, willDisplay cell: UICollectionViewCell, forPageAt index: Int) {
-        if let photoCell = cell as? PhotoCell {
-            self.startPlaying(for: photoCell, at: index)
+        if let cell = cell as? PhotoCell {
+            self.startPlaying(for: cell, at: index)
             
-            self.eventHandler?.willDisplayPhotoCell(photoCell, at: index)
+            self.eventHandler?.willDisplayPhotoCell(cell, at: index)
         }
     }
     
     public func mediaBrowserView(_ mediaBrowserView: MediaBrowserView, didEndDisplaying cell: UICollectionViewCell, forPageAt index: Int) {
-        if let photoCell = cell as? PhotoCell {
-            if let photoView = photoCell.photoView {
-                photoView.stopPlaying()
-            }
+        if let cell = cell as? PhotoCell {
+            cell.photoView.stopPlaying()
             
-            self.eventHandler?.didEndDisplayingPhotoCell(photoCell, at: index)
+            self.eventHandler?.didEndDisplayingPhotoCell(cell, at: index)
         }
     }
     
@@ -468,8 +456,8 @@ extension MediaBrowserViewController: MediaBrowserViewDelegate {
     }
     
     public func mediaBrowserView(_ mediaBrowserView: MediaBrowserView, didScrollTo index: Int) {
-        if let photoCell = self.currentPageCell as? PhotoCell {
-            self.startPlaying(for: photoCell, at: index)
+        if let cell = self.currentPageCell as? PhotoCell {
+            self.startPlaying(for: cell, at: index)
         }
         
         self.eventHandler?.didScroll(to: index)
@@ -494,10 +482,10 @@ extension MediaBrowserViewController: MediaBrowserViewDelegate {
         guard self.zoomWhenDoubleTap else {
             return
         }
-        guard let photoCell = self.currentPageCell as? PhotoCell, let photoView = photoCell.photoView else {
+        guard let cell = self.currentPageCell as? PhotoCell else {
             return
         }
-        photoView.doubleTap(at: point, from: mediaBrowserView)
+        cell.photoView.doubleTap(at: point, from: mediaBrowserView)
     }
     
     public func mediaBrowserView(_ mediaBrowserView: MediaBrowserView, didLongPressAt index: Int, point: CGPoint) {
@@ -513,11 +501,11 @@ extension MediaBrowserViewController: UIGestureRecognizerDelegate {
             guard self.isPresented && self.hideWhenSliding else {
                 return false
             }
-            guard let photoCell = self.currentPageCell as? PhotoCell, let photoView = photoCell.photoView else {
+            guard let cell = self.currentPageCell as? PhotoCell else {
                 return true
             }
             let velocity = self.dismissingRecognizer.velocity(in: self.dismissingRecognizer.view)
-            return !photoView.isScrolling(with: velocity)
+            return !cell.photoView.isScrolling(with: velocity)
         } else {
             return true
         }
@@ -639,12 +627,12 @@ extension MediaBrowserViewController: UIViewControllerTransitioningDelegate, Tra
     }
     
     public var transitionThumbnail: UIImage? {
-        if let photoCell = self.currentPageCell as? PhotoCell, let photoView = photoCell.photoView {
-            if let image = photoView.thumbnail {
+        if let cell = self.currentPageCell as? PhotoCell {
+            if let image = cell.photoView.thumbnail {
                 return image
             } else if let thumbnail = self.dataSource[self.currentPage].thumbnail {
                 return thumbnail
-            } else if let image = photoView.asset as? UIImage {
+            } else if let image = cell.photoView.asset as? UIImage {
                 return image
             } else {
                 return nil
@@ -667,8 +655,8 @@ extension MediaBrowserViewController: UIViewControllerTransitioningDelegate, Tra
     }
     
     public var transitionTargetFrame: CGRect {
-        if let photoCell = self.currentPageCell as? PhotoCell, let photoView = photoCell.photoView {
-            return photoView.contentViewFrame
+        if let cell = self.currentPageCell as? PhotoCell {
+            return cell.photoView.contentViewFrame
         }
         return .zero
     }

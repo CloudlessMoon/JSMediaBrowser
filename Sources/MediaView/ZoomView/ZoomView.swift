@@ -91,7 +91,7 @@ open class ZoomView<AssetView: ZoomAssetView>: BasisMediaView {
     public init(
         assetView: AssetView,
         thumbnailView: UIImageView,
-        configuration: ZoomViewConfiguration,
+        configuration: ZoomViewConfiguration = .init(),
         eventHandler: ZoomViewEventHandler? = nil
     ) {
         self.assetView = assetView

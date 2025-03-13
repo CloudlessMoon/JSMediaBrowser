@@ -9,7 +9,10 @@ import UIKit
 
 extension ZoomView: PhotoView {
     
-    public var zoomView: ZoomView<AssetView> {
+    public typealias ZoomAssetViewType = AssetView
+    public typealias ZoomViewType = ZoomView<ZoomAssetViewType>
+    
+    public var zoomView: ZoomViewType {
         return self
     }
     
