@@ -58,26 +58,32 @@ open class ZoomView<AssetView: ZoomAssetView>: BasisMediaView {
             guard oldValue != self.isEnabledZoom else {
                 return
             }
+            self.updateMinimumZoomScale()
+            self.updateMaximumZoomScale()
             self.setNeedsRevertZoom()
         }
     }
     
     public var minimumZoomScale: CGFloat {
         didSet {
-            self.scrollView.minimumZoomScale = self.minimumZoomScale
+            guard oldValue != self.minimumZoomScale else {
+                return
+            }
+            self.updateMinimumZoomScale()
         }
     }
     
     public var maximumZoomScale: CGFloat {
         didSet {
-            self.scrollView.maximumZoomScale = self.maximumZoomScale
+            guard oldValue != self.maximumZoomScale else {
+                return
+            }
+            self.updateMaximumZoomScale()
         }
     }
     
     private lazy var scrollView: ZoomScrollView = {
         let scrollView = ZoomScrollView()
-        scrollView.minimumZoomScale = self.minimumZoomScale
-        scrollView.maximumZoomScale = self.maximumZoomScale
         scrollView.delegate = self.delegator
         return scrollView
     }()
@@ -86,6 +92,7 @@ open class ZoomView<AssetView: ZoomAssetView>: BasisMediaView {
         return ScrollViewDelegator(owner: self)
     }()
     
+    fileprivate var isZoomInAnimation: Bool = false
     private var isNeededRevertZoom: Bool = false
     
     public init(
@@ -112,6 +119,9 @@ open class ZoomView<AssetView: ZoomAssetView>: BasisMediaView {
         self.addSubview(self.scrollView)
         self.scrollView.addSubview(self.assetView)
         self.scrollView.addSubview(self.thumbnailView)
+        
+        self.updateMinimumZoomScale()
+        self.updateMaximumZoomScale()
     }
     
     open override func layoutSubviews() {
@@ -206,6 +216,14 @@ extension ZoomView {
         return self.scrollView.zoomScale
     }
     
+    public var isZooming: Bool {
+        return self.scrollView.isZooming
+    }
+    
+    public var isZoomAnimating: Bool {
+        return self.isZoomInAnimation
+    }
+    
     public func setZoom(scale: CGFloat, animated: Bool) {
         let center = {
             let center = self.scrollView.center
@@ -231,9 +249,11 @@ extension ZoomView {
     public func zoom(to rect: CGRect, animated: Bool) {
         if animated {
             self.callWillBeginZooming()
+            self.isZoomInAnimation = true
             UIView.animate(withDuration: 0.25, delay: 0.0, options: [JSCoreHelper.animationOptionsCurveIn]) {
                 self.scrollView.zoom(to: rect, animated: false)
             } completion: { _ in
+                self.isZoomInAnimation = false
                 self.callDidEndZooming()
             }
         } else {
@@ -388,9 +408,21 @@ extension ZoomView {
         self.isNeededRevertZoom = false
         
         /// 重置zoomScale
-        self.setZoom(scale: self.minimumZoomScale, animated: false)
+        if self.zoomScale != self.minimumZoomScale {
+            self.setZoom(scale: self.minimumZoomScale, animated: false)
+        }
         /// 重置contentOffset
-        self.scrollView.contentOffset = self.scrollView.js_minimumContentOffset
+        if self.scrollView.contentOffset != self.minimumContentOffset {
+            self.scrollView.contentOffset = self.minimumContentOffset
+        }
+    }
+    
+    private func updateMinimumZoomScale() {
+        self.scrollView.minimumZoomScale = self.isEnabledZoom ? self.minimumZoomScale : 1.0
+    }
+    
+    private func updateMaximumZoomScale() {
+        self.scrollView.maximumZoomScale = self.isEnabledZoom ? self.maximumZoomScale : 1.0
     }
     
     fileprivate func callWillBeginZooming() {
@@ -428,11 +460,19 @@ private final class ScrollViewDelegator<View: ZoomAssetView>: NSObject, UIScroll
     }
     
     func scrollViewWillBeginZooming(_ scrollView: UIScrollView, with view: UIView?) {
-        self.owner?.callWillBeginZooming()
+        guard let owner = self.owner else {
+            return
+        }
+        owner.callWillBeginZooming()
+        owner.isZoomInAnimation = true
     }
     
     func scrollViewDidEndZooming(_ scrollView: UIScrollView, with view: UIView?, atScale scale: CGFloat) {
-        self.owner?.callDidEndZooming(at: scale)
+        guard let owner = self.owner else {
+            return
+        }
+        owner.isZoomInAnimation = false
+        owner.callDidEndZooming(at: scale)
     }
     
     func scrollViewDidZoom(_ scrollView: UIScrollView) {
