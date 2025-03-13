@@ -98,9 +98,9 @@ open class MediaBrowserViewController: UIViewController {
     private weak var presentedFromViewController: UIViewController?
     private var isPresented: Bool = false
     
-    private var isTransitionFinished: Bool = false {
+    private var isViewAppeared: Bool = false {
         didSet {
-            guard oldValue != self.isTransitionFinished else {
+            guard oldValue != self.isViewAppeared else {
                 return
             }
             guard let cell = self.currentPageCell as? PhotoCell else {
@@ -164,8 +164,13 @@ open class MediaBrowserViewController: UIViewController {
     
     open override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        if !self.isTransitionFinished {
-            self.isTransitionFinished = true
+        self.isViewAppeared = true
+    }
+    
+    open override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        if let cell = self.currentPageCell as? PhotoCell {
+            self.stopPlaying(for: cell)
         }
     }
     
@@ -416,7 +421,10 @@ extension MediaBrowserViewController: MediaBrowserViewDataSource {
     }
     
     private func startPlaying(for cell: PhotoCell, at index: Int) {
-        guard self.isTransitionFinished && !self.isDragging && !self.isDecelerating && !self.isScrollAnimating else {
+        guard self.isViewAppeared && !self.isDragging && !self.isDecelerating && !self.isScrollAnimating else {
+            return
+        }
+        guard !self.view.isHidden && self.view.window != nil else {
             return
         }
         guard !cell.isHidden && cell.window != nil else {
@@ -429,6 +437,10 @@ extension MediaBrowserViewController: MediaBrowserViewDataSource {
         } else {
             cell.photoView.startPlaying()
         }
+    }
+    
+    private func stopPlaying(for cell: PhotoCell) {
+        cell.photoView.stopPlaying()
     }
     
 }
@@ -445,7 +457,7 @@ extension MediaBrowserViewController: MediaBrowserViewDelegate {
     
     public func mediaBrowserView(_ mediaBrowserView: MediaBrowserView, didEndDisplaying cell: UICollectionViewCell, forPageAt index: Int) {
         if let cell = cell as? PhotoCell {
-            cell.photoView.stopPlaying()
+            self.stopPlaying(for: cell)
             
             self.eventHandler?.didEndDisplayingPhotoCell(cell, at: index)
         }
