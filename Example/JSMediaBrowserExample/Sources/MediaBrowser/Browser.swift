@@ -10,6 +10,19 @@ import SDWebImage
 import JSMediaBrowser
 import PhotosUI
 
+extension PhotoGeneralView {
+    
+    convenience init(zoomAssetView: T) {
+        let thumbnailView = SDAnimatedImageView()
+        thumbnailView.autoPlayAnimatedImage = false
+        self.init(
+            configuration: .init(emptyImage: UIImage(named: "img_fail")),
+            zoomView: .init(assetView: zoomAssetView, thumbnailView: thumbnailView)
+        )
+    }
+    
+}
+
 struct ImageBuilder: PhotoBuilder {
     
     func createMediator() -> SDWebImagePhotosMediator {
@@ -66,19 +79,6 @@ struct LivePhotoItem: PhotoItem {
     
     var builder: LivePhotoBuilder {
         return .init()
-    }
-    
-}
-
-extension PhotoGeneralView {
-    
-    convenience init(zoomAssetView: T) {
-        let thumbnailView = SDAnimatedImageView()
-        thumbnailView.autoPlayAnimatedImage = false
-        self.init(
-            configuration: .init(emptyImage: UIImage(named: "img_fail")),
-            zoomView: .init(assetView: zoomAssetView, thumbnailView: thumbnailView)
-        )
     }
     
 }

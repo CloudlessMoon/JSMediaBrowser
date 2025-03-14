@@ -106,7 +106,7 @@ extension BrowserViewController {
     }
     
     private func willDisplayPhotoCell(_ cell: PhotoCell, at index: Int) {
-      
+        
     }
     
 }

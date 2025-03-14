@@ -18,11 +18,3 @@ public protocol PhotoView: UIView {
     func setError(_ error: NSError?)
     
 }
-
-public extension PhotoView {
-    
-    func asZoomView<T: ZoomAssetView>() -> ZoomView<T>? {
-        return self.zoomView as? ZoomView<T>
-    }
-    
-}
