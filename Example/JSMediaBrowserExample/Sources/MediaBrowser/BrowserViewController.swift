@@ -106,9 +106,7 @@ extension BrowserViewController {
     }
     
     private func willDisplayPhotoCell(_ cell: PhotoCell, at index: Int) {
-        if cell.emptyView.image == nil {
-            cell.emptyView.image = UIImage(named: "img_fail")
-        }
+      
     }
     
 }

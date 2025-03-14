@@ -23,15 +23,13 @@ struct ImageBuilder: PhotoBuilder {
         )
     }
     
-    func createView() -> ZoomView<SDAnimatedImageView> {
+    func createView() -> PhotoGeneralView<SDAnimatedImageView> {
         let assetView = SDAnimatedImageView()
         assetView.autoPlayAnimatedImage = false
         if #available(iOS 17.0, *) {
             assetView.preferredImageDynamicRange = .high
         }
-        let thumbnailView = SDAnimatedImageView()
-        thumbnailView.autoPlayAnimatedImage = false
-        return .init(assetView: assetView, thumbnailView: thumbnailView)
+        return .init(zoomAssetView: assetView)
     }
     
 }
@@ -54,10 +52,8 @@ struct LivePhotoBuilder: PhotoBuilder {
         return .init()
     }
     
-    func createView() -> ZoomView<PHLivePhotoView> {
-        let thumbnailView = SDAnimatedImageView()
-        thumbnailView.autoPlayAnimatedImage = false
-        return .init(assetView: PHLivePhotoView(), thumbnailView: thumbnailView)
+    func createView() -> PhotoGeneralView<PHLivePhotoView> {
+        return .init(zoomAssetView: PHLivePhotoView())
     }
     
 }
@@ -70,6 +66,19 @@ struct LivePhotoItem: PhotoItem {
     
     var builder: LivePhotoBuilder {
         return .init()
+    }
+    
+}
+
+extension PhotoGeneralView {
+    
+    convenience init(zoomAssetView: T) {
+        let thumbnailView = SDAnimatedImageView()
+        thumbnailView.autoPlayAnimatedImage = false
+        self.init(
+            configuration: .init(emptyImage: UIImage(named: "img_fail")),
+            zoomView: .init(assetView: zoomAssetView, thumbnailView: thumbnailView)
+        )
     }
     
 }

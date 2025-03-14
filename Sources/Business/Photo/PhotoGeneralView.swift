@@ -1,13 +1,36 @@
 //
-//  BasisCell.swift
+//  PhotoGeneralView.swift
 //  JSMediaBrowser
 //
-//  Created by jiasong on 2020/12/12.
+//  Created by jiasong on 2025/3/14.
 //
 
 import UIKit
 
-open class BasisCell: UICollectionViewCell {
+open class PhotoGeneralView<T: ZoomAssetView>: UIView, PhotoView {
+    
+    public struct Configuration {
+        public var emptyImage: UIImage?
+        public var progressTintColor: UIColor?
+        public var progressBackgroundColor: UIColor?
+        
+        public init(
+            emptyImage: UIImage? = nil,
+            progressTintColor: UIColor? = .white,
+            progressBackgroundColor: UIColor? = .black.withAlphaComponent(0.15)
+        ) {
+            self.emptyImage = emptyImage
+            self.progressTintColor = progressTintColor
+            self.progressBackgroundColor = progressBackgroundColor
+        }
+    }
+    
+    public typealias ZoomAssetViewType = T
+    public typealias ZoomViewType = ZoomView<T>
+    
+    public let configuration: Configuration
+    
+    public let zoomView: ZoomViewType
     
     public private(set) lazy var emptyView: EmptyView = {
         let view = EmptyView()
@@ -17,13 +40,11 @@ open class BasisCell: UICollectionViewCell {
     
     public private(set) lazy var progressView: PieProgressView = {
         let view = PieProgressView()
-        view.tintColor = .white
-        return view
+        return PieProgressView()
     }()
     
-    private lazy var progressBackgroundView: UIView = {
+    public private(set) lazy var progressBackgroundView: UIView = {
         let view = UIView()
-        view.backgroundColor = .black.withAlphaComponent(0.15)
         view.layer.cornerRadius = 8
         return view
     }()
@@ -37,7 +58,7 @@ open class BasisCell: UICollectionViewCell {
         }
     }
     
-    private var progress = Progress() {
+    private var progress: Float? {
         didSet {
             guard oldValue != self.progress else {
                 return
@@ -46,24 +67,35 @@ open class BasisCell: UICollectionViewCell {
         }
     }
     
-    public override init(frame: CGRect) {
-        super.init(frame: frame)
+    public init(configuration: Configuration, zoomView: ZoomViewType) {
+        self.configuration = configuration
+        self.zoomView = zoomView
+        
+        super.init(frame: .zero)
         self.didInitialize()
     }
     
     @available(*, unavailable, message: "use init()")
     required public init?(coder: NSCoder) {
-        fatalError()
+        fatalError("init(coder:) has not been implemented")
     }
     
     open func didInitialize() {
-        self.contentView.addSubview(self.emptyView)
-        self.contentView.addSubview(self.progressBackgroundView)
+        self.addSubview(self.zoomView)
+        self.addSubview(self.emptyView)
+        self.addSubview(self.progressBackgroundView)
         self.progressBackgroundView.addSubview(self.progressView)
+        
+        self.emptyView.image = self.configuration.emptyImage
+        self.progressView.tintColor = self.configuration.progressTintColor
+        self.progressBackgroundView.backgroundColor = self.configuration.progressBackgroundColor
+        
+        self.updateProgress()
     }
     
     open override func layoutSubviews() {
         super.layoutSubviews()
+        self.zoomView.frame = self.bounds
         self.emptyView.frame = self.bounds
         
         let progressBackgroundSize = min(self.bounds.width * 0.16, 80)
@@ -84,15 +116,19 @@ open class BasisCell: UICollectionViewCell {
     
 }
 
-extension BasisCell {
+extension PhotoGeneralView {
     
-    internal func setProgress(_ progress: Progress) {
-        self.progress = progress
+    public func setProgress(received: Int, expected: Int) {
+        if expected > 0 {
+            self.progress = Float(received) / Float(expected)
+        } else {
+            self.progress = nil
+        }
         
-        self.progressView.setProgress(Float(progress.fractionCompleted), animated: true)
+        self.progressView.setProgress(self.progress ?? 0, animated: true)
     }
     
-    internal func setError(_ error: NSError?) {
+    public func setError(_ error: NSError?) {
         self.error = error
         
         if let error = error {
@@ -105,10 +141,10 @@ extension BasisCell {
     
 }
 
-extension BasisCell {
+extension PhotoGeneralView {
     
     private func updateProgress() {
-        if self.error != nil || self.progress.fractionCompleted == 1.0 || self.progress.totalUnitCount == 0 {
+        if self.error != nil || self.progress == 1 || self.progress == nil {
             self.progressBackgroundView.isHidden = true
         } else {
             self.progressBackgroundView.isHidden = false

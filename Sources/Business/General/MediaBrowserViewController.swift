@@ -344,15 +344,13 @@ extension MediaBrowserViewController: MediaBrowserViewDataSource {
         }
         let updateError = { (cell: PhotoCell, error: NSError?, isCancelled: Bool) in
             if isCancelled && (cell.photoView.asset != nil || cell.photoView.thumbnail != nil) {
-                cell.setError(nil)
+                cell.photoView.setError(nil)
             } else {
-                cell.setError(error)
+                cell.photoView.setError(error)
             }
         }
         let updateProgress = { (cell: PhotoCell, receivedSize: Int, expectedSize: Int) in
-            let progress = Progress(totalUnitCount: Int64(expectedSize))
-            progress.completedUnitCount = Int64(receivedSize)
-            cell.setProgress(progress)
+            cell.photoView.setProgress(received: receivedSize, expected: expectedSize)
         }
         updateAsset(cell, nil, dataItem.thumbnail)
         updateProgress(cell, 0, 0)

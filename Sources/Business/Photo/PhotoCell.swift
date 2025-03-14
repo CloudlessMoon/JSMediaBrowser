@@ -7,7 +7,7 @@
 
 import UIKit
 
-open class PhotoCell: BasisCell {
+open class PhotoCell: UICollectionViewCell {
     
     public private(set) var photoView: any PhotoView {
         didSet {
@@ -25,6 +25,11 @@ open class PhotoCell: BasisCell {
         self.photoView = DefaultPhotoView()
         
         super.init(frame: frame)
+    }
+    
+    @available(*, unavailable, message: "use init()")
+    required public init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
     
     open override func layoutSubviews() {
@@ -51,8 +56,20 @@ private final class DefaultPhotoView: UIView, PhotoView {
     typealias ZoomViewType = ZoomView<UIImageView>
     
     var zoomView: ZoomViewType {
-        assertionFailure("此处理论上不会调用，请按照堆栈检查代码")
+        self.assertion()
         return ZoomView(assetView: UIImageView(), thumbnailView: UIImageView())
+    }
+    
+    func setProgress(received: Int, expected: Int) {
+        self.assertion()
+    }
+    
+    func setError(_ error: NSError?) {
+        self.assertion()
+    }
+    
+    private func assertion() {
+        assertionFailure("此处理论上不会调用，请按照堆栈检查代码")
     }
     
 }
