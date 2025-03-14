@@ -40,6 +40,8 @@
 		7A730FE62D2272D1006C8FA6 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7A730FA02D22719D006C8FA6 /* Assets.xcassets */; };
 		7A730FE72D2272D1006C8FA6 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7A730FA32D22719D006C8FA6 /* LaunchScreen.storyboard */; };
 		7A730FF02D227439006C8FA6 /* MacOSInfo.plist in Resources */ = {isa = PBXBuildFile; fileRef = 7A730FEE2D227439006C8FA6 /* MacOSInfo.plist */; };
+		7AE05C132D8434C10067CEC1 /* Browser+Convenient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7AE05C122D8434C10067CEC1 /* Browser+Convenient.swift */; };
+		7AE05C142D8434C10067CEC1 /* Browser+Convenient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7AE05C122D8434C10067CEC1 /* Browser+Convenient.swift */; };
 		7AE273A92D261C1600E72D33 /* Browser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7AE273A82D261C1600E72D33 /* Browser.swift */; };
 		7AE273AA2D261C1600E72D33 /* Browser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7AE273A82D261C1600E72D33 /* Browser.swift */; };
 		7AE273B32D262FFF00E72D33 /* LivePhoto.JPG in Resources */ = {isa = PBXBuildFile; fileRef = 7AE273B12D262FFF00E72D33 /* LivePhoto.JPG */; };
@@ -77,6 +79,7 @@
 		7A730FEB2D2272D1006C8FA6 /* JSMediaBrowserExampleMacOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = JSMediaBrowserExampleMacOS.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		7A730FED2D2272DD006C8FA6 /* MacOS.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = MacOS.entitlements; sourceTree = "<group>"; };
 		7A730FEE2D227439006C8FA6 /* MacOSInfo.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = MacOSInfo.plist; sourceTree = "<group>"; };
+		7AE05C122D8434C10067CEC1 /* Browser+Convenient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Browser+Convenient.swift"; sourceTree = "<group>"; };
 		7AE273A82D261C1600E72D33 /* Browser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Browser.swift; sourceTree = "<group>"; };
 		7AE273B12D262FFF00E72D33 /* LivePhoto.JPG */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = LivePhoto.JPG; sourceTree = "<group>"; };
 		7AE273B22D262FFF00E72D33 /* LivePhoto.MOV */ = {isa = PBXFileReference; lastKnownFileType = video.quicktime; path = LivePhoto.MOV; sourceTree = "<group>"; };
@@ -208,6 +211,7 @@
 			isa = PBXGroup;
 			children = (
 				7AE273A82D261C1600E72D33 /* Browser.swift */,
+				7AE05C122D8434C10067CEC1 /* Browser+Convenient.swift */,
 				7A730FC12D2271E2006C8FA6 /* BrowserViewController.swift */,
 				7A730FC22D2271E2006C8FA6 /* PageControl.swift */,
 				7A730FC32D2271E2006C8FA6 /* ShareControl.swift */,
@@ -457,6 +461,7 @@
 				7A730FA92D22719D006C8FA6 /* AppDelegate.swift in Sources */,
 				7AE273A92D261C1600E72D33 /* Browser.swift in Sources */,
 				7A730FC62D2271E2006C8FA6 /* HomeViewController.swift in Sources */,
+				7AE05C132D8434C10067CEC1 /* Browser+Convenient.swift in Sources */,
 				7A730FC72D2271E2006C8FA6 /* ShareControl.swift in Sources */,
 				7AE273B92D26313000E72D33 /* AppDelegate+Debug.swift in Sources */,
 				7A730FC82D2271E2006C8FA6 /* BrowserViewController.swift in Sources */,
@@ -472,6 +477,7 @@
 				7A730FD52D2272D1006C8FA6 /* AppDelegate.swift in Sources */,
 				7AE273AA2D261C1600E72D33 /* Browser.swift in Sources */,
 				7A730FD72D2272D1006C8FA6 /* HomeViewController.swift in Sources */,
+				7AE05C142D8434C10067CEC1 /* Browser+Convenient.swift in Sources */,
 				7A730FD82D2272D1006C8FA6 /* ShareControl.swift in Sources */,
 				7AE273B82D26313000E72D33 /* AppDelegate+Debug.swift in Sources */,
 				7A730FD92D2272D1006C8FA6 /* BrowserViewController.swift in Sources */,
