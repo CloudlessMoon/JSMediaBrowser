@@ -7,7 +7,7 @@
 
 import UIKit
 
-open class PhotoGeneralView<T: ZoomAssetView>: UIView, PhotoView {
+open class PhotoGeneralView<ZoomViewType: ZoomView<ZoomAssetViewType>, ZoomAssetViewType: ZoomAssetView>: UIView, PhotoView {
     
     public struct Configuration {
         public var emptyImage: UIImage?
@@ -24,9 +24,6 @@ open class PhotoGeneralView<T: ZoomAssetView>: UIView, PhotoView {
             self.progressBackgroundColor = progressBackgroundColor
         }
     }
-    
-    public typealias ZoomAssetViewType = T
-    public typealias ZoomViewType = ZoomView<T>
     
     public let configuration: Configuration
     

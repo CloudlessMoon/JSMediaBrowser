@@ -10,15 +10,27 @@ import SDWebImage
 import JSMediaBrowser
 import PhotosUI
 
+typealias PhotoImageView = PhotoGeneralView<ZoomView<SDAnimatedImageView>, SDAnimatedImageView>
+typealias PhotoLivePhotoView = PhotoGeneralView<ZoomView<PHLivePhotoView>, PHLivePhotoView>
+
 extension PhotoGeneralView {
     
-    convenience init(zoomAssetView: T) {
-        let thumbnailView = SDAnimatedImageView()
-        thumbnailView.autoPlayAnimatedImage = false
+    convenience init(zoomView: ZoomViewType) {
         self.init(
             configuration: .init(emptyImage: UIImage(named: "img_fail")),
-            zoomView: .init(assetView: zoomAssetView, thumbnailView: thumbnailView)
+            zoomView: zoomView
         )
+    }
+    
+}
+
+extension ZoomView {
+    
+    convenience init(assetView: AssetView) {
+        let thumbnailView = SDAnimatedImageView().then {
+            $0.autoPlayAnimatedImage = false
+        }
+        self.init(assetView: assetView, thumbnailView: thumbnailView)
     }
     
 }
@@ -36,13 +48,13 @@ struct ImageBuilder: PhotoBuilder {
         )
     }
     
-    func createView() -> PhotoGeneralView<SDAnimatedImageView> {
+    func createView() -> PhotoImageView {
         let assetView = SDAnimatedImageView()
         assetView.autoPlayAnimatedImage = false
         if #available(iOS 17.0, *) {
             assetView.preferredImageDynamicRange = .high
         }
-        return .init(zoomAssetView: assetView)
+        return .init(zoomView: .init(assetView: assetView))
     }
     
 }
@@ -65,8 +77,8 @@ struct LivePhotoBuilder: PhotoBuilder {
         return .init()
     }
     
-    func createView() -> PhotoGeneralView<PHLivePhotoView> {
-        return .init(zoomAssetView: PHLivePhotoView())
+    func createView() -> PhotoLivePhotoView {
+        return .init(zoomView: .init(assetView: PHLivePhotoView()))
     }
     
 }

@@ -22,7 +22,7 @@ open class PhotoCell: UICollectionViewCell {
     }
     
     public override init(frame: CGRect) {
-        self.photoView = DefaultPhotoView()
+        self.photoView = UselessPhotoView()
         
         super.init(frame: frame)
     }
@@ -42,7 +42,7 @@ open class PhotoCell: UICollectionViewCell {
 extension PhotoCell {
     
     internal func createPhotoView(_ photoView: any PhotoView) {
-        guard self.photoView is DefaultPhotoView else {
+        guard self.photoView is UselessPhotoView else {
             return
         }
         self.photoView = photoView
@@ -50,10 +50,10 @@ extension PhotoCell {
     
 }
 
-private final class DefaultPhotoView: UIView, PhotoView {
+private final class UselessPhotoView: UIView, PhotoView {
     
-    typealias ZoomAssetViewType = UIImageView
     typealias ZoomViewType = ZoomView<UIImageView>
+    typealias ZoomAssetViewType = UIImageView
     
     var zoomView: ZoomViewType {
         self.assertion()
