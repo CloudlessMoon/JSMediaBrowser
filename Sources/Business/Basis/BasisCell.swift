@@ -9,9 +9,6 @@ import UIKit
 
 open class BasisCell: UICollectionViewCell {
     
-    public var onPressEmpty: (() -> Void)?
-    public var willDisplayEmptyView: ((EmptyView, NSError) -> Void)?
-    
     public private(set) lazy var emptyView: EmptyView = {
         let view = EmptyView()
         view.isHidden = true
@@ -63,11 +60,6 @@ open class BasisCell: UICollectionViewCell {
         self.contentView.addSubview(self.emptyView)
         self.contentView.addSubview(self.progressBackgroundView)
         self.progressBackgroundView.addSubview(self.progressView)
-        
-        self.emptyView.onPressAction = { [weak self] _ in
-            guard let self = self else { return }
-            self.onPressEmpty?()
-        }
     }
     
     open override func layoutSubviews() {
@@ -94,18 +86,17 @@ open class BasisCell: UICollectionViewCell {
 
 extension BasisCell {
     
-    public func setProgress(_ progress: Progress) {
+    internal func setProgress(_ progress: Progress) {
         self.progress = progress
         
         self.progressView.setProgress(Float(progress.fractionCompleted), animated: true)
     }
     
-    public func setError(_ error: NSError?) {
+    internal func setError(_ error: NSError?) {
         self.error = error
         
         if let error = error {
             self.emptyView.title = NSAttributedString(string: error.localizedDescription, attributes: nil)
-            self.willDisplayEmptyView?(self.emptyView, error)
             self.emptyView.isHidden = false
         } else {
             self.emptyView.isHidden = true

@@ -30,8 +30,9 @@ class BrowserViewController: MediaBrowserViewController {
                 guard let self = self else { return }
                 self.updatePageControl()
             },
-            willDisplayEmptyView: { emptyView, _, _ in
-                emptyView.image = UIImage(named: "img_fail")
+            willDisplayPhotoCell: { [weak self] in
+                guard let self = self else { return }
+                self.willDisplayPhotoCell($0, at: $1)
             },
             willScrollHalf: { [weak self] in
                 guard let self = self else { return }
@@ -99,9 +100,15 @@ class BrowserViewController: MediaBrowserViewController {
 
 extension BrowserViewController {
     
-    func updatePageControl(for index: Int? = nil) {
+    private func updatePageControl(for index: Int? = nil) {
         self.pageControl.numberOfPages = self.totalUnitPage
         self.pageControl.currentPage = index ?? self.currentPage
+    }
+    
+    private func willDisplayPhotoCell(_ cell: PhotoCell, at index: Int) {
+        if cell.emptyView.image == nil {
+            cell.emptyView.image = UIImage(named: "img_fail")
+        }
     }
     
 }

@@ -323,25 +323,10 @@ extension MediaBrowserViewController: MediaBrowserViewDataSource {
     public func mediaBrowserView(_ mediaBrowserView: MediaBrowserView, cellForPageAt index: Int) -> UICollectionViewCell {
         let dataItem = self.dataSource[index]
         let cell = mediaBrowserView.dequeueReusableCell(PhotoCell.self, reuseIdentifier: "\(dataItem.targetType)", at: index)
-        self.configCell(cell, at: index)
+        self.configPhotoCell(cell, at: index)
         return cell
     }
-    
-    private func configCell(_ cell: BasisCell, at index: Int) {
-        cell.onPressEmpty = { [weak self] in
-            guard let self = self else { return }
-            self.reloadData()
-        }
-        cell.willDisplayEmptyView = { [weak self] (emptyView: EmptyView, error: NSError) in
-            guard let self = self else { return }
-            self.eventHandler?.willDisplayEmptyView(emptyView, with: error, at: index)
-        }
-        
-        if let cell = cell as? PhotoCell {
-            self.configPhotoCell(cell, at: index)
-        }
-    }
-    
+  
     private func configPhotoCell(_ cell: PhotoCell, at index: Int) {
         guard index < self.dataSource.count else {
             return
