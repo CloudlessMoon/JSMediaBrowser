@@ -97,6 +97,8 @@ open class PieProgressView: UIControl {
         
         self.layer.addSublayer(self.trackLayer)
         self.layer.addSublayer(self.progressLayer)
+        
+        self.setProgress(0, animated: false)
     }
     
     open override func layoutSubviews() {

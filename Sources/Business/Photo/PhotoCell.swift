@@ -36,7 +36,7 @@ open class PhotoCell: BasisCell {
 
 extension PhotoCell {
     
-    public func createPhotoView(_ photoView: any PhotoView) {
+    internal func createPhotoView(_ photoView: any PhotoView) {
         guard self.photoView is DefaultPhotoView else {
             return
         }

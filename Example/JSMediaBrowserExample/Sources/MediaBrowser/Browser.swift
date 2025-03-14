@@ -57,7 +57,7 @@ struct LivePhotoBuilder: PhotoBuilder {
     func createView() -> ZoomView<PHLivePhotoView> {
         let thumbnailView = SDAnimatedImageView()
         thumbnailView.autoPlayAnimatedImage = false
-        return .init(assetView: assetView, thumbnailView: thumbnailView)
+        return .init(assetView: PHLivePhotoView(), thumbnailView: thumbnailView)
     }
     
 }

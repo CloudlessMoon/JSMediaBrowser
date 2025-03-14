@@ -9,6 +9,9 @@ import UIKit
 
 open class BasisCell: UICollectionViewCell {
     
+    public var onPressEmpty: (() -> Void)?
+    public var willDisplayEmptyView: ((EmptyView, NSError) -> Void)?
+    
     public private(set) lazy var emptyView: EmptyView = {
         let view = EmptyView()
         view.isHidden = true
@@ -21,8 +24,12 @@ open class BasisCell: UICollectionViewCell {
         return view
     }()
     
-    public var onPressEmpty: (() -> Void)?
-    public var willDisplayEmptyView: ((EmptyView, NSError) -> Void)?
+    private lazy var progressBackgroundView: UIView = {
+        let view = UIView()
+        view.backgroundColor = .black.withAlphaComponent(0.15)
+        view.layer.cornerRadius = 8
+        return view
+    }()
     
     private var error: NSError? {
         didSet {
@@ -54,7 +61,8 @@ open class BasisCell: UICollectionViewCell {
     
     open func didInitialize() {
         self.contentView.addSubview(self.emptyView)
-        self.contentView.addSubview(self.progressView)
+        self.contentView.addSubview(self.progressBackgroundView)
+        self.progressBackgroundView.addSubview(self.progressView)
         
         self.emptyView.onPressAction = { [weak self] _ in
             guard let self = self else { return }
@@ -66,10 +74,20 @@ open class BasisCell: UICollectionViewCell {
         super.layoutSubviews()
         self.emptyView.frame = self.bounds
         
-        let width = min(self.bounds.width * 0.12, 60)
-        let progressSize = CGSize(width: width, height: width)
-        let progressPoint = CGPoint(x: (self.bounds.width - progressSize.width) / 2, y: (self.bounds.height - progressSize.height) / 2)
-        self.progressView.frame = CGRect(origin: progressPoint, size: progressSize)
+        let progressBackgroundSize = min(self.bounds.width * 0.16, 80)
+        self.progressBackgroundView.frame = CGRect(
+            x: (self.bounds.width - progressBackgroundSize) / 2,
+            y: (self.bounds.height - progressBackgroundSize) / 2,
+            width: progressBackgroundSize,
+            height: progressBackgroundSize
+        )
+        let progressSize = progressBackgroundSize - 20
+        self.progressView.frame = CGRect(
+            x: (progressBackgroundSize - progressSize) / 2,
+            y: (progressBackgroundSize - progressSize) / 2,
+            width: progressSize,
+            height: progressSize
+        )
     }
     
 }
@@ -100,9 +118,9 @@ extension BasisCell {
     
     private func updateProgress() {
         if self.error != nil || self.progress.fractionCompleted == 1.0 || self.progress.totalUnitCount == 0 {
-            self.progressView.isHidden = true
+            self.progressBackgroundView.isHidden = false
         } else {
-            self.progressView.isHidden = false
+            self.progressBackgroundView.isHidden = false
         }
     }
     

@@ -55,7 +55,7 @@ public struct SDWebImagePhotosMediator: PhotoMediator {
                 context: self.context
             )
             return mediator.request(source: source.url, progress: progress, completed: completed)
-        case .asset(let identifier):
+        case .asset:
             let context = {
                 let context = [.imageLoader: SDImagePhotosLoader.shared] as [SDWebImageContextOption: Any]
                 return context.merging(self.context ?? [:], uniquingKeysWith: { $1 })
