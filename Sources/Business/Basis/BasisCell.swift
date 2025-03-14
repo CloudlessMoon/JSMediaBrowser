@@ -118,7 +118,7 @@ extension BasisCell {
     
     private func updateProgress() {
         if self.error != nil || self.progress.fractionCompleted == 1.0 || self.progress.totalUnitCount == 0 {
-            self.progressBackgroundView.isHidden = false
+            self.progressBackgroundView.isHidden = true
         } else {
             self.progressBackgroundView.isHidden = false
         }
