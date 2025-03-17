@@ -18,7 +18,8 @@ struct ImageBuilder: PhotoBuilder {
             context: [
                 .storeCacheType: SDImageCacheType.disk.rawValue,
                 .queryCacheType: SDImageCacheType.disk.rawValue,
-                .animatedImageClass: SDAnimatedImage.self
+                .animatedImageClass: SDAnimatedImage.self,
+                .imageDecodeToHDR: true
             ]
         )
     }

@@ -167,23 +167,19 @@ extension HomeViewController: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let browserVC = BrowserViewController()
         browserVC.setCurrentPage(indexPath.item, animated: false)
-        browserVC.dataSource = self.dataSource.enumerated().map {
-            let cell = self.pictureCell(at: $0.offset)
+        browserVC.dataSource = self.dataSource.map {
             var item: any PhotoItem
-            if $0.element.contains("LivePhoto") {
+            if $0.contains("LivePhoto") {
                 let video = Bundle.main.url(forResource: "LivePhoto", withExtension: "MOV")!
-                item = LivePhotoItem(source: .url(image: URL(string: $0.element), video: video), thumbnail: cell?.imageView.image)
+                item = LivePhotoItem(source: .url(image: URL(string: $0), video: video), thumbnail: SDImageCache.shared.imageFromMemoryCache(forKey: $0))
             } else {
-                item = ImageItem(source: .url(URL(string: $0.element)), thumbnail: cell?.imageView.image)
+                item = ImageItem(source: .url(URL(string: $0)), thumbnail: SDImageCache.shared.imageFromMemoryCache(forKey: $0))
             }
             return item
         }
         browserVC.sourceProvider = .init(sourceView: { [weak self] in
             guard let self = self else { return nil }
-            guard let cell = self.pictureCell(at: $0) else {
-                return nil
-            }
-            return cell.imageView
+            return self.pictureCell(at: $0)?.imageView
         })
         // normal
         // browserVC.show(from: self, animated: true)
