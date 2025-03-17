@@ -16,7 +16,6 @@ struct ImageBuilder: PhotoBuilder {
         return .init(
             options: [.retryFailed],
             context: [
-                .storeCacheType: SDImageCacheType.disk.rawValue,
                 .queryCacheType: SDImageCacheType.disk.rawValue,
                 .animatedImageClass: SDAnimatedImage.self,
                 .imageDecodeToHDR: true
