@@ -41,11 +41,11 @@ open class PhotoCell: UICollectionViewCell {
 
 extension PhotoCell {
     
-    internal func createPhotoView(_ photoView: any PhotoView) {
+    internal func createPhotoView(_ photoView: @autoclosure () -> any PhotoView) {
         guard self.photoView is UselessPhotoView else {
             return
         }
-        self.photoView = photoView
+        self.photoView = photoView()
     }
     
 }

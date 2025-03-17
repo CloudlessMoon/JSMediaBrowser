@@ -322,7 +322,7 @@ extension MediaBrowserViewController: MediaBrowserViewDataSource {
     
     public func mediaBrowserView(_ mediaBrowserView: MediaBrowserView, cellForPageAt index: Int) -> UICollectionViewCell {
         let dataItem = self.dataSource[index]
-        let cell = mediaBrowserView.dequeueReusableCell(PhotoCell.self, reuseIdentifier: "\(dataItem.targetType)", at: index)
+        let cell = mediaBrowserView.dequeueReusableCell(PhotoCell.self, reuseIdentifier: "Photo_\(dataItem.targetType)", at: index)
         self.configPhotoCell(cell, at: index)
         return cell
     }
@@ -618,11 +618,11 @@ extension MediaBrowserViewController: UIViewControllerTransitioningDelegate, Tra
     }
     
     public var transitionThumbnailView: UIImageView? {
-        if self.currentPage < self.dataSource.count {
-            let item = self.dataSource[self.currentPage]
-            return item.builder.createView().thumbnailView
+        guard self.currentPage < self.dataSource.count else {
+            return nil
         }
-        return nil
+        let item = self.dataSource[self.currentPage]
+        return item.builder.createView().thumbnailView
     }
     
     public var transitionThumbnail: UIImage? {
