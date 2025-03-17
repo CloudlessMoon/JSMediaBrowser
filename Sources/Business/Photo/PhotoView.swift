@@ -14,6 +14,7 @@ public protocol PhotoView: UIView {
     
     var zoomView: ZoomViewType { get }
     
+    func setAsset(_ asset: ZoomAssetViewType.Asset?, thumbnail: UIImage?)
     func setProgress(received: Int, expected: Int)
     func setError(_ error: NSError?, cancelled: Bool)
     

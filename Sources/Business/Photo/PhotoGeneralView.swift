@@ -115,6 +115,11 @@ open class PhotoGeneralView<ZoomViewType: ZoomView<ZoomAssetViewType>, ZoomAsset
 
 extension PhotoGeneralView {
     
+    public func setAsset(_ asset: ZoomAssetViewType.Asset?, thumbnail: UIImage?) {
+        self.zoomView.asset = asset
+        self.zoomView.thumbnail = thumbnail
+    }
+    
     public func setProgress(received: Int, expected: Int) {
         if expected > 0 {
             self.progress = Float(received) / Float(expected)

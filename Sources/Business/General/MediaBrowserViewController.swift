@@ -338,7 +338,7 @@ extension MediaBrowserViewController: MediaBrowserViewDataSource {
         
         let updateAsset = { [weak self] (cell: PhotoCell, asset: (any ZoomAsset)?, thumbnail: UIImage?) in
             guard let self = self else { return }
-            cell.photoView.setAsset(asset, thumbnail: thumbnail)
+            cell.photoView.setAnyAsset(asset, thumbnail: thumbnail)
             /// 解决资源下载完成后不播放的问题
             self.startPlaying(for: cell, at: index)
         }

@@ -60,6 +60,10 @@ private final class UselessPhotoView: UIView, PhotoView {
         return ZoomView(assetView: UIImageView(), thumbnailView: UIImageView())
     }
     
+    func setAsset(_ asset: ZoomAssetViewType.Asset?, thumbnail: UIImage?) {
+        self.assertion()
+    }
+    
     func setProgress(received: Int, expected: Int) {
         self.assertion()
     }

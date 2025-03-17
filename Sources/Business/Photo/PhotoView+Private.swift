@@ -25,15 +25,13 @@ internal extension PhotoView {
         return self.zoomView.contentViewFrame
     }
     
-    func setAsset(_ asset: (any ZoomAsset)?, thumbnail: UIImage?) {
+    func setAnyAsset(_ asset: (any ZoomAsset)?, thumbnail: UIImage?) {
         if let asset = asset {
-            assert(self.isAsset(asset), "类型不匹配")
-            self.zoomView.asset = self.asAsset(asset)
+            assert(self.isAsset(asset), "类型不匹配，理论上不会出现此情况，请按照堆栈检查代码")
+            self.setAsset(self.asAsset(asset), thumbnail: thumbnail)
         } else {
-            self.zoomView.asset = nil
+            self.setAsset(nil, thumbnail: thumbnail)
         }
-        
-        self.zoomView.thumbnail = thumbnail
     }
     
     func setViewportInsets(_ viewportInsets: UIEdgeInsets) {
