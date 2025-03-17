@@ -37,7 +37,7 @@ public final class TransitionAnimator: Transitioner {
     
     public var exitingStyle: TransitioningStyle = .zoom
     
-    private static let animationGroupKey: String = "AnimationGroupKey"
+    private static let animationGroupKey = "AnimationGroupKey"
     
     private var imageView: UIImageView?
     
@@ -77,16 +77,17 @@ extension TransitionAnimator {
         let toView: UIView = transitionContext.view(forKey: .to) ?? toViewController.view
         let containerView: UIView = transitionContext.containerView
         
-        if let imageView = self.delegate?.transitionThumbnailView {
+        if self.imageView == nil, let imageView = self.delegate?.transitionThumbnailView {
             imageView.contentMode = .scaleAspectFill
             imageView.clipsToBounds = true
-            /// 最后添加ImageView, 保证在最上层
+            self.imageView = imageView
+        }
+        if let imageView = self.imageView {
             imageView.removeFromSuperview()
             self.delegate?.transitionViewWillMoveToSuperview(imageView)
             if imageView.superview == nil {
                 containerView.addSubview(imageView)
             }
-            self.imageView = imageView
         }
         
         var style: TransitioningStyle = isEntering ? self.enteringStyle : self.exitingStyle
@@ -237,7 +238,6 @@ extension TransitionAnimator {
             imageView.removeFromSuperview()
             imageView.layer.removeAnimation(forKey: TransitionAnimator.animationGroupKey)
             imageView.image = nil
-            self.imageView = nil
         }
     }
     
