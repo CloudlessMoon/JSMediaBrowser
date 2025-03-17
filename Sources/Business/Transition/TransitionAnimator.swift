@@ -22,7 +22,7 @@ public protocol TransitionAnimatorDelegate: AnyObject {
     
 }
 
-public enum TransitioningStyle: Int {
+public enum TransitioningStyle: Equatable {
     case zoom
     case fade
 }
