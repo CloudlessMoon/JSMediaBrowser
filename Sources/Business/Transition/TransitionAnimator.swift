@@ -165,12 +165,15 @@ extension TransitionAnimator {
             currentView?.alpha = isEntering ? 0 : 1
         } else if style == .zoom, let imageView = self.imageView {
             let zoomView = self.delegate?.transitionTargetView
-            let zoomContentViewFrameInView = currentView?.convert(self.delegate?.transitionTargetFrame ?? .zero, from: zoomView) ?? .zero
+            let zoomContentViewFrameInView = {
+                let rect = currentView?.convert(self.delegate?.transitionTargetFrame ?? .zero, from: zoomView) ?? .zero
+                return CGRect(origin: JSCGPointRoundPixelValue(rect.origin), size: JSCGSizeCeilPixelValue(rect.size))
+            }()
             let zoomContentViewBoundsInView = CGRect(origin: .zero, size: zoomContentViewFrameInView.size)
             /// 隐藏目标视图
             zoomView?.isHidden = true
             /// 设置下Frame
-            imageView.image = self.renderTransitionThumbnail()
+            imageView.image = self.renderTransitionThumbnail(with: zoomContentViewBoundsInView.size)
             imageView.frame = isEntering ? sourceRect : zoomContentViewFrameInView
             imageView.startAnimating()
             /// 计算position
@@ -237,23 +240,28 @@ extension TransitionAnimator {
         }
     }
     
-    private func renderTransitionThumbnail() -> UIImage? {
+    private func renderTransitionThumbnail(with targetSize: CGSize) -> UIImage? {
         guard let image = self.delegate?.transitionThumbnail else {
             return nil
         }
-        /// 图片方向不正常时，重绘图片
+        /// 图片方向不是up时重绘图片，以解决动画显示异常的问题
         let orientation = image.imageOrientation
         guard orientation != .up else {
             return image
         }
-        let size = image.size
-        guard JSCGSizeIsValidated(size) else {
+        guard JSCGSizeIsValidated(image.size) else {
             return image
         }
+        let size = {
+            let ratio = image.size.width / image.size.height
+            return JSCGSizeCeilPixelValue(CGSize(
+                width: targetSize.width,
+                height: targetSize.width / ratio
+            ))
+        }()
         let format = UIGraphicsImageRendererFormat()
         format.scale = image.scale
         format.opaque = image.js_opaque
-        format.preferredRange = .standard
         let renderer = UIGraphicsImageRenderer(size: size, format: format)
         return renderer.image { _ in
             image.draw(in: CGRect(origin: .zero, size: size))
