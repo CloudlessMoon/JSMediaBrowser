@@ -15,6 +15,6 @@ public protocol PhotoView: UIView {
     var zoomView: ZoomViewType { get }
     
     func setProgress(received: Int, expected: Int)
-    func setError(_ error: NSError?)
+    func setError(_ error: NSError?, cancelled: Bool)
     
 }

@@ -64,7 +64,7 @@ private final class UselessPhotoView: UIView, PhotoView {
         self.assertion()
     }
     
-    func setError(_ error: NSError?) {
+    func setError(_ error: NSError?, cancelled: Bool) {
         self.assertion()
     }
     

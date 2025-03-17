@@ -344,9 +344,9 @@ extension MediaBrowserViewController: MediaBrowserViewDataSource {
         }
         let updateError = { (cell: PhotoCell, error: NSError?, isCancelled: Bool) in
             if isCancelled && (cell.photoView.asset != nil || cell.photoView.thumbnail != nil) {
-                cell.photoView.setError(nil)
+                cell.photoView.setError(nil, cancelled: isCancelled)
             } else {
-                cell.photoView.setError(error)
+                cell.photoView.setError(error, cancelled: isCancelled)
             }
         }
         let updateProgress = { (cell: PhotoCell, receivedSize: Int, expectedSize: Int) in
@@ -383,7 +383,7 @@ extension MediaBrowserViewController: MediaBrowserViewDataSource {
                         if !error.isCancelled {
                             updateAsset(cell, nil, nil)
                         }
-                        updateError(cell, error.error, error.isCancelled)
+                        updateError(cell, error as NSError, error.isCancelled)
                     }
                 }
             }

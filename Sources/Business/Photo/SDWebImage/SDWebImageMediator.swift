@@ -38,7 +38,7 @@ public struct SDWebImageMediator: PhotoMediator {
             completed: { image, data, error, cacheType, finished, url in
                 let nsError = error as? NSError
                 if let nsError = nsError {
-                    let error = PhotoMediatorError(error: nsError, isCancelled: nsError.code == SDWebImageError.cancelled.rawValue)
+                    let error = PhotoMediatorError(error: nsError, cancelled: nsError.code == SDWebImageError.cancelled.rawValue)
                     completed(.failure(error))
                 } else {
                     completed(.success(image))

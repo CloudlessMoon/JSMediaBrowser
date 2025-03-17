@@ -125,7 +125,7 @@ extension PhotoGeneralView {
         self.progressView.setProgress(self.progress ?? 0, animated: true)
     }
     
-    public func setError(_ error: NSError?) {
+    public func setError(_ error: NSError?, cancelled: Bool) {
         self.error = error
         
         if let error = error {

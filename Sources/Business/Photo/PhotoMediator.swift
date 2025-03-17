@@ -31,14 +31,26 @@ public protocol PhotoMediatorRequestToken {
     
 }
 
-public struct PhotoMediatorError: Error {
+public struct PhotoMediatorError: CustomNSError {
     
-    public let error: NSError
+    public static var errorDomain: String {
+        return "com.jiasong.JSMediaBrowser.error"
+    }
+    
+    public let errorCode: Int
+    public let errorUserInfo: [String: Any]
     public let isCancelled: Bool
     
-    public init(error: NSError, isCancelled: Bool) {
-        self.error = error
-        self.isCancelled = isCancelled
+    public init(error: NSError, cancelled: Bool) {
+        self.errorCode = error.code
+        self.errorUserInfo = error.userInfo
+        self.isCancelled = cancelled
+    }
+    
+    public init(code: Int, userInfo: [String: Any], cancelled: Bool) {
+        self.errorCode = code
+        self.errorUserInfo = userInfo
+        self.isCancelled = cancelled
     }
     
 }

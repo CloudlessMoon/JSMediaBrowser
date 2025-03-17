@@ -41,12 +41,12 @@ open class EmptyView: UIView {
     
     public var onPressAction: ((UIButton) -> Void)?
     
-    private lazy var imageView: UIImageView = {
+    public private(set) lazy var imageView: UIImageView = {
         let imageView = UIImageView()
         return imageView
     }()
     
-    private lazy var titleLabel: UILabel = {
+    public private(set) lazy var titleLabel: UILabel = {
         let label = UILabel()
         label.font = UIFont.systemFont(ofSize: 16)
         label.numberOfLines = 2
@@ -55,7 +55,7 @@ open class EmptyView: UIView {
         return label
     }()
     
-    private lazy var subtitleLabel: UILabel = {
+    public private(set) lazy var subtitleLabel: UILabel = {
         let label = UILabel()
         label.font = UIFont.systemFont(ofSize: 14)
         label.numberOfLines = 3
@@ -64,7 +64,7 @@ open class EmptyView: UIView {
         return label
     }()
     
-    private lazy var actionButton: UIButton = {
+    public private(set) lazy var actionButton: UIButton = {
         let button = UIButton()
         button.titleLabel?.font = UIFont.systemFont(ofSize: 15)
         button.setTitleColor(.white, for: UIControl.State.normal)
