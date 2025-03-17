@@ -50,6 +50,8 @@
 		7AE273B62D262FFF00E72D33 /* LivePhoto.MOV in Resources */ = {isa = PBXBuildFile; fileRef = 7AE273B22D262FFF00E72D33 /* LivePhoto.MOV */; };
 		7AE273B82D26313000E72D33 /* AppDelegate+Debug.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7AE273B72D26313000E72D33 /* AppDelegate+Debug.swift */; };
 		7AE273B92D26313000E72D33 /* AppDelegate+Debug.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7AE273B72D26313000E72D33 /* AppDelegate+Debug.swift */; };
+		7AEA4E862D88219D00C65905 /* data5.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 7AEA4E852D88219D00C65905 /* data5.jpg */; };
+		7AEA4E872D88219D00C65905 /* data5.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 7AEA4E852D88219D00C65905 /* data5.jpg */; };
 		B5A342F313EAFDD20A99ACD8 /* Pods_JSMediaBrowserExampleMacOS.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 930BE4B593CCF42250530719 /* Pods_JSMediaBrowserExampleMacOS.framework */; };
 		B8C0C0F48A259BE03C48E14B /* Pods_JSMediaBrowserExample.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CBBEC1C1254DE13C6485DAAA /* Pods_JSMediaBrowserExample.framework */; };
 /* End PBXBuildFile section */
@@ -84,6 +86,7 @@
 		7AE273B12D262FFF00E72D33 /* LivePhoto.JPG */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = LivePhoto.JPG; sourceTree = "<group>"; };
 		7AE273B22D262FFF00E72D33 /* LivePhoto.MOV */ = {isa = PBXFileReference; lastKnownFileType = video.quicktime; path = LivePhoto.MOV; sourceTree = "<group>"; };
 		7AE273B72D26313000E72D33 /* AppDelegate+Debug.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppDelegate+Debug.swift"; sourceTree = "<group>"; };
+		7AEA4E852D88219D00C65905 /* data5.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = data5.jpg; sourceTree = "<group>"; };
 		930BE4B593CCF42250530719 /* Pods_JSMediaBrowserExampleMacOS.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_JSMediaBrowserExampleMacOS.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		CA0997732CAC4C0B948FA4FC /* Pods-JSMediaBrowserExample.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-JSMediaBrowserExample.release.xcconfig"; path = "Target Support Files/Pods-JSMediaBrowserExample/Pods-JSMediaBrowserExample.release.xcconfig"; sourceTree = "<group>"; };
 		CBBEC1C1254DE13C6485DAAA /* Pods_JSMediaBrowserExample.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_JSMediaBrowserExample.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -189,6 +192,7 @@
 				7A730FB42D2271E2006C8FA6 /* data2.gif */,
 				7A730FB52D2271E2006C8FA6 /* data3.jpg */,
 				7A730FB62D2271E2006C8FA6 /* data4.jpg */,
+				7AEA4E852D88219D00C65905 /* data5.jpg */,
 				7A730FB72D2271E2006C8FA6 /* TestHDR1.heic */,
 				7A730FB82D2271E2006C8FA6 /* TestHDR2.JPG */,
 				7A730FB92D2271E2006C8FA6 /* TestHDR3.JPG */,
@@ -311,6 +315,7 @@
 				7A730FD02D2271E2006C8FA6 /* data3.jpg in Resources */,
 				7A730FD12D2271E2006C8FA6 /* data2.gif in Resources */,
 				7A730FD22D2271E2006C8FA6 /* data4.jpg in Resources */,
+				7AEA4E872D88219D00C65905 /* data5.jpg in Resources */,
 				7A730FAC2D22719D006C8FA6 /* Assets.xcassets in Resources */,
 				7A730FAE2D22719D006C8FA6 /* LaunchScreen.storyboard in Resources */,
 			);
@@ -323,6 +328,7 @@
 				7A730FDE2D2272D1006C8FA6 /* TestHDR3.JPG in Resources */,
 				7A730FDF2D2272D1006C8FA6 /* TestHDR1.heic in Resources */,
 				7A730FE02D2272D1006C8FA6 /* data.json in Resources */,
+				7AEA4E862D88219D00C65905 /* data5.jpg in Resources */,
 				7A730FE12D2272D1006C8FA6 /* TestHDR2.JPG in Resources */,
 				7A730FE22D2272D1006C8FA6 /* data1.jpg in Resources */,
 				7A730FE32D2272D1006C8FA6 /* data3.jpg in Resources */,

@@ -73,6 +73,9 @@ class HomeViewController: UIViewController {
         if let data = Bundle.main.path(forResource: "data4", ofType: "jpg") {
             array?.append(URL(fileURLWithPath: data).absoluteString)
         }
+        if let data = Bundle.main.path(forResource: "data5", ofType: "jpg") {
+            array?.append(URL(fileURLWithPath: data).absoluteString)
+        }
         self.dataSource = array ?? []
     }
     
