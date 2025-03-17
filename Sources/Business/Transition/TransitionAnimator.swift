@@ -77,17 +77,15 @@ extension TransitionAnimator {
         let toView: UIView = transitionContext.view(forKey: .to) ?? toViewController.view
         let containerView: UIView = transitionContext.containerView
         
-        if self.imageView == nil, let imageView = self.delegate?.transitionThumbnailView {
+        if let imageView = self.delegate?.transitionThumbnailView {
             imageView.contentMode = .scaleAspectFill
             imageView.clipsToBounds = true
-            self.imageView = imageView
-        }
-        if let imageView = self.imageView {
             imageView.removeFromSuperview()
             self.delegate?.transitionViewWillMoveToSuperview(imageView)
             if imageView.superview == nil {
                 containerView.addSubview(imageView)
             }
+            self.imageView = imageView
         }
         
         var style: TransitioningStyle = isEntering ? self.enteringStyle : self.exitingStyle
@@ -234,10 +232,8 @@ extension TransitionAnimator {
             self.delegate?.transitionTargetView?.isHidden = false
         }
         if let imageView = self.imageView {
-            imageView.stopAnimating()
             imageView.removeFromSuperview()
-            imageView.layer.removeAnimation(forKey: TransitionAnimator.animationGroupKey)
-            imageView.image = nil
+            self.imageView = nil
         }
     }
     
