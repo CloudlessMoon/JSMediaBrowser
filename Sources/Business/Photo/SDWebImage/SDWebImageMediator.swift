@@ -32,13 +32,12 @@ public struct SDWebImageMediator: PhotoMediator {
             with: source,
             options: self.options,
             context: self.context,
-            progress: { receivedSize, expectedSize, targetUR in
+            progress: { receivedSize, expectedSize, targetURL in
                 progress(receivedSize, expectedSize)
             },
             completed: { image, data, error, cacheType, finished, url in
-                let nsError = error as? NSError
-                if let nsError = nsError {
-                    let error = PhotoMediatorError(error: nsError, cancelled: nsError.code == SDWebImageError.cancelled.rawValue)
+                if let error = error as? NSError {
+                    let error = PhotoMediatorError(error, cancelled: error.code == SDWebImageError.cancelled.rawValue)
                     completed(.failure(error))
                 } else {
                     completed(.success(image))

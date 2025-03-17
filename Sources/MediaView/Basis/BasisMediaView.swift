@@ -19,8 +19,14 @@ open class BasisMediaView: UIView {
         }
     }
     
-    /// 以下属性viewportRect为zero时才会生效, 若自定义viewportRect, 请自行实现
-    private var viewportRectMaxWidth = 580.0
+    public var viewportMaximumSize: CGSize = .init(width: .max, height: .max) {
+        didSet {
+            guard oldValue != self.viewportMaximumSize else {
+                return
+            }
+            self.setNeedsLayout()
+        }
+    }
     
     public init() {
         super.init(frame: .zero)
@@ -53,17 +59,19 @@ extension BasisMediaView {
             return .zero
         }
         let viewportInsets = self.viewportInsets
-        let size = CGSize(width: min(self.bounds.width, self.viewportRectMaxWidth), height: self.bounds.height)
-        let offsetX = (self.bounds.width - size.width) / 2
-        let top = viewportInsets.top
-        let left = max(viewportInsets.left, offsetX)
+        let size = CGSize(
+            width: min(self.bounds.width, self.viewportMaximumSize.width),
+            height: min(self.bounds.height, self.viewportMaximumSize.height)
+        )
+        let top = max(viewportInsets.top, (self.bounds.height - size.height) / 2)
+        let left = max(viewportInsets.left, (self.bounds.width - size.width) / 2)
         let bottom = viewportInsets.bottom
         let right = viewportInsets.right
         return CGRect(
             x: left,
             y: top,
             width: min(size.width, self.bounds.width - (left + right)),
-            height: size.height - (top + bottom)
+            height: min(size.height, self.bounds.height - (top + bottom))
         )
     }
     

@@ -41,10 +41,10 @@ public struct PHLivePhotoMediator: PhotoMediator {
                 completed(.success(livePhoto))
             } else {
                 guard let error = info?[PHLivePhotoInfoErrorKey] as? NSError else {
-                    completed(.failure(PhotoMediatorError(error: .init(), isCancelled: isCancelled)))
+                    completed(.failure(PhotoMediatorError(.init(), cancelled: isCancelled)))
                     return
                 }
-                let error1 = PhotoMediatorError(error: error, isCancelled: isCancelled)
+                let error1 = PhotoMediatorError(error, cancelled: isCancelled)
                 completed(.failure(error1))
             }
         }

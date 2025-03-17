@@ -179,7 +179,7 @@ open class MediaBrowserViewController: UIViewController {
         self.contentView.js_frameApplyTransform = self.view.bounds
         
         if let cell = self.currentPageCell as? PhotoCell {
-            self.configViewportInsets(for: cell)
+            self.configViewport(for: cell)
         }
     }
     
@@ -326,7 +326,7 @@ extension MediaBrowserViewController: MediaBrowserViewDataSource {
         self.configPhotoCell(cell, at: index)
         return cell
     }
-  
+    
     private func configPhotoCell(_ cell: PhotoCell, at index: Int) {
         guard index < self.dataSource.count else {
             return
@@ -389,18 +389,22 @@ extension MediaBrowserViewController: MediaBrowserViewDataSource {
             }
         )
         
-        self.configViewportInsets(for: cell)
+        self.configViewport(for: cell)
     }
     
-    private func configViewportInsets(for cell: PhotoCell) {
-        cell.photoView.setViewportInsets({
+    private func configViewport(for cell: PhotoCell) {
+        let insets = {
             let insets = self.view.safeAreaInsets
             if JSCoreHelper.isMac {
                 return insets
             } else {
                 return UIEdgeInsets(top: 0, left: insets.left, bottom: 0, right: insets.right)
             }
-        }())
+        }()
+        let size = {
+            return CGSize(width: 580, height: .max)
+        }()
+        cell.photoView.setViewport(insets: insets, maximumSize: size)
     }
     
     private func startPlaying(for cell: PhotoCell, at index: Int) {

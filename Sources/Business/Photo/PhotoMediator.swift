@@ -41,7 +41,7 @@ public struct PhotoMediatorError: CustomNSError {
     public let errorUserInfo: [String: Any]
     public let isCancelled: Bool
     
-    public init(error: NSError, cancelled: Bool) {
+    public init(_ error: NSError, cancelled: Bool) {
         self.errorCode = error.code
         self.errorUserInfo = error.userInfo
         self.isCancelled = cancelled

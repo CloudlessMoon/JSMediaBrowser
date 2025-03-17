@@ -34,8 +34,9 @@ internal extension PhotoView {
         }
     }
     
-    func setViewportInsets(_ viewportInsets: UIEdgeInsets) {
-        self.zoomView.viewportInsets = viewportInsets
+    func setViewport(insets: UIEdgeInsets, maximumSize: CGSize) {
+        self.zoomView.viewportInsets = insets
+        self.zoomView.viewportMaximumSize = maximumSize
     }
     
     func startPlaying() {
