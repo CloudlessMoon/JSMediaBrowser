@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import JSCoreKit
 
 open class PagingLayout: UICollectionViewFlowLayout {
     
@@ -30,10 +31,6 @@ open class PagingLayout: UICollectionViewFlowLayout {
         self.sectionInset = .zero
     }
     
-}
-
-extension PagingLayout {
-    
     open override func layoutAttributesForElements(in rect: CGRect) -> [UICollectionViewLayoutAttributes]? {
         var resultAttributes: [UICollectionViewLayoutAttributes] = []
         let originalAttributes: [UICollectionViewLayoutAttributes] = super.layoutAttributesForElements(in: rect) ?? []
@@ -49,26 +46,20 @@ extension PagingLayout {
         guard let collectionView = self.collectionView else {
             return nil
         }
-        if let attributesItem = super.layoutAttributesForItem(at: indexPath)?.copy() as? UICollectionViewLayoutAttributes {
-            if attributesItem.size.width <= 0 || attributesItem.size.height <= 0 {
-                return attributesItem
-            }
-            
-            let halfWidth: CGFloat = attributesItem.size.width / 2.0
-            let centerX: CGFloat = collectionView.contentOffset.x + halfWidth
-            attributesItem.center = CGPoint(
-                x: attributesItem.center.x + (attributesItem.center.x - centerX) / halfWidth * self.pageSpacing / 2,
-                y: attributesItem.center.y
-            )
-            return attributesItem
-        } else {
+        guard let attributesItem = super.layoutAttributesForItem(at: indexPath)?.copy() as? UICollectionViewLayoutAttributes else {
             return nil
         }
+        guard JSCGSizeIsValidated(attributesItem.size) else {
+            return nil
+        }
+        let halfWidth: CGFloat = attributesItem.size.width / 2.0
+        let centerX: CGFloat = collectionView.contentOffset.x + halfWidth
+        attributesItem.center = CGPoint(
+            x: attributesItem.center.x + (attributesItem.center.x - centerX) / halfWidth * self.pageSpacing / 2,
+            y: attributesItem.center.y
+        )
+        return attributesItem
     }
-    
-}
-
-extension PagingLayout {
     
     open override func shouldInvalidateLayout(forBoundsChange newBounds: CGRect) -> Bool {
         return true

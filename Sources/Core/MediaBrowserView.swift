@@ -442,13 +442,13 @@ extension MediaBrowserView: UIScrollViewDelegate {
     }
     
     private func callWillScrollHalf(from sourceIndex: Int, to targetIndex: Int) {
-        print("willScrollHalf from: \(sourceIndex) to: \(targetIndex)")
+        // print("willScrollHalf from: \(sourceIndex) to: \(targetIndex)")
         
         self.delegate?.mediaBrowserView(self, willScrollHalfFrom: sourceIndex, to: targetIndex)
     }
     
     private func callDidScrollToIndex() {
-        print("didScrollTo to: \(self.currentPage)")
+        // print("didScrollTo to: \(self.currentPage)")
         
         self.delegate?.mediaBrowserView(self, didScrollTo: self.currentPage)
     }
