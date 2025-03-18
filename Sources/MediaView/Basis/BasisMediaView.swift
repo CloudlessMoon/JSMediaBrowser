@@ -42,14 +42,6 @@ open class BasisMediaView: UIView {
         
     }
     
-    open var contentView: UIView? {
-        return nil
-    }
-    
-    open var contentViewFrame: CGRect {
-        return .zero
-    }
-    
 }
 
 extension BasisMediaView {

@@ -13,16 +13,16 @@ internal extension PhotoView {
         return self.zoomView.asset
     }
     
+    var assetView: any ZoomAssetView {
+        return self.zoomView.assetView
+    }
+    
     var thumbnail: UIImage? {
         return self.zoomView.thumbnail
     }
     
     var thumbnailView: UIImageView {
         return self.zoomView.thumbnailView
-    }
-    
-    var contentViewFrame: CGRect {
-        return self.zoomView.contentViewFrame
     }
     
     func setAnyAsset(_ asset: (any ZoomAsset)?, thumbnail: UIImage?) {

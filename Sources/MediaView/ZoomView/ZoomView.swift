@@ -150,35 +150,26 @@ open class ZoomView<AssetView: ZoomAssetView>: BasisMediaView {
         self.thumbnailView.frame = self.contentViewFrameThatFits(thumbnailSize)
         
         /// scrollView.content
-        if let contentView = self.contentView {
-            let contentViewSize = contentView.frame.size
-            let contentInset = self.contentInsetThatFits(contentViewSize)
-            if self.scrollView.contentInset != contentInset {
-                self.scrollView.contentInset = contentInset
+        let contentSize = {
+            let assetViewSize = self.assetView.frame.size
+            let thumbnailViewSize = self.thumbnailView.frame.size
+            if JSCGSizeIsValidated(assetViewSize) {
+                return assetViewSize
+            } else if JSCGSizeIsValidated(thumbnailViewSize) {
+                return thumbnailViewSize
+            } else {
+                return .zero
             }
-            if self.scrollView.contentSize != contentViewSize {
-                self.scrollView.contentSize = contentViewSize
-            }
+        }()
+        let contentInset = self.contentInsetThatFits(contentSize)
+        if self.scrollView.contentInset != contentInset {
+            self.scrollView.contentInset = contentInset
+        }
+        if self.scrollView.contentSize != contentSize {
+            self.scrollView.contentSize = contentSize
         }
         
         self.revertZoomIfNeeded()
-    }
-    
-    open override var contentView: UIView? {
-        if self.asset != nil {
-            return self.assetView
-        } else if self.thumbnail != nil {
-            return self.thumbnailView
-        } else {
-            return nil
-        }
-    }
-    
-    open override var contentViewFrame: CGRect {
-        guard let contentView = self.contentView else {
-            return .zero
-        }
-        return self.convert(contentView.frame, from: contentView.superview)
     }
     
 }
@@ -456,7 +447,7 @@ private final class ScrollViewDelegator<View: ZoomAssetView>: NSObject, UIScroll
         guard owner.isEnabledZoom else {
             return nil
         }
-        return owner.contentView
+        return owner.assetView
     }
     
     func scrollViewWillBeginZooming(_ scrollView: UIScrollView, with view: UIView?) {

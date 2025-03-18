@@ -622,7 +622,8 @@ extension MediaBrowserViewController: UIViewControllerTransitioningDelegate, Tra
             return nil
         }
         let item = self.dataSource[self.currentPage]
-        return item.builder.createView().thumbnailView
+        let thumbnailView = item.builder.createView().thumbnailView
+        return thumbnailView
     }
     
     public var transitionThumbnail: UIImage? {
@@ -650,14 +651,18 @@ extension MediaBrowserViewController: UIViewControllerTransitioningDelegate, Tra
     }
     
     public var transitionTargetView: UIView? {
-        return self.currentPageCell
-    }
-    
-    public var transitionTargetFrame: CGRect {
         if let cell = self.currentPageCell as? PhotoCell {
-            return cell.photoView.contentViewFrame
+            let assetView = cell.photoView.assetView
+            let thumbnailView = cell.photoView.thumbnailView
+            if JSCGSizeIsValidated(assetView.bounds.size) {
+                return assetView
+            } else if JSCGSizeIsValidated(thumbnailView.bounds.size) {
+                return thumbnailView
+            } else {
+                return nil
+            }
         }
-        return .zero
+        return nil
     }
     
     public var transitionAnimatorViews: [UIView]? {
@@ -671,10 +676,6 @@ extension MediaBrowserViewController: UIViewControllerTransitioningDelegate, Tra
             }
         }
         return animatorViews
-    }
-    
-    public func transitionViewWillMoveToSuperview(_ transitionView: UIView) {
-        self.contentView.addSubview(transitionView)
     }
     
 }

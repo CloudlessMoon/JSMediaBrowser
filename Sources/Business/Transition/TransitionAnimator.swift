@@ -15,10 +15,7 @@ public protocol TransitionAnimatorDelegate: AnyObject {
     var transitionSourceView: UIView? { get }
     var transitionSourceRect: CGRect { get }
     var transitionTargetView: UIView? { get }
-    var transitionTargetFrame: CGRect { get }
     var transitionAnimatorViews: [UIView]? { get }
-    
-    func transitionViewWillMoveToSuperview(_ transitionView: UIView)
     
 }
 
@@ -37,9 +34,13 @@ public final class TransitionAnimator: Transitioner {
     
     public var exitingStyle: TransitioningStyle = .zoom
     
-    private static let animationGroupKey = "AnimationGroupKey"
-    
     private var imageView: UIImageView?
+    
+    private lazy var maskLayer: CALayer = {
+        return CALayer()
+    }()
+    
+    private var retainMaskLayer: CALayer?
     
     public override init() {
         super.init()
@@ -51,7 +52,6 @@ extension TransitionAnimator: UIViewControllerAnimatedTransitioning {
     
     public func animateTransition(using transitionContext: UIViewControllerContextTransitioning) {
         let isEntering = self.type == .presenting
-        
         self.beginTransition(transitionContext, isEntering: isEntering)
         self.performAnimation(using: transitionContext, isEntering: isEntering) { finished in
             self.endTransition(transitionContext)
@@ -66,111 +66,140 @@ extension TransitionAnimator: UIViewControllerAnimatedTransitioning {
 
 extension TransitionAnimator {
     
-    public func performAnimation(using transitionContext: UIViewControllerContextTransitioning, isEntering: Bool, completion: @escaping ((Bool) -> Void)) {
-        guard let fromViewController = transitionContext.viewController(forKey: .from) else {
+    public func performAnimation(using transitionContext: UIViewControllerContextTransitioning, isEntering: Bool, completed: @escaping ((Bool) -> Void)) {
+        guard let fromView = transitionContext.view(forKey: .from) ?? transitionContext.viewController(forKey: .from)?.view else {
             return
         }
-        guard let toViewController = transitionContext.viewController(forKey: .to) else {
-            return
-        }
-        guard let fromView = transitionContext.view(forKey: .from) ?? fromViewController.view else {
-            return
-        }
-        guard let toView = transitionContext.view(forKey: .to) ?? toViewController.view else {
+        guard let toView = transitionContext.view(forKey: .to) ?? transitionContext.viewController(forKey: .to)?.view else {
             return
         }
         let currentView = isEntering ? toView : fromView
-        
-        var style = isEntering ? self.enteringStyle : self.exitingStyle
-        var sourceCornerRadius: CGFloat
-        var sourceRect: CGRect
-        if style == .zoom {
-            let transitionSourceView = self.delegate?.transitionSourceView
-            let transitionSourceRect = self.delegate?.transitionSourceRect ?? .zero
-            
-            if let transitionSourceView = transitionSourceView, transitionSourceRect.isEmpty {
-                sourceRect = currentView.convert(transitionSourceView.frame, from: transitionSourceView.superview)
-            } else if !transitionSourceRect.isEmpty {
-                sourceRect = currentView.convert(transitionSourceRect, from: transitionSourceView)
-            } else {
-                sourceRect = .zero
-            }
-            if !sourceRect.isEmpty && !sourceRect.intersects(currentView.bounds) {
-                sourceRect = .zero
-            }
-            sourceCornerRadius = transitionSourceView?.layer.cornerRadius ?? 0
-        } else {
-            sourceRect = .zero
-            sourceCornerRadius = 0
-        }
-        
-        let targetView = self.delegate?.transitionTargetView
-        let targetFrame = {
-            let rect = currentView.convert(self.delegate?.transitionTargetFrame ?? .zero, from: targetView)
-            return CGRect(origin: JSCGPointRoundPixelValue(rect.origin), size: JSCGSizeCeilPixelValue(rect.size))
-        }()
-        
-        /// 判断是否可以zoom
-        if style == .zoom && (sourceRect.isEmpty || targetFrame.isEmpty) {
-            style = .fade
-        }
-        
-        if style == .zoom, let imageView = self.delegate?.transitionThumbnailView {
-            imageView.contentMode = .scaleAspectFill
-            imageView.clipsToBounds = true
-            imageView.removeFromSuperview()
-            self.delegate?.transitionViewWillMoveToSuperview(imageView)
-            if imageView.superview == nil {
-                transitionContext.containerView.addSubview(imageView)
-            }
-            self.imageView = imageView
-        }
-        if self.imageView == nil {
-            style = .fade
-        }
-        
-        if style == .fade {
-            currentView.alpha = isEntering ? 0 : 1
-        } else if style == .zoom, let imageView = self.imageView {
-            /// 隐藏目标视图
-            targetView?.isHidden = true
-            /// 设置下Frame
-            imageView.image = self.delegate?.transitionThumbnail
-            imageView.frame = isEntering ? sourceRect : targetFrame
-            imageView.startAnimating()
-        }
-        if isEntering {
-            self.delegate?.transitionAnimatorViews?.forEach { subview in
-                subview.alpha = 0.0
-            }
-        }
-        UIView.animate(withDuration: self.duration, delay: 0, options: isEntering ? .curveEaseInOut : .curveEaseOut) {
-            if style == .fade {
-                currentView.alpha = isEntering ? 1 : 0
-            } else if style == .zoom, let imageView = self.imageView {
-                imageView.frame = isEntering ? targetFrame : sourceRect
-                imageView.layer.cornerRadius = isEntering ? 0 : sourceCornerRadius
-            }
-            self.delegate?.transitionAnimatorViews?.forEach { subview in
-                subview.alpha = isEntering ? 1 : 0
-            }
-        } completion: { (finished) in
-            if style == .fade {
-                currentView.alpha = 1
-            } else if style == .zoom {
-                targetView?.isHidden = false
-            }
-            if let imageView = self.imageView {
-                imageView.removeFromSuperview()
-                self.imageView = nil
-            }
-            
-            completion(finished)
+        let style = isEntering ? self.enteringStyle : self.exitingStyle
+        switch style {
+        case .zoom:
+            self.zoomAnimate(in: currentView, isEntering: isEntering, completed: completed)
+        case .fade:
+            self.fadeAnimate(in: currentView, isEntering: isEntering, completed: completed)
         }
     }
     
 }
 
 extension TransitionAnimator {
+    
+    private func zoomAnimate(
+        in view: UIView,
+        isEntering: Bool,
+        completed: @escaping (Bool) -> Void
+    ) {
+        let fadeAnimate = {
+            self.fadeAnimate(in: view, isEntering: isEntering, completed: completed)
+        }
+        let source: (rect: CGRect, cornerRadius: CGFloat)? = {
+            let transitionSourceView = self.delegate?.transitionSourceView
+            let transitionSourceRect = self.delegate?.transitionSourceRect ?? .zero
+            let cornerRadius = transitionSourceView?.layer.cornerRadius ?? 0
+            var rect: CGRect
+            if let transitionSourceView = transitionSourceView, transitionSourceRect.isEmpty {
+                rect = view.convert(transitionSourceView.frame, from: transitionSourceView.superview)
+            } else if !transitionSourceRect.isEmpty {
+                rect = view.convert(transitionSourceRect, from: transitionSourceView)
+            } else {
+                rect = .zero
+            }
+            if !rect.isEmpty && !rect.intersects(view.bounds) {
+                rect = .zero
+            }
+            guard !rect.isEmpty else {
+                return nil
+            }
+            return (rect, cornerRadius)
+        }()
+        guard let source = source else {
+            return fadeAnimate()
+        }
+        let target: (view: UIView, rect: CGRect)? = {
+            guard let transitionTargetView = self.delegate?.transitionTargetView else {
+                return nil
+            }
+            let rect = view.convert(transitionTargetView.frame, from: transitionTargetView.superview)
+            guard !rect.isEmpty else {
+                return nil
+            }
+            return (view, rect)
+        }()
+        guard let target = target else {
+            return fadeAnimate()
+        }
+        guard let imageView = self.delegate?.transitionThumbnailView else {
+            return fadeAnimate()
+        }
+        imageView.image = self.delegate?.transitionThumbnail
+        imageView.contentMode = .scaleAspectFill
+        imageView.clipsToBounds = true
+        imageView.removeFromSuperview()
+        view.addSubview(imageView)
+        
+        imageView.frame = isEntering ? source.rect : target.rect
+        imageView.startAnimating()
+        
+        let animatorViews = self.delegate?.transitionAnimatorViews
+        animatorViews?.forEach {
+            $0.alpha = isEntering ? 0 : 1
+        }
+        
+        self.retainMaskLayer = target.view.layer.mask
+        target.view.layer.mask = self.maskLayer
+        
+        self.animate(
+            isEntering: isEntering,
+            animations: {
+                imageView.frame = isEntering ? target.rect : source.rect
+                imageView.layer.cornerRadius = isEntering ? 0 : source.cornerRadius
+                
+                animatorViews?.forEach {
+                    $0.alpha = isEntering ? 1 : 0
+                }
+            },
+            completed: {
+                target.view.layer.mask = self.retainMaskLayer
+                self.retainMaskLayer = nil
+                
+                imageView.removeFromSuperview()
+                self.imageView = nil
+                
+                completed($0)
+            }
+        )
+    }
+    
+    private func fadeAnimate(
+        in view: UIView,
+        isEntering: Bool,
+        completed: @escaping (Bool) -> Void
+    ) {
+        view.alpha = isEntering ? 0 : 1
+        self.animate(
+            isEntering: isEntering,
+            animations: {
+                view.alpha = isEntering ? 1 : 0
+            },
+            completed: {
+                view.alpha = 1
+                
+                completed($0)
+            }
+        )
+    }
+    
+    private func animate(isEntering: Bool, animations: @escaping () -> Void, completed: @escaping (Bool) -> Void) {
+        UIView.animate(
+            withDuration: self.duration,
+            delay: 0,
+            options: isEntering ? .curveEaseInOut : .curveEaseOut,
+            animations: animations,
+            completion: completed
+        )
+    }
     
 }
