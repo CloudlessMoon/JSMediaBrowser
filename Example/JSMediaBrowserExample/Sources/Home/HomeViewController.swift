@@ -167,13 +167,13 @@ extension HomeViewController: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let browserVC = BrowserViewController()
         browserVC.setCurrentPage(indexPath.item, animated: false)
-        browserVC.dataSource = self.dataSource.map {
+        browserVC.dataSource = self.dataSource.enumerated().map {
             var item: any PhotoItem
-            if $0.contains("LivePhoto") {
+            if $0.element.contains("LivePhoto") {
                 let video = Bundle.main.url(forResource: "LivePhoto", withExtension: "MOV")!
-                item = LivePhotoItem(source: .url(image: URL(string: $0), video: video), thumbnail: SDImageCache.shared.imageFromMemoryCache(forKey: $0))
+                item = LivePhotoItem(source: .url(image: URL(string: $0.element), video: video), thumbnail: self.image(at: $0.offset))
             } else {
-                item = ImageItem(source: .url(URL(string: $0)), thumbnail: SDImageCache.shared.imageFromMemoryCache(forKey: $0))
+                item = ImageItem(source: .url(URL(string: $0.element)), thumbnail: self.image(at: $0.offset))
             }
             return item
         }
@@ -206,6 +206,10 @@ extension HomeViewController {
             return nil
         }
         return cell
+    }
+    
+    private func image(at index: Int) -> UIImage? {
+        return self.pictureCell(at: index)?.imageView.image
     }
     
     @objc private func onClear() {
