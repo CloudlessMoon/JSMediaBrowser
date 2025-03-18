@@ -35,8 +35,6 @@ public final class TransitionAnimator: Transitioner {
     
     public var exitingStyle: TransitioningStyle = .zoom
     
-    private var imageView: UIImageView?
-    
     private lazy var maskLayer: CALayer = {
         return CALayer()
     }()
@@ -166,7 +164,6 @@ extension TransitionAnimator {
                 self.retainMaskLayer = nil
                 
                 imageView.removeFromSuperview()
-                self.imageView = nil
                 
                 completed($0)
             }
