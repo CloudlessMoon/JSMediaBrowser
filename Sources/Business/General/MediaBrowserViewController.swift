@@ -665,6 +665,10 @@ extension MediaBrowserViewController: UIViewControllerTransitioningDelegate, Tra
         return nil
     }
     
+    public var transitionContainerView: UIView? {
+        return self.contentView
+    }
+    
     public var transitionMaskedView: UIView? {
         if let cell = self.currentPageCell as? PhotoCell {
             return cell
@@ -674,11 +678,11 @@ extension MediaBrowserViewController: UIViewControllerTransitioningDelegate, Tra
     
     public var transitionAnimatorViews: [UIView] {
         var views: [UIView] = []
-        if let dimmingView = self.contentView.dimmingView {
+        if let dimmingView = self.dimmingView {
             views.append(dimmingView)
         }
         self.view.subviews.forEach {
-            guard $0 != self.contentView else {
+            guard $0 != self.transitionContainerView else {
                 return
             }
             views.append($0)

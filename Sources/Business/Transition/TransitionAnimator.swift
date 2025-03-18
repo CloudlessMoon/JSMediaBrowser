@@ -15,6 +15,7 @@ public protocol TransitionAnimatorDelegate: AnyObject {
     var transitionSourceView: UIView? { get }
     var transitionSourceRect: CGRect { get }
     var transitionTargetView: UIView? { get }
+    var transitionContainerView: UIView? { get }
     var transitionMaskedView: UIView? { get }
     var transitionAnimatorViews: [UIView] { get }
     
@@ -88,19 +89,22 @@ extension TransitionAnimator {
         let fadeAnimate = {
             self.fadeAnimate(in: containerView, isEntering: isEntering, completed: completed)
         }
+        guard let transitionContainerView = self.delegate?.transitionContainerView else {
+            return fadeAnimate()
+        }
         let source: (rect: CGRect, cornerRadius: CGFloat)? = {
             let transitionSourceView = self.delegate?.transitionSourceView
             let transitionSourceRect = self.delegate?.transitionSourceRect ?? .zero
             let cornerRadius = transitionSourceView?.layer.cornerRadius ?? 0
             var rect: CGRect
             if let transitionSourceView = transitionSourceView, transitionSourceRect.isEmpty {
-                rect = containerView.convert(transitionSourceView.frame, from: transitionSourceView.superview)
+                rect = transitionContainerView.convert(transitionSourceView.frame, from: transitionSourceView.superview)
             } else if !transitionSourceRect.isEmpty {
-                rect = containerView.convert(transitionSourceRect, from: transitionSourceView)
+                rect = transitionContainerView.convert(transitionSourceRect, from: transitionSourceView)
             } else {
                 rect = .zero
             }
-            if !rect.isEmpty && !rect.intersects(containerView.bounds) {
+            if !rect.isEmpty && !rect.intersects(transitionContainerView.bounds) {
                 rect = .zero
             }
             guard !rect.isEmpty else {
@@ -115,7 +119,7 @@ extension TransitionAnimator {
             guard let transitionTargetView = self.delegate?.transitionTargetView else {
                 return nil
             }
-            let rect = containerView.convert(transitionTargetView.frame, from: transitionTargetView.superview)
+            let rect = transitionContainerView.convert(transitionTargetView.frame, from: transitionTargetView.superview)
             guard !rect.isEmpty else {
                 return nil
             }
@@ -134,7 +138,7 @@ extension TransitionAnimator {
         imageView.contentMode = .scaleAspectFill
         imageView.clipsToBounds = true
         imageView.removeFromSuperview()
-        containerView.addSubview(imageView)
+        transitionContainerView.addSubview(imageView)
         
         imageView.frame = isEntering ? source.rect : target.rect
         imageView.startAnimating()
