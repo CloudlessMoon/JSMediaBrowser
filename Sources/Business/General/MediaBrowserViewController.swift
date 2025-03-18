@@ -470,9 +470,6 @@ extension MediaBrowserViewController: MediaBrowserViewDelegate {
         guard self.hideWhenSingleTap else {
             return
         }
-        if let cell = self.currentPageCell as? PhotoCell {
-            self.stopPlaying(for: cell)
-        }
         self.hide(animated: true)
     }
     
@@ -575,9 +572,6 @@ extension MediaBrowserViewController: UIGestureRecognizerDelegate {
     
     private func beginDismissingAnimation() {
         if let context = self.transitionInteractiver.context {
-            if let cell = self.currentPageCell as? PhotoCell {
-                self.stopPlaying(for: cell)
-            }
             self.transitionAnimator.performAnimation(using: context, isEntering: false) { finished in
                 self.transitionInteractiver.finish()
             }
