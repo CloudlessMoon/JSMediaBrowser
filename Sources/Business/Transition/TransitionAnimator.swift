@@ -10,8 +10,6 @@ import JSCoreKit
 
 public protocol TransitionAnimatorDelegate: AnyObject {
     
-    var transitionThumbnail: UIImage? { get }
-    var transitionThumbnailView: UIImageView? { get }
     var transitionSourceView: UIView? { get }
     var transitionSourceRect: CGRect { get }
     var transitionTargetView: UIView? { get }
@@ -34,8 +32,6 @@ public final class TransitionAnimator: Transitioner {
     public var enteringStyle: TransitioningStyle = .zoom
     
     public var exitingStyle: TransitioningStyle = .zoom
-    
-    private var imageView: UIImageView?
     
     private lazy var maskLayer: CALayer = {
         return CALayer()
@@ -117,10 +113,12 @@ extension TransitionAnimator {
             guard let transitionTargetView = self.delegate?.transitionTargetView else {
                 return nil
             }
-            let rect = containerView.convert(transitionTargetView.frame, from: transitionTargetView.superview)
+            var rect = containerView.convert(transitionTargetView.frame, from: transitionTargetView.superview)
             guard !rect.isEmpty else {
                 return nil
             }
+            rect.size.width = min(containerView.bounds.width, rect.width)
+            rect.size.height = min(containerView.bounds.height, rect.height)
             guard let transitionMaskedView = self.delegate?.transitionMaskedView else {
                 return nil
             }
@@ -129,17 +127,14 @@ extension TransitionAnimator {
         guard let target = target else {
             return fadeAnimate()
         }
-        guard let imageView = self.delegate?.transitionThumbnailView else {
+        guard let replicantView = containerView.resizableSnapshotView(from: target.rect, afterScreenUpdates: true, withCapInsets: .zero) else {
             return fadeAnimate()
         }
-        imageView.image = self.delegate?.transitionThumbnail
-        imageView.contentMode = .scaleAspectFill
-        imageView.clipsToBounds = true
-        imageView.removeFromSuperview()
-        containerView.addSubview(imageView)
-        
-        imageView.frame = isEntering ? source.rect : target.rect
-        imageView.startAnimating()
+        let snapshotView = SnapshotView(replicantView, size: target.rect.size)
+        snapshotView.frame = isEntering ? source.rect : target.rect
+        snapshotView.setNeedsLayout()
+        snapshotView.layoutIfNeeded()
+        containerView.addSubview(snapshotView)
         
         let transitionAnimatorViews = self.delegate?.transitionAnimatorViews
         if isEntering {
@@ -154,8 +149,10 @@ extension TransitionAnimator {
         self.animate(
             isEntering: isEntering,
             animations: {
-                imageView.frame = isEntering ? target.rect : source.rect
-                imageView.layer.cornerRadius = isEntering ? 0 : source.cornerRadius
+                snapshotView.frame = isEntering ? target.rect : source.rect
+                snapshotView.setNeedsLayout()
+                snapshotView.layoutIfNeeded()
+                snapshotView.layer.cornerRadius = isEntering ? 0 : source.cornerRadius
                 
                 transitionAnimatorViews?.forEach {
                     $0.alpha = isEntering ? 1 : 0
@@ -165,8 +162,7 @@ extension TransitionAnimator {
                 target.maskedView.layer.mask = self.retainMaskLayer
                 self.retainMaskLayer = nil
                 
-                imageView.removeFromSuperview()
-                self.imageView = nil
+                snapshotView.removeFromSuperview()
                 
                 completed($0)
             }
@@ -199,6 +195,65 @@ extension TransitionAnimator {
             options: isEntering ? .curveEaseInOut : .curveEaseOut,
             animations: animations,
             completion: completed
+        )
+        //        UIView.animate(
+        //            withDuration: 2,
+        //            delay: 0,
+        //            options: .curveLinear,
+        //            animations: animations,
+        //            completion: completed
+        //        )
+    }
+    
+}
+
+private final class SnapshotView: UIView {
+    
+    private let view: UIView
+    private let size: CGSize
+    
+    init(_ view: UIView, size: CGSize) {
+        self.view = view
+        self.size = size
+        
+        super.init(frame: .zero)
+        
+        self.didInitialize()
+    }
+    
+    @available(*, unavailable, message: "use init()")
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    private func didInitialize() {
+        self.clipsToBounds = true
+        
+        self.addSubview(self.view)
+    }
+    
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        guard JSCGSizeIsValidated(self.size) && !self.bounds.isEmpty else {
+            self.view.frame = .zero
+            return
+        }
+        let bounds = self.bounds
+        var scale = 0.0
+        if self.size.width / self.size.height < bounds.width / bounds.height {
+            scale = bounds.width / self.size.width
+        } else {
+            scale = bounds.height / self.size.height
+        }
+        let size = JSCGSizeCeilPixelValue(CGSize(
+            width: self.size.width * scale,
+            height: self.size.height * scale
+        ))
+        self.view.frame = CGRect(
+            x: JSRoundPixelValue((self.bounds.width - size.width) / 2),
+            y: JSRoundPixelValue((self.bounds.height - size.height) / 2),
+            width: size.width,
+            height: size.height
         )
     }
     

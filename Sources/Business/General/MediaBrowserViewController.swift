@@ -470,6 +470,9 @@ extension MediaBrowserViewController: MediaBrowserViewDelegate {
         guard self.hideWhenSingleTap else {
             return
         }
+        if let cell = self.currentPageCell as? PhotoCell {
+            self.stopPlaying(for: cell)
+        }
         self.hide(animated: true)
     }
     
@@ -572,6 +575,9 @@ extension MediaBrowserViewController: UIGestureRecognizerDelegate {
     
     private func beginDismissingAnimation() {
         if let context = self.transitionInteractiver.context {
+            if let cell = self.currentPageCell as? PhotoCell {
+                self.stopPlaying(for: cell)
+            }
             self.transitionAnimator.performAnimation(using: context, isEntering: false) { finished in
                 self.transitionInteractiver.finish()
             }
@@ -615,31 +621,6 @@ extension MediaBrowserViewController: UIViewControllerTransitioningDelegate, Tra
     public func interactionControllerForDismissal(using animator: UIViewControllerAnimatedTransitioning) -> UIViewControllerInteractiveTransitioning? {
         self.transitionInteractiver.type = .dismiss
         return self.transitionInteractiver.wantsInteractiveStart ? self.transitionInteractiver : nil
-    }
-    
-    public var transitionThumbnailView: UIImageView? {
-        guard self.currentPage < self.dataSource.count else {
-            return nil
-        }
-        let item = self.dataSource[self.currentPage]
-        let thumbnailView = item.builder.createView().thumbnailView
-        return thumbnailView
-    }
-    
-    public var transitionThumbnail: UIImage? {
-        if let cell = self.currentPageCell as? PhotoCell {
-            if let image = cell.photoView.thumbnail {
-                return image
-            } else if let thumbnail = self.dataSource[self.currentPage].thumbnail {
-                return thumbnail
-            } else if let image = cell.photoView.asset as? UIImage {
-                return image
-            } else {
-                return nil
-            }
-        } else {
-            return nil
-        }
     }
     
     public var transitionSourceView: UIView? {
