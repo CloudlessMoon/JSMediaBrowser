@@ -554,8 +554,8 @@ extension MediaBrowserViewController: UIGestureRecognizerDelegate {
             )
             let transform = CGAffineTransform(translationX: horizontalDistance, y: verticalDistance).scaledBy(x: ratio, y: ratio)
             self.currentPageCell?.transform = transform
-            self.transitionAnimatorViews?.forEach { (subview) in
-                subview.alpha = alpha
+            self.transitionAnimatorViews.forEach {
+                $0.alpha = alpha
             }
         case .ended, .cancelled, .failed:
             let location = gestureRecognizer.location(in: gestureRecognizer.view)
@@ -583,9 +583,9 @@ extension MediaBrowserViewController: UIGestureRecognizerDelegate {
     private func resetDismissingAnimation() {
         self.gestureBeganLocation = CGPoint.zero
         
-        UIView.animate(withDuration: self.transitionAnimator.duration, delay: 0, options: JSCoreHelper.animationOptionsCurveOut) {
+        UIView.animate(withDuration: self.transitionAnimator.duration, delay: 0, options: .curveEaseInOut) {
             self.currentPageCell?.transform = CGAffineTransform.identity
-            self.transitionAnimatorViews?.forEach {
+            self.transitionAnimatorViews.forEach {
                 $0.alpha = 1.0
             }
         } completion: { finished in
@@ -665,17 +665,25 @@ extension MediaBrowserViewController: UIViewControllerTransitioningDelegate, Tra
         return nil
     }
     
-    public var transitionAnimatorViews: [UIView]? {
-        var animatorViews: [UIView] = []
+    public var transitionMaskedView: UIView? {
+        if let cell = self.currentPageCell as? PhotoCell {
+            return cell
+        }
+        return nil
+    }
+    
+    public var transitionAnimatorViews: [UIView] {
+        var views: [UIView] = []
         if let dimmingView = self.contentView.dimmingView {
-            animatorViews.append(dimmingView)
+            views.append(dimmingView)
         }
-        self.view.subviews.forEach { (subview) in
-            if subview != self.contentView {
-                animatorViews.append(subview)
+        self.view.subviews.forEach {
+            guard $0 != self.contentView else {
+                return
             }
+            views.append($0)
         }
-        return animatorViews
+        return views
     }
     
 }
