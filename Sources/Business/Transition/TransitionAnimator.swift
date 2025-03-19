@@ -28,8 +28,6 @@ public enum TransitioningStyle: Equatable {
 
 public final class TransitionAnimator: Transitioner {
     
-    public weak var delegate: TransitionAnimatorDelegate?
-    
     public var duration: TimeInterval = 0.25
     
     public var appearStyle: TransitioningStyle = .zoom
@@ -42,7 +40,11 @@ public final class TransitionAnimator: Transitioner {
     
     private var retainMaskLayer: CALayer?
     
-    public override init() {
+    private weak var delegate: TransitionAnimatorDelegate?
+    
+    public init(delegate: TransitionAnimatorDelegate) {
+        self.delegate = delegate
+        
         super.init()
     }
     

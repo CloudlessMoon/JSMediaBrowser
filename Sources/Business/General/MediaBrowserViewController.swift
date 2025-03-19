@@ -44,13 +44,13 @@ open class MediaBrowserViewController: UIViewController {
     
     public var appearStyle: TransitioningStyle {
         didSet {
-            self.transitionAnimator.appearStyle = self.appearStyle
+            self.transitionAdapter.animator.appearStyle = self.appearStyle
         }
     }
     
     public var disappearStyle: TransitioningStyle {
         didSet {
-            self.transitionAnimator.disappearStyle = self.disappearStyle
+            self.transitionAdapter.animator.disappearStyle = self.disappearStyle
         }
     }
     
@@ -64,25 +64,12 @@ open class MediaBrowserViewController: UIViewController {
     
     public let configuration: MediaBrowserViewControllerConfiguration
     
-    private lazy var contentView: MediaBrowserView = {
+    internal private(set) lazy var contentView: MediaBrowserView = {
         let view = MediaBrowserView()
         view.dataSource = self
         view.delegate = self
         view.pageSpacing = self.pageSpacing
         return view
-    }()
-    
-    private lazy var transitionAnimator: TransitionAnimator = {
-        let animator = TransitionAnimator()
-        animator.delegate = self
-        animator.appearStyle = self.appearStyle
-        animator.disappearStyle = self.disappearStyle
-        return animator
-    }()
-    
-    private lazy var transitionInteractiver: TransitionInteractiver = {
-        let interactiver = TransitionInteractiver()
-        return interactiver
     }()
     
     private lazy var dismissRecognizer: UIPanGestureRecognizer = {
@@ -94,6 +81,13 @@ open class MediaBrowserViewController: UIViewController {
     }()
     
     private var gestureBeganLocation = CGPoint.zero
+    
+    private lazy var transitionAdapter: TransitionAdapter = {
+        let adapter = TransitionAdapter(owner: self)
+        adapter.animator.appearStyle = self.appearStyle
+        adapter.animator.disappearStyle = self.disappearStyle
+        return adapter
+    }()
     
     private weak var presentedFromViewController: UIViewController?
     private var isPresented: Bool = false
@@ -280,7 +274,7 @@ extension MediaBrowserViewController {
                 return .overCurrentContext
             }
         }()
-        viewController.transitioningDelegate = self
+        viewController.transitioningDelegate = self.transitionAdapter
         
         var presenter = sender
         guard presenter.isViewLoaded else {
@@ -524,7 +518,7 @@ extension MediaBrowserViewController: UIGestureRecognizerDelegate {
             break
         case .began:
             self.gestureBeganLocation = gestureRecognizer.location(in: gestureRecognizerView)
-            self.transitionInteractiver.begin()
+            self.transitionAdapter.interactiver.begin()
             self.hide(animated: true)
         case .changed:
             let location = gestureRecognizer.location(in: gestureRecognizerView)
@@ -547,7 +541,7 @@ extension MediaBrowserViewController: UIGestureRecognizerDelegate {
             )
             let transform = CGAffineTransform(translationX: horizontalDistance, y: verticalDistance).scaledBy(x: ratio, y: ratio)
             self.currentPageCell?.transform = transform
-            self.transitionAnimatorViews.forEach {
+            self.transitionAdapter.transitionAnimatorViews.forEach {
                 $0.alpha = alpha
             }
         case .ended, .cancelled, .failed:
@@ -564,9 +558,9 @@ extension MediaBrowserViewController: UIGestureRecognizerDelegate {
     }
     
     private func beginDismissingAnimation() {
-        if let context = self.transitionInteractiver.context {
-            self.transitionAnimator.performAnimation(using: context) { finished in
-                self.transitionInteractiver.finish()
+        if let context = self.transitionAdapter.interactiver.context {
+            self.transitionAdapter.animator.performAnimation(using: context) { finished in
+                self.transitionAdapter.interactiver.finish()
             }
         } else {
             self.resetDismissingAnimation()
@@ -576,111 +570,14 @@ extension MediaBrowserViewController: UIGestureRecognizerDelegate {
     private func resetDismissingAnimation() {
         self.gestureBeganLocation = CGPoint.zero
         
-        UIView.animate(withDuration: self.transitionAnimator.duration, delay: 0, options: .curveEaseInOut) {
+        UIView.animate(withDuration: self.transitionAdapter.animator.duration, delay: 0, options: .curveEaseInOut) {
             self.currentPageCell?.transform = CGAffineTransform.identity
-            self.transitionAnimatorViews.forEach {
+            self.transitionAdapter.transitionAnimatorViews.forEach {
                 $0.alpha = 1.0
             }
         } completion: { finished in
-            self.transitionInteractiver.cancel()
+            self.transitionAdapter.interactiver.cancel()
         }
-    }
-    
-}
-
-extension MediaBrowserViewController: UIViewControllerTransitioningDelegate, TransitionAnimatorDelegate {
-    
-    public func animationController(forPresented presented: UIViewController, presenting: UIViewController, source: UIViewController) -> UIViewControllerAnimatedTransitioning? {
-        self.transitionAnimator.type = .presenting
-        return self.transitionAnimator
-    }
-    
-    public func animationController(forDismissed dismissed: UIViewController) -> UIViewControllerAnimatedTransitioning? {
-        self.transitionAnimator.type = .dismiss
-        return self.transitionAnimator
-    }
-    
-    public func interactionControllerForPresentation(using animator: UIViewControllerAnimatedTransitioning) -> UIViewControllerInteractiveTransitioning? {
-        self.transitionInteractiver.type = .presenting
-        return self.transitionInteractiver.wantsInteractiveStart ? self.transitionInteractiver : nil
-    }
-    
-    public func interactionControllerForDismissal(using animator: UIViewControllerAnimatedTransitioning) -> UIViewControllerInteractiveTransitioning? {
-        self.transitionInteractiver.type = .dismiss
-        return self.transitionInteractiver.wantsInteractiveStart ? self.transitionInteractiver : nil
-    }
-    
-    public var transitionThumbnailView: UIImageView? {
-        guard self.currentPage < self.dataSource.count else {
-            return nil
-        }
-        let item = self.dataSource[self.currentPage]
-        let thumbnailView = item.builder.createView().thumbnailView
-        return thumbnailView
-    }
-    
-    public var transitionThumbnail: UIImage? {
-        if let cell = self.currentPageCell as? PhotoCell {
-            if let image = cell.photoView.thumbnail {
-                return image
-            } else if let thumbnail = self.dataSource[self.currentPage].thumbnail {
-                return thumbnail
-            } else if let image = cell.photoView.asset as? UIImage {
-                return image
-            } else {
-                return nil
-            }
-        } else {
-            return nil
-        }
-    }
-    
-    public var transitionSourceView: UIView? {
-        return self.sourceProvider?.sourceView?(self.currentPage)
-    }
-    
-    public var transitionSourceRect: CGRect {
-        return self.sourceProvider?.sourceRect?(self.currentPage) ?? .zero
-    }
-    
-    public var transitionTargetView: UIView? {
-        if let cell = self.currentPageCell as? PhotoCell {
-            let assetView = cell.photoView.assetView
-            let thumbnailView = cell.photoView.thumbnailView
-            if JSCGSizeIsValidated(assetView.bounds.size) {
-                return assetView
-            } else if JSCGSizeIsValidated(thumbnailView.bounds.size) {
-                return thumbnailView
-            } else {
-                return nil
-            }
-        }
-        return nil
-    }
-    
-    public var transitionContainerView: UIView? {
-        return self.contentView
-    }
-    
-    public var transitionMaskedView: UIView? {
-        if let cell = self.currentPageCell as? PhotoCell {
-            return cell
-        }
-        return nil
-    }
-    
-    public var transitionAnimatorViews: [UIView] {
-        var views: [UIView] = []
-        if let dimmingView = self.dimmingView {
-            views.append(dimmingView)
-        }
-        self.view.subviews.forEach {
-            guard $0 != self.transitionContainerView else {
-                return
-            }
-            views.append($0)
-        }
-        return views
     }
     
 }
