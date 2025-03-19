@@ -167,13 +167,6 @@ open class MediaBrowserViewController: UIViewController {
         self.isViewAppeared = true
     }
     
-    open override func viewDidDisappear(_ animated: Bool) {
-        super.viewDidDisappear(animated)
-        if let cell = self.currentPageCell as? PhotoCell {
-            self.stopPlaying(for: cell)
-        }
-    }
-    
     open override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         self.contentView.js_frameApplyTransform = self.view.bounds
