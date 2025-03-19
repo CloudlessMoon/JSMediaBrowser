@@ -16,10 +16,8 @@ public class TransitionInteractiver: Transitioner {
 extension TransitionInteractiver: UIViewControllerInteractiveTransitioning {
     
     public func startInteractiveTransition(_ transitionContext: UIViewControllerContextTransitioning) {
-        let isEntering = self.type == .presenting
-        
         if self.isInteractive {
-            self.beginTransition(transitionContext, isEntering: isEntering)
+            self.beginTransition(transitionContext)
         } else {
             /// 极端情况下isInteractive已经设置为false, 但是此时未处理transitionContext时会出现异常
             /// 所以这里规避下, 出现异常时直接取消

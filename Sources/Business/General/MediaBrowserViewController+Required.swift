@@ -9,8 +9,8 @@ import UIKit
 
 public struct MediaBrowserViewControllerConfiguration {
     
-    public var enteringStyle: TransitioningStyle
-    public var exitingStyle: TransitioningStyle
+    public var appearStyle: TransitioningStyle
+    public var disappearStyle: TransitioningStyle
     public var hideWhenSingleTap: Bool
     public var hideWhenSliding: Bool
     public var hideWhenSlidingDistance: CGFloat
@@ -18,16 +18,16 @@ public struct MediaBrowserViewControllerConfiguration {
     public var pageSpacing: CGFloat
     
     public init(
-        enteringStyle: TransitioningStyle = .zoom,
-        exitingStyle: TransitioningStyle = .zoom,
+        appearStyle: TransitioningStyle = .zoom,
+        disappearStyle: TransitioningStyle = .zoom,
         hideWhenSingleTap: Bool = true,
         hideWhenSliding: Bool = true,
         hideWhenSlidingDistance: CGFloat = 70,
         zoomWhenDoubleTap: Bool = true,
         pageSpacing: CGFloat = 10
     ) {
-        self.enteringStyle = enteringStyle
-        self.exitingStyle = exitingStyle
+        self.appearStyle = appearStyle
+        self.disappearStyle = disappearStyle
         self.hideWhenSingleTap = hideWhenSingleTap
         self.hideWhenSliding = hideWhenSliding
         self.hideWhenSlidingDistance = hideWhenSlidingDistance

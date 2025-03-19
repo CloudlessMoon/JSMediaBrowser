@@ -32,9 +32,9 @@ public final class TransitionAnimator: Transitioner {
     
     public var duration: TimeInterval = 0.25
     
-    public var enteringStyle: TransitioningStyle = .zoom
+    public var appearStyle: TransitioningStyle = .zoom
     
-    public var exitingStyle: TransitioningStyle = .zoom
+    public var disappearStyle: TransitioningStyle = .zoom
     
     private lazy var maskLayer: CALayer = {
         return CALayer()
@@ -51,9 +51,8 @@ public final class TransitionAnimator: Transitioner {
 extension TransitionAnimator: UIViewControllerAnimatedTransitioning {
     
     public func animateTransition(using transitionContext: UIViewControllerContextTransitioning) {
-        let isEntering = self.type == .presenting
-        self.beginTransition(transitionContext, isEntering: isEntering)
-        self.performAnimation(using: transitionContext, isEntering: isEntering) { finished in
+        self.beginTransition(transitionContext)
+        self.performAnimation(using: transitionContext) { finished in
             self.endTransition(transitionContext)
         }
     }
@@ -66,14 +65,18 @@ extension TransitionAnimator: UIViewControllerAnimatedTransitioning {
 
 extension TransitionAnimator {
     
-    public func performAnimation(using transitionContext: UIViewControllerContextTransitioning, isEntering: Bool, completed: @escaping ((Bool) -> Void)) {
+    public func performAnimation(
+        using transitionContext: UIViewControllerContextTransitioning,
+        completed: @escaping ((Bool) -> Void)
+    ) {
+        let isAppear = self.type == .presenting
         let containerView = transitionContext.containerView
-        let style = isEntering ? self.enteringStyle : self.exitingStyle
+        let style = isAppear ? self.appearStyle : self.disappearStyle
         switch style {
         case .zoom:
-            self.zoomAnimate(in: containerView, isEntering: isEntering, completed: completed)
+            self.zoomAnimate(in: containerView, isAppear: isAppear, completed: completed)
         case .fade:
-            self.fadeAnimate(in: containerView, isEntering: isEntering, completed: completed)
+            self.fadeAnimate(in: containerView, isAppear: isAppear, completed: completed)
         }
     }
     
@@ -83,11 +86,11 @@ extension TransitionAnimator {
     
     private func zoomAnimate(
         in containerView: UIView,
-        isEntering: Bool,
+        isAppear: Bool,
         completed: @escaping (Bool) -> Void
     ) {
         let fadeAnimate = {
-            self.fadeAnimate(in: containerView, isEntering: isEntering, completed: completed)
+            self.fadeAnimate(in: containerView, isAppear: isAppear, completed: completed)
         }
         guard let transitionContainerView = self.delegate?.transitionContainerView else {
             return fadeAnimate()
@@ -140,11 +143,11 @@ extension TransitionAnimator {
         imageView.removeFromSuperview()
         transitionContainerView.addSubview(imageView)
         
-        imageView.frame = isEntering ? source.rect : target.rect
+        imageView.frame = isAppear ? source.rect : target.rect
         imageView.startAnimating()
         
         let transitionAnimatorViews = self.delegate?.transitionAnimatorViews
-        if isEntering {
+        if isAppear {
             transitionAnimatorViews?.forEach {
                 $0.alpha = 0
             }
@@ -154,13 +157,13 @@ extension TransitionAnimator {
         target.maskedView.layer.mask = self.maskLayer
         
         self.animate(
-            isEntering: isEntering,
+            isAppear: isAppear,
             animations: {
-                imageView.frame = isEntering ? target.rect : source.rect
-                imageView.layer.cornerRadius = isEntering ? 0 : source.cornerRadius
+                imageView.frame = isAppear ? target.rect : source.rect
+                imageView.layer.cornerRadius = isAppear ? 0 : source.cornerRadius
                 
                 transitionAnimatorViews?.forEach {
-                    $0.alpha = isEntering ? 1 : 0
+                    $0.alpha = isAppear ? 1 : 0
                 }
             },
             completed: {
@@ -176,14 +179,14 @@ extension TransitionAnimator {
     
     private func fadeAnimate(
         in containerView: UIView,
-        isEntering: Bool,
+        isAppear: Bool,
         completed: @escaping (Bool) -> Void
     ) {
-        containerView.alpha = isEntering ? 0 : 1
+        containerView.alpha = isAppear ? 0 : 1
         self.animate(
-            isEntering: isEntering,
+            isAppear: isAppear,
             animations: {
-                containerView.alpha = isEntering ? 1 : 0
+                containerView.alpha = isAppear ? 1 : 0
             },
             completed: {
                 containerView.alpha = 1
@@ -193,11 +196,11 @@ extension TransitionAnimator {
         )
     }
     
-    private func animate(isEntering: Bool, animations: @escaping () -> Void, completed: @escaping (Bool) -> Void) {
+    private func animate(isAppear: Bool, animations: @escaping () -> Void, completed: @escaping (Bool) -> Void) {
         UIView.animate(
             withDuration: self.duration,
             delay: 0,
-            options: isEntering ? .curveEaseInOut : .curveEaseOut,
+            options: isAppear ? .curveEaseInOut : .curveEaseOut,
             animations: animations,
             completion: completed
         )

@@ -42,15 +42,15 @@ open class MediaBrowserViewController: UIViewController {
         }
     }
     
-    public var enteringStyle: TransitioningStyle {
+    public var appearStyle: TransitioningStyle {
         didSet {
-            self.transitionAnimator.enteringStyle = self.enteringStyle
+            self.transitionAnimator.appearStyle = self.appearStyle
         }
     }
     
-    public var exitingStyle: TransitioningStyle {
+    public var disappearStyle: TransitioningStyle {
         didSet {
-            self.transitionAnimator.exitingStyle = self.exitingStyle
+            self.transitionAnimator.disappearStyle = self.disappearStyle
         }
     }
     
@@ -75,8 +75,8 @@ open class MediaBrowserViewController: UIViewController {
     private lazy var transitionAnimator: TransitionAnimator = {
         let animator = TransitionAnimator()
         animator.delegate = self
-        animator.enteringStyle = self.enteringStyle
-        animator.exitingStyle = self.exitingStyle
+        animator.appearStyle = self.appearStyle
+        animator.disappearStyle = self.disappearStyle
         return animator
     }()
     
@@ -114,8 +114,8 @@ open class MediaBrowserViewController: UIViewController {
     
     public init(configuration: MediaBrowserViewControllerConfiguration = .init()) {
         self.configuration = configuration
-        self.enteringStyle = configuration.enteringStyle
-        self.exitingStyle = configuration.exitingStyle
+        self.appearStyle = configuration.appearStyle
+        self.disappearStyle = configuration.disappearStyle
         self.hideWhenSingleTap = configuration.hideWhenSingleTap
         self.hideWhenSliding = configuration.hideWhenSliding
         self.hideWhenSliding = configuration.hideWhenSliding
@@ -565,7 +565,7 @@ extension MediaBrowserViewController: UIGestureRecognizerDelegate {
     
     private func beginDismissingAnimation() {
         if let context = self.transitionInteractiver.context {
-            self.transitionAnimator.performAnimation(using: context, isEntering: false) { finished in
+            self.transitionAnimator.performAnimation(using: context) { finished in
                 self.transitionInteractiver.finish()
             }
         } else {

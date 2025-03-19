@@ -30,7 +30,7 @@ public class Transitioner: NSObject {
 
 extension Transitioner {
     
-    public func beginTransition(_ transitionContext: UIViewControllerContextTransitioning, isEntering: Bool) {
+    public func beginTransition(_ transitionContext: UIViewControllerContextTransitioning) {
         self.context = transitionContext
         
         guard let fromViewController = transitionContext.viewController(forKey: .from) else {
@@ -42,9 +42,10 @@ extension Transitioner {
         let fromView: UIView = transitionContext.view(forKey: .from) ?? fromViewController.view
         let toView: UIView = transitionContext.view(forKey: .to) ?? toViewController.view
         let containerView: UIView = transitionContext.containerView
+        let isAppear = self.type == .presenting
         
         /// 添加视图
-        if isEntering {
+        if isAppear {
             if toView.superview == nil {
                 containerView.addSubview(toView)
             }
@@ -61,7 +62,7 @@ extension Transitioner {
         }
         let finalFrame: CGRect = transitionContext.finalFrame(for: toViewController)
         /// dismiss时finalFrame可能与原视图的frame不一致, 导致一些UI异常
-        if !finalFrame.isEmpty && isEntering {
+        if !finalFrame.isEmpty && isAppear {
             toView.frame = finalFrame
         }
         /// 触发toView的布局, 提前获得toView内视图的Frame, 用作后续动画使用
