@@ -11,13 +11,13 @@ public extension ZoomAssetView where Self: UIImageView, Asset: UIImage {
     
     var asset: UIImage? {
         get {
-            return self.getAssociated(for: &AssociatedKeys.asset)
+            return self.getAssociatedValue(for: &AssociatedKeys.asset)
         }
         set {
             guard self.asset != newValue else {
                 return
             }
-            self.setAssociated(newValue, for: &AssociatedKeys.asset)
+            self.setAssociatedValue(newValue, for: &AssociatedKeys.asset)
             
             self.updateImage()
         }
@@ -25,13 +25,13 @@ public extension ZoomAssetView where Self: UIImageView, Asset: UIImage {
     
     var thumbnail: UIImage? {
         get {
-            return self.getAssociated(for: &AssociatedKeys.thumbnail)
+            return self.getAssociatedValue(for: &AssociatedKeys.thumbnail)
         }
         set {
             guard self.thumbnail != newValue else {
                 return
             }
-            self.setAssociated(newValue, for: &AssociatedKeys.thumbnail)
+            self.setAssociatedValue(newValue, for: &AssociatedKeys.thumbnail)
             
             self.updateImage()
         }
@@ -65,12 +65,12 @@ public extension ZoomAssetView where Self: UIImageView, Asset: UIImage {
 
 private extension UIView {
     
-    func getAssociated<T>(for key: UnsafeRawPointer) -> T? {
+    func getAssociatedValue<T>(for key: UnsafeRawPointer) -> T? {
         return objc_getAssociatedObject(self, key) as? T
     }
     
-    func setAssociated<T>(_ object: T, for key: UnsafeRawPointer) {
-        objc_setAssociatedObject(self, key, object, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+    func setAssociatedValue<T>(_ value: T, policy: objc_AssociationPolicy = .OBJC_ASSOCIATION_RETAIN_NONATOMIC, for key: UnsafeRawPointer) {
+        objc_setAssociatedObject(self, key, value, policy)
     }
     
 }
