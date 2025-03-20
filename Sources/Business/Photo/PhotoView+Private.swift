@@ -40,8 +40,8 @@ internal extension PhotoView {
         return self.zoomView.thumbnailView
     }
     
-    var image: UIImage? {
-        return self.zoomView.assetView.image
+    var renderedImage: UIImage? {
+        return self.zoomView.assetView.renderedImage
     }
     
     func setViewport(insets: UIEdgeInsets, maximumSize: CGSize) {

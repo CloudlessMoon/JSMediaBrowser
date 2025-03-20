@@ -20,7 +20,7 @@ extension PHLivePhotoView: ZoomAssetView {
         }
     }
     
-    public var image: UIImage? {
+    public var renderedImage: UIImage? {
         return nil
     }
     

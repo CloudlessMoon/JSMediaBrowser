@@ -20,6 +20,10 @@ extension UIImageView: ZoomAssetView {
         }
     }
     
+    public var renderedImage: UIImage? {
+        return self.image
+    }
+    
     public var isPlaying: Bool {
         return self.isAnimating
     }

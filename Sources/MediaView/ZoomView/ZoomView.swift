@@ -17,11 +17,14 @@ open class ZoomView<AssetView: ZoomAssetView>: BasisMediaView {
     public let assetView: AssetView
     
     public var asset: AssetView.Asset? {
-        didSet {
-            guard self.assetView.asset != self.asset else {
+        get {
+            return self.assetView.asset
+        }
+        set {
+            guard self.assetView.asset != newValue else {
                 return
             }
-            self.assetView.asset = self.asset
+            self.assetView.asset = newValue
             
             self.updateThumbnailView()
             
@@ -32,11 +35,14 @@ open class ZoomView<AssetView: ZoomAssetView>: BasisMediaView {
     public let thumbnailView: UIImageView
     
     public var thumbnail: UIImage? {
-        didSet {
-            guard self.thumbnailView.image != self.thumbnail else {
+        get {
+            return self.thumbnailView.image
+        }
+        set {
+            guard self.thumbnailView.image != newValue else {
                 return
             }
-            self.thumbnailView.image = self.thumbnail
+            self.thumbnailView.image = newValue
             
             self.updateThumbnailView()
             
@@ -133,34 +139,19 @@ open class ZoomView<AssetView: ZoomAssetView>: BasisMediaView {
         
         /// assetView
         let assetSize = {
-            guard let asset = self.asset else {
-                return CGSize.zero
-            }
-            return asset.size
-        }()
-        self.assetView.frame = self.contentViewFrameThatFits(assetSize)
-        
-        /// thumbnailView
-        let thumbnailSize = {
-            guard let thumbnail = self.thumbnail else {
-                return CGSize.zero
-            }
-            return thumbnail.size
-        }()
-        self.thumbnailView.frame = self.contentViewFrameThatFits(thumbnailSize)
-        
-        /// scrollView.content
-        let contentSize = {
-            let assetViewSize = self.assetView.frame.size
-            let thumbnailViewSize = self.thumbnailView.frame.size
-            if JSCGSizeIsValidated(assetViewSize) {
-                return assetViewSize
-            } else if JSCGSizeIsValidated(thumbnailViewSize) {
-                return thumbnailViewSize
+            if let asset = self.assetView.asset {
+                return asset.size
+            } else if let thumbnail = self.thumbnailView.image {
+                return thumbnail.size
             } else {
                 return .zero
             }
         }()
+        self.assetView.frame = self.contentViewFrameThatFits(assetSize)
+        self.thumbnailView.frame = self.assetView.frame
+        
+        /// scrollView.content
+        let contentSize = self.assetView.frame.size
         let contentInset = self.contentInsetThatFits(contentSize)
         if self.scrollView.contentInset != contentInset {
             self.scrollView.contentInset = contentInset
@@ -245,6 +236,35 @@ extension ZoomView {
         }
     }
     
+    public func setNeedsRevertZoom() {
+        self.isNeededRevertZoom = true
+        self.setNeedsLayout()
+    }
+    
+    public var contentOffset: CGPoint {
+        return self.scrollView.contentOffset
+    }
+    
+    public var minimumContentOffset: CGPoint {
+        return self.scrollView.js_minimumContentOffset
+    }
+    
+    public var maximumContentOffset: CGPoint {
+        return self.scrollView.js_maximumContentOffset
+    }
+    
+    public var isTracking: Bool {
+        return self.scrollView.isTracking
+    }
+    
+    public var isDragging: Bool {
+        return self.scrollView.isDragging
+    }
+    
+    public var isDecelerating: Bool {
+        return self.scrollView.isDecelerating
+    }
+    
     public func contentViewFrameThatFits(_ size: CGSize) -> CGRect {
         let contentSize = self.contentSizeThatFits(size)
         return CGRect(
@@ -270,30 +290,6 @@ extension ZoomView {
             left: JSFloorPixelValue(contentInset.left),
             bottom: JSFloorPixelValue(contentInset.bottom),
             right: JSFloorPixelValue(contentInset.right))
-    }
-    
-    public var contentOffset: CGPoint {
-        return self.scrollView.contentOffset
-    }
-    
-    public var minimumContentOffset: CGPoint {
-        return self.scrollView.js_minimumContentOffset
-    }
-    
-    public var maximumContentOffset: CGPoint {
-        return self.scrollView.js_maximumContentOffset
-    }
-    
-    public var isTracking: Bool {
-        return self.scrollView.isTracking
-    }
-    
-    public var isDragging: Bool {
-        return self.scrollView.isDragging
-    }
-    
-    public var isDecelerating: Bool {
-        return self.scrollView.isDecelerating
     }
     
 }
@@ -377,11 +373,6 @@ extension ZoomView {
 }
 
 extension ZoomView {
-    
-    private func setNeedsRevertZoom() {
-        self.isNeededRevertZoom = true
-        self.setNeedsLayout()
-    }
     
     private func revertZoomIfNeeded() {
         guard self.isNeededRevertZoom && !self.bounds.isEmpty else {
