@@ -321,7 +321,7 @@ extension MediaBrowserViewController: MediaBrowserViewDataSource {
         let dataItem = self.dataSource[index]
         
         /// create
-        cell.createPhotoView(dataItem.builder.createView())
+        cell.createPhotoView(dataItem.builder.createPhotoView())
         
         let updateAsset = { [weak self] (cell: PhotoCell, asset: (any ZoomAsset)?) in
             guard let self = self else { return }

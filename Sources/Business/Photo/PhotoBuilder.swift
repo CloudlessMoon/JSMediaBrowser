@@ -13,6 +13,7 @@ public protocol PhotoBuilder {
     associatedtype View: PhotoView where View.ZoomAssetViewType.Asset == Mediator.Target
     
     func createMediator() -> Mediator
-    func createView() -> View
+    func createPhotoView() -> View
+    func createTransitionView() -> UIImageView
     
 }

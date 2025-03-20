@@ -26,25 +26,19 @@ open class ZoomView<AssetView: ZoomAssetView>: BasisMediaView {
             }
             self.assetView.asset = newValue
             
-            self.updateThumbnailView()
-            
             self.setNeedsRevertZoom()
         }
     }
     
-    public let thumbnailView: UIImageView
-    
     public var thumbnail: UIImage? {
         get {
-            return self.thumbnailView.image
+            return self.assetView.thumbnail
         }
         set {
-            guard self.thumbnailView.image != newValue else {
+            guard self.assetView.thumbnail != newValue else {
                 return
             }
-            self.thumbnailView.image = newValue
-            
-            self.updateThumbnailView()
+            self.assetView.thumbnail = newValue
             
             self.setNeedsRevertZoom()
         }
@@ -103,12 +97,10 @@ open class ZoomView<AssetView: ZoomAssetView>: BasisMediaView {
     
     public init(
         assetView: AssetView,
-        thumbnailView: UIImageView,
         configuration: ZoomViewConfiguration = .init(),
         eventHandler: ZoomViewEventHandler? = nil
     ) {
         self.assetView = assetView
-        self.thumbnailView = thumbnailView
         self.configuration = configuration
         self.assetMode = configuration.assetMode
         self.isEnabledZoom = configuration.isEnabledZoom
@@ -124,7 +116,6 @@ open class ZoomView<AssetView: ZoomAssetView>: BasisMediaView {
         super.didInitialize()
         self.addSubview(self.scrollView)
         self.scrollView.addSubview(self.assetView)
-        self.scrollView.addSubview(self.thumbnailView)
         
         self.updateMinimumZoomScale()
         self.updateMaximumZoomScale()
@@ -141,14 +132,13 @@ open class ZoomView<AssetView: ZoomAssetView>: BasisMediaView {
         let assetSize = {
             if let asset = self.assetView.asset {
                 return asset.size
-            } else if let thumbnail = self.thumbnailView.image {
+            } else if let thumbnail = self.assetView.thumbnail {
                 return thumbnail.size
             } else {
                 return .zero
             }
         }()
         self.assetView.frame = self.contentViewFrameThatFits(assetSize)
-        self.thumbnailView.frame = self.assetView.frame
         
         /// scrollView.content
         let contentSize = self.assetView.frame.size
@@ -295,10 +285,6 @@ extension ZoomView {
 }
 
 extension ZoomView {
-    
-    private func updateThumbnailView() {
-        self.thumbnailView.isHidden = self.thumbnail == nil || self.asset != nil
-    }
     
     private func assetSize(with size: CGSize) -> CGSize {
         guard JSCGSizeIsValidated(size) else {

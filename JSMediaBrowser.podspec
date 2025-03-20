@@ -31,18 +31,11 @@ Pod::Spec.new do |s|
   s.subspec "Business" do |ss|
     ss.source_files = "Sources/Business/**/*.{swift,h,m}"
     ss.exclude_files = [
-      "Sources/Business/Photo/PHLivePhoto/*.{swift,h,m}", 
       "Sources/Business/Photo/SDWebImage/*.{swift,h,m}",
       "Sources/Business/Photo/SDWebImagePhotos/*.{swift,h,m}"
     ]
     ss.dependency "JSMediaBrowser/Core"
     ss.dependency "JSMediaBrowser/MediaZoomView"
-  end
-
-  s.subspec "BusinessForPHLivePhoto" do |ss|
-    ss.source_files = "Sources/Business/Photo/PHLivePhoto/*.{swift,h,m}"
-    ss.frameworks   = "PhotosUI"
-    ss.dependency "JSMediaBrowser/Business"
   end
 
   s.subspec "BusinessForSDWebImage" do |ss|

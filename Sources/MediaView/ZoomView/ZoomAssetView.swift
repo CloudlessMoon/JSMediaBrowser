@@ -19,6 +19,8 @@ public protocol ZoomAssetView: UIView {
     
     var asset: Asset? { get set }
     
+    var thumbnail: UIImage? { get set }
+    
     var renderedImage: UIImage? { get }
     
     var isPlaying: Bool { get }

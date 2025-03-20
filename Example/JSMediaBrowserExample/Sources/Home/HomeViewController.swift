@@ -49,9 +49,6 @@ class HomeViewController: UIViewController {
         }
         var array = try? JSONSerialization.jsonObject(with: data, options: JSONSerialization.ReadingOptions.fragmentsAllowed) as? [String]
         
-        if let image = Bundle.main.url(forResource: "LivePhoto", withExtension: "JPG") {
-            array?.append(image.absoluteString)
-        }
         if let HDR = Bundle.main.path(forResource: "TestHDR1", ofType: "heic") {
             array?.append(URL(fileURLWithPath: HDR).absoluteString)
         }
@@ -168,14 +165,7 @@ extension HomeViewController: UICollectionViewDelegateFlowLayout {
         let browserVC = BrowserViewController()
         browserVC.setCurrentPage(indexPath.item, animated: false)
         browserVC.dataSource = self.dataSource.enumerated().map {
-            var item: any PhotoItem
-            if $0.element.contains("LivePhoto") {
-                let video = Bundle.main.url(forResource: "LivePhoto", withExtension: "MOV")!
-                item = LivePhotoItem(source: .url(image: URL(string: $0.element), video: video), thumbnail: self.image(at: $0.offset))
-            } else {
-                item = ImageItem(source: .url(URL(string: $0.element)), thumbnail: self.image(at: $0.offset))
-            }
-            return item
+            return ImageItem(source: .url(URL(string: $0.element)), thumbnail: self.image(at: $0.offset))
         }
         browserVC.sourceProvider = .init(sourceView: { [weak self] in
             guard let self = self else { return nil }

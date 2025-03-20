@@ -71,8 +71,7 @@ extension TransitionAdapter: UIViewControllerTransitioningDelegate, TransitionAn
             return nil
         }
         let item = owner.dataSource[owner.currentPage]
-        let thumbnailView = item.builder.createView().thumbnailView
-        return thumbnailView
+        return item.builder.createTransitionView()
     }
     
     var transitionThumbnail: UIImage? {
@@ -112,14 +111,7 @@ extension TransitionAdapter: UIViewControllerTransitioningDelegate, TransitionAn
         }
         if let cell = owner.currentPageCell as? PhotoCell {
             let assetView = cell.photoView.assetView
-            let thumbnailView = cell.photoView.thumbnailView
-            if JSCGSizeIsValidated(assetView.bounds.size) {
-                return assetView
-            } else if JSCGSizeIsValidated(thumbnailView.bounds.size) {
-                return thumbnailView
-            } else {
-                return nil
-            }
+            return assetView
         }
         return nil
     }

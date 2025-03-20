@@ -36,10 +36,6 @@ internal extension PhotoView {
         }
     }
     
-    var thumbnailView: UIImageView {
-        return self.zoomView.thumbnailView
-    }
-    
     var renderedImage: UIImage? {
         return self.zoomView.assetView.renderedImage
     }

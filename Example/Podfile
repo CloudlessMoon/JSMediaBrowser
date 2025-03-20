@@ -6,7 +6,6 @@ def pod_Common
     "Business", 
     "BusinessForSDWebImage",
     "BusinessForSDWebImagePhotos",
-    "BusinessForPHLivePhoto"
   ]
   pod "QMUIKit"
   pod "SnapKit"

@@ -11,7 +11,6 @@ import JSMediaBrowser
 import PhotosUI
 
 typealias PhotoImageView = PhotoGeneralView<ZoomView<SDAnimatedImageView>, SDAnimatedImageView>
-typealias PhotoLivePhotoView = PhotoGeneralView<ZoomView<PHLivePhotoView>, PHLivePhotoView>
 
 extension PhotoGeneralView {
     
@@ -24,13 +23,4 @@ extension PhotoGeneralView {
     
 }
 
-extension ZoomView {
-    
-    convenience init(assetView: AssetView) {
-        let thumbnailView = SDAnimatedImageView().then {
-            $0.autoPlayAnimatedImage = false
-        }
-        self.init(assetView: assetView, thumbnailView: thumbnailView)
-    }
-    
-}
+extension SDAnimatedImageView: @retroactive ZoomAssetView {}
