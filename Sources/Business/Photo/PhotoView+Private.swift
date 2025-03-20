@@ -25,6 +25,10 @@ internal extension PhotoView {
         return self.zoomView.thumbnailView
     }
     
+    var image: UIImage? {
+        return self.zoomView.assetView.image
+    }
+    
     func setAnyAsset(_ asset: (any ZoomAsset)?, thumbnail: UIImage?) {
         if let asset = asset {
             assert(self.isAsset(asset), "类型不匹配，理论上不会出现此情况，请按照堆栈检查代码")

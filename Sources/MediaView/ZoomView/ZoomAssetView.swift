@@ -19,9 +19,20 @@ public protocol ZoomAssetView: UIView {
     
     var asset: Asset? { get set }
     
+    var image: UIImage? { get }
+    
     var isPlaying: Bool { get }
     
     func startPlaying()
     func stopPlaying()
     
 }
+
+public extension ZoomAssetView where Asset: UIImage {
+    
+    var image: UIImage? {
+        return self.asset
+    }
+    
+}
+ 

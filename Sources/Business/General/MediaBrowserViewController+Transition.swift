@@ -80,12 +80,10 @@ extension TransitionAdapter: UIViewControllerTransitioningDelegate, TransitionAn
             return nil
         }
         if let cell = owner.currentPageCell as? PhotoCell {
-            if let image = cell.photoView.thumbnail {
+            if let image = cell.photoView.image ?? cell.photoView.thumbnail {
                 return image
             } else if let thumbnail = owner.dataSource[owner.currentPage].thumbnail {
                 return thumbnail
-            } else if let image = cell.photoView.asset as? UIImage {
-                return image
             } else {
                 return nil
             }
