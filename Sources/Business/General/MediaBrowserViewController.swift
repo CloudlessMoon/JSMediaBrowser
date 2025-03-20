@@ -339,8 +339,8 @@ extension MediaBrowserViewController: MediaBrowserViewDataSource {
             cell.photoView.setError(error)
         }
         
-        updateAsset(cell, nil)
         updateThumbnail(cell, dataItem.thumbnail)
+        updateAsset(cell, nil)
         updateProgress(cell, 0, 0)
         updateError(cell, nil)
         
