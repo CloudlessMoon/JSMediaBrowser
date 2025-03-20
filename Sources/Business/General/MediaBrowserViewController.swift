@@ -323,9 +323,9 @@ extension MediaBrowserViewController: MediaBrowserViewDataSource {
         /// create
         cell.createPhotoView(dataItem.builder.createView())
         
-        let updateAsset = { [weak self] (cell: PhotoCell, asset: (any ZoomAsset)?, thumbnail: UIImage?) in
+        let updateAsset = { [weak self] (cell: PhotoCell, asset: (any ZoomAsset)?) in
             guard let self = self else { return }
-            cell.photoView.setAnyAsset(asset, thumbnail: thumbnail)
+            cell.photoView.setAnyAsset(asset, thumbnail: dataItem.thumbnail)
             /// 解决资源下载完成后不播放的问题
             self.startPlaying(for: cell, at: index)
         }
@@ -339,7 +339,7 @@ extension MediaBrowserViewController: MediaBrowserViewDataSource {
         let updateProgress = { (cell: PhotoCell, receivedSize: Int, expectedSize: Int) in
             cell.photoView.setProgress(received: receivedSize, expected: expectedSize)
         }
-        updateAsset(cell, nil, dataItem.thumbnail)
+        updateAsset(cell, nil)
         updateProgress(cell, 0, 0)
         updateError(cell, nil, false)
         
@@ -365,10 +365,10 @@ extension MediaBrowserViewController: MediaBrowserViewDataSource {
                     }
                     switch result {
                     case .success(let asset):
-                        updateAsset(cell, asset, nil)
+                        updateAsset(cell, asset)
                     case .failure(let error):
                         if !error.isCancelled {
-                            updateAsset(cell, nil, nil)
+                            updateAsset(cell, nil)
                         }
                         updateError(cell, error as NSError, error.isCancelled)
                     }
