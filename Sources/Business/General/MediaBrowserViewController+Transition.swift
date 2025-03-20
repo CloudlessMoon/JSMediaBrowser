@@ -82,9 +82,10 @@ extension TransitionAdapter: UIViewControllerTransitioningDelegate, TransitionAn
         if let cell = owner.currentPageCell as? PhotoCell {
             let image = cell.photoView.image
             let thumbnail = cell.photoView.thumbnail ?? owner.dataSource[owner.currentPage].thumbnail
-            if owner.isBeingPresented {
+            switch self.animator.type {
+            case .presenting:
                 return thumbnail ?? image
-            } else {
+            case .dismiss:
                 return image ?? thumbnail
             }
         }
