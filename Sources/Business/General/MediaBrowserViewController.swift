@@ -325,23 +325,24 @@ extension MediaBrowserViewController: MediaBrowserViewDataSource {
         
         let updateAsset = { [weak self] (cell: PhotoCell, asset: (any ZoomAsset)?) in
             guard let self = self else { return }
-            cell.photoView.setAnyAsset(asset, thumbnail: dataItem.thumbnail)
+            cell.photoView.asset = asset
             /// 解决资源下载完成后不播放的问题
             self.startPlaying(for: cell, at: index)
         }
-        let updateError = { (cell: PhotoCell, error: NSError?, isCancelled: Bool) in
-            if isCancelled && (cell.photoView.asset != nil || cell.photoView.thumbnail != nil) {
-                cell.photoView.setError(nil, cancelled: isCancelled)
-            } else {
-                cell.photoView.setError(error, cancelled: isCancelled)
-            }
+        let updateThumbnail = { (cell: PhotoCell, thumbnail: UIImage?) in
+            cell.photoView.thumbnail = thumbnail
         }
         let updateProgress = { (cell: PhotoCell, receivedSize: Int, expectedSize: Int) in
             cell.photoView.setProgress(received: receivedSize, expected: expectedSize)
         }
+        let updateError = { (cell: PhotoCell, error: PhotoMediatorError?) in
+            cell.photoView.setError(error)
+        }
+        
         updateAsset(cell, nil)
+        updateThumbnail(cell, dataItem.thumbnail)
         updateProgress(cell, 0, 0)
-        updateError(cell, nil, false)
+        updateError(cell, nil)
         
         if let token = cell.mb_requestToken, !token.isCancelled {
             token.cancel()
@@ -367,10 +368,7 @@ extension MediaBrowserViewController: MediaBrowserViewDataSource {
                     case .success(let asset):
                         updateAsset(cell, asset)
                     case .failure(let error):
-                        if !error.isCancelled {
-                            updateAsset(cell, nil)
-                        }
-                        updateError(cell, error as NSError, error.isCancelled)
+                        updateError(cell, error)
                     }
                 }
             }

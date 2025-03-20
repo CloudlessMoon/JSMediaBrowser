@@ -20,6 +20,10 @@ extension PHLivePhotoView: ZoomAssetView {
         }
     }
     
+    public var image: UIImage? {
+        return nil
+    }
+    
     public var isPlaying: Bool {
         return self.delegator?.isPlaying ?? false
     }

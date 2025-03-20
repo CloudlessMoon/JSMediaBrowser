@@ -177,30 +177,21 @@ open class ZoomView<AssetView: ZoomAssetView>: BasisMediaView {
 extension ZoomView {
     
     public var isPlaying: Bool {
-        if self.asset != nil {
-            return self.assetView.isPlaying
-        } else if self.thumbnail != nil {
-            return self.thumbnailView.isAnimating
-        } else {
-            return false
-        }
+        return self.assetView.isPlaying
     }
     
     public func startPlaying() {
-        if self.asset != nil, !self.assetView.isPlaying {
-            self.assetView.startPlaying()
-        } else if self.thumbnail != nil, !self.thumbnailView.isAnimating {
-            self.thumbnailView.startAnimating()
+        guard self.asset != nil && !self.assetView.isPlaying else {
+            return
         }
+        self.assetView.startPlaying()
     }
     
     public func stopPlaying() {
-        if self.assetView.isPlaying {
-            self.assetView.stopPlaying()
+        guard self.assetView.isPlaying else {
+            return
         }
-        if self.thumbnailView.isAnimating {
-            self.thumbnailView.stopAnimating()
-        }
+        self.assetView.stopPlaying()
     }
     
     public var zoomScale: CGFloat {

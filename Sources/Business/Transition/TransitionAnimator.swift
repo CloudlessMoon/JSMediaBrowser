@@ -146,7 +146,7 @@ extension TransitionAnimator {
         transitionContainerView.addSubview(imageView)
         
         imageView.frame = isAppear ? source.rect : target.rect
-        imageView.startAnimating()
+        imageView.stopAnimating()
         
         let transitionAnimatorViews = self.delegate?.transitionAnimatorViews
         if isAppear {

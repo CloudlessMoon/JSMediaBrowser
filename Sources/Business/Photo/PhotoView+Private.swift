@@ -10,7 +10,17 @@ import UIKit
 internal extension PhotoView {
     
     var asset: (any ZoomAsset)? {
-        return self.zoomView.asset
+        get {
+            return self.zoomView.asset
+        }
+        set {
+            if let asset = newValue {
+                assert(self.isAsset(asset), "类型不匹配，理论上不会出现此情况，请按照堆栈检查代码")
+                self.setAsset(self.asAsset(asset))
+            } else {
+                self.setAsset(nil)
+            }
+        }
     }
     
     var assetView: any ZoomAssetView {
@@ -18,7 +28,12 @@ internal extension PhotoView {
     }
     
     var thumbnail: UIImage? {
-        return self.zoomView.thumbnail
+        get {
+            return self.zoomView.thumbnail
+        }
+        set {
+            self.zoomView.thumbnail = newValue
+        }
     }
     
     var thumbnailView: UIImageView {
@@ -27,15 +42,6 @@ internal extension PhotoView {
     
     var image: UIImage? {
         return self.zoomView.assetView.image
-    }
-    
-    func setAnyAsset(_ asset: (any ZoomAsset)?, thumbnail: UIImage?) {
-        if let asset = asset {
-            assert(self.isAsset(asset), "类型不匹配，理论上不会出现此情况，请按照堆栈检查代码")
-            self.setAsset(self.asAsset(asset), thumbnail: thumbnail)
-        } else {
-            self.setAsset(nil, thumbnail: thumbnail)
-        }
     }
     
     func setViewport(insets: UIEdgeInsets, maximumSize: CGSize) {

@@ -46,11 +46,8 @@ open class PhotoGeneralView<ZoomViewType: ZoomView<ZoomAssetViewType>, ZoomAsset
         return view
     }()
     
-    private var error: NSError? {
+    private var error: PhotoMediatorError? {
         didSet {
-            guard oldValue != self.error else {
-                return
-            }
             self.updateProgress()
         }
     }
@@ -115,8 +112,11 @@ open class PhotoGeneralView<ZoomViewType: ZoomView<ZoomAssetViewType>, ZoomAsset
 
 extension PhotoGeneralView {
     
-    public func setAsset(_ asset: ZoomAssetViewType.Asset?, thumbnail: UIImage?) {
+    public func setAsset(_ asset: ZoomAssetViewType.Asset?) {
         self.zoomView.asset = asset
+    }
+    
+    public func setThumbnail(_ thumbnail: UIImage?) {
         self.zoomView.thumbnail = thumbnail
     }
     
@@ -130,10 +130,14 @@ extension PhotoGeneralView {
         self.progressView.setProgress(self.progress ?? 0, animated: true)
     }
     
-    public func setError(_ error: NSError?, cancelled: Bool) {
-        self.error = error
+    public func setError(_ error: PhotoMediatorError?) {
+        if let error = error, !error.isCancelled {
+            self.error = error
+        } else {
+            self.error = nil
+        }
         
-        if let error = error {
+        if let error = self.error {
             self.emptyView.title = NSAttributedString(string: error.localizedDescription, attributes: nil)
             self.emptyView.isHidden = false
         } else {

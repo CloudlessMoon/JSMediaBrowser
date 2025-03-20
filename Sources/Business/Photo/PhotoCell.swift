@@ -60,7 +60,11 @@ private final class UselessPhotoView: UIView, PhotoView {
         return ZoomView(assetView: UIImageView(), thumbnailView: UIImageView())
     }
     
-    func setAsset(_ asset: ZoomAssetViewType.Asset?, thumbnail: UIImage?) {
+    func setAsset(_ asset: ZoomAssetViewType.Asset?) {
+        self.assertion()
+    }
+    
+    func setThumbnail(_ thumbnail: UIImage?) {
         self.assertion()
     }
     
@@ -68,7 +72,7 @@ private final class UselessPhotoView: UIView, PhotoView {
         self.assertion()
     }
     
-    func setError(_ error: NSError?, cancelled: Bool) {
+    func setError(_ error: PhotoMediatorError?) {
         self.assertion()
     }
     

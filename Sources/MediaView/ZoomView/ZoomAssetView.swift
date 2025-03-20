@@ -35,4 +35,3 @@ public extension ZoomAssetView where Asset: UIImage {
     }
     
 }
- 
