@@ -14,35 +14,40 @@ open class PieProgressView: UIControl {
         case ring
     }
     
+    public private(set) var value: Float = 0.0
+    
     public var shape: Shape = .sector {
         didSet {
+            guard oldValue != self.shape else {
+                return
+            }
             self.progressLayer.shape = self.shape
         }
     }
     
     public var animationDuration: CFTimeInterval = 0.5 {
         didSet {
-            self.progressLayer.animationDuration = self.animationDuration
-        }
-    }
-    
-    public var progress: Float = 0.0 {
-        didSet {
-            guard self.needSetProgress else {
+            guard oldValue != self.animationDuration else {
                 return
             }
-            self.setProgress(self.progress, animated: false)
+            self.progressLayer.animationDuration = self.animationDuration
         }
     }
     
     public var minimumProgress: Float = 0.05 {
         didSet {
-            self.progress = Float(self.progress)
+            guard oldValue != self.minimumProgress else {
+                return
+            }
+            self.setValue(self.value, animated: false)
         }
     }
     
     public var trackWidth: CGFloat = 2.0 {
         didSet {
+            guard oldValue != self.trackWidth else {
+                return
+            }
             self.progressLayer.trackWidth = self.trackWidth
             self.trackLayer.borderWidth = self.trackWidth
         }
@@ -50,6 +55,9 @@ open class PieProgressView: UIControl {
     
     public var trackColor: UIColor? {
         didSet {
+            guard oldValue != self.trackColor else {
+                return
+            }
             self.progressLayer.trackColor = self.trackColor
             self.trackLayer.borderColor = self.trackColor?.cgColor
         }
@@ -57,17 +65,30 @@ open class PieProgressView: UIControl {
     
     public var lineWidth: CGFloat = 2.0 {
         didSet {
+            guard oldValue != self.lineWidth else {
+                return
+            }
             self.progressLayer.lineWidth = self.lineWidth
         }
     }
     
     public var spacing: CGFloat = 3.0 {
         didSet {
+            guard oldValue != self.spacing else {
+                return
+            }
             self.progressLayer.spacing = self.spacing
         }
     }
     
-    private var needSetProgress: Bool = true
+    public var contentInset: UIEdgeInsets = .zero {
+        didSet {
+            guard oldValue != self.contentInset else {
+                return
+            }
+            self.setNeedsLayout()
+        }
+    }
     
     private lazy var progressLayer: PieProgressLayer = {
         return PieProgressLayer()
@@ -89,24 +110,20 @@ open class PieProgressView: UIControl {
     
     open func didInitialize() {
         self.backgroundColor = nil
-        self.lineWidth = CGFloat(self.lineWidth)
-        self.trackWidth = CGFloat(self.trackWidth)
-        self.spacing = CGFloat(self.spacing)
-        self.progress = Float(self.progress)
-        self.animationDuration = CGFloat(self.animationDuration)
-        
         self.layer.addSublayer(self.trackLayer)
         self.layer.addSublayer(self.progressLayer)
         
-        self.setProgress(0, animated: false)
+        self.updateUI()
     }
     
     open override func layoutSubviews() {
         super.layoutSubviews()
-        self.progressLayer.frame = self.bounds
-        self.progressLayer.cornerRadius = min(self.bounds.width, self.bounds.height) / 2
+        let bounds = self.bounds.inset(by: self.contentInset)
         
-        self.trackLayer.frame = self.bounds
+        self.progressLayer.frame = bounds
+        self.progressLayer.cornerRadius = min(bounds.width, bounds.height) / 2
+        
+        self.trackLayer.frame = self.progressLayer.frame
         self.trackLayer.cornerRadius = self.progressLayer.cornerRadius
     }
     
@@ -125,15 +142,39 @@ open class PieProgressView: UIControl {
 
 extension PieProgressView {
     
-    public func setProgress(_ progress: Float, animated: Bool) {
-        self.needSetProgress = false
-        self.progress = max(self.minimumProgress, min(1.0, progress))
-        self.needSetProgress = true
+    public func setValue(_ value: Float, animated: Bool) {
+        let value = max(self.minimumProgress, min(1.0, value))
+        guard self.value != value else {
+            return
+        }
+        self.value = value
         
         self.progressLayer.shouldChangeProgressWithAnimation = animated
-        self.progressLayer.progress = self.progress
+        self.progressLayer.progress = self.value
         self.progressLayer.setNeedsDisplay()
         self.sendActions(for: UIControl.Event.valueChanged)
+    }
+    
+}
+
+extension PieProgressView {
+    
+    private func updateUI() {
+        self.progressLayer.shape = self.shape
+        
+        self.progressLayer.animationDuration = self.animationDuration
+        
+        self.progressLayer.trackWidth = self.trackWidth
+        self.trackLayer.borderWidth = self.trackWidth
+        
+        self.progressLayer.trackColor = self.trackColor
+        self.trackLayer.borderColor = self.trackColor?.cgColor
+        
+        self.progressLayer.lineWidth = self.lineWidth
+        
+        self.progressLayer.spacing = self.spacing
+        
+        self.setValue(self.minimumProgress, animated: false)
     }
     
 }

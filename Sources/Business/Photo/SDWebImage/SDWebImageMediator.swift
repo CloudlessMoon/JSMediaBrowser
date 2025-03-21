@@ -28,6 +28,10 @@ public struct SDWebImageMediator: PhotoMediator {
         progress: @escaping PhotoMediatorProgress,
         completed: @escaping PhotoMediatorCompletion<UIImage>
     ) -> PhotoMediatorRequestToken? {
+        guard let source = source else {
+            completed(.success(nil))
+            return nil
+        }
         return self.manager.loadImage(
             with: source,
             options: self.options,

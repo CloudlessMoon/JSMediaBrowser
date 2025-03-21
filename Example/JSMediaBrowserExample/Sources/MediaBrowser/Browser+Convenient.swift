@@ -8,15 +8,15 @@
 import UIKit
 import SDWebImage
 import JSMediaBrowser
-import PhotosUI
 
 typealias PhotoImageView = PhotoGeneralView<ZoomView<SDAnimatedImageView>, SDAnimatedImageView>
 
 extension PhotoGeneralView {
     
     convenience init(zoomView: ZoomViewType) {
+        let image = UIImage(named: "img_fail")?.sd_resizedImage(with: .init(width: 80, height: 80), scaleMode: .aspectFit)
         self.init(
-            configuration: .init(emptyImage: UIImage(named: "img_fail")),
+            configuration: .init(emptyImage: image),
             zoomView: zoomView
         )
     }

@@ -11,17 +11,9 @@ open class PhotoGeneralView<ZoomViewType: ZoomView<ZoomAssetViewType>, ZoomAsset
     
     public struct Configuration {
         public var emptyImage: UIImage?
-        public var progressTintColor: UIColor?
-        public var progressBackgroundColor: UIColor?
         
-        public init(
-            emptyImage: UIImage? = nil,
-            progressTintColor: UIColor? = .white,
-            progressBackgroundColor: UIColor? = .black.withAlphaComponent(0.15)
-        ) {
+        public init(emptyImage: UIImage? = nil) {
             self.emptyImage = emptyImage
-            self.progressTintColor = progressTintColor
-            self.progressBackgroundColor = progressBackgroundColor
         }
     }
     
@@ -31,18 +23,18 @@ open class PhotoGeneralView<ZoomViewType: ZoomView<ZoomAssetViewType>, ZoomAsset
     
     public private(set) lazy var emptyView: EmptyView = {
         let view = EmptyView()
-        view.isHidden = true
+        view.backgroundColor = .black.withAlphaComponent(0.4)
+        view.layer.cornerRadius = 8
+        view.contentInset = UIEdgeInsets(top: 15, left: 15, bottom: 15, right: 15)
         return view
     }()
     
     public private(set) lazy var progressView: PieProgressView = {
         let view = PieProgressView()
-        return PieProgressView()
-    }()
-    
-    public private(set) lazy var progressBackgroundView: UIView = {
-        let view = UIView()
+        view.tintColor = .white
+        view.backgroundColor = .black.withAlphaComponent(0.15)
         view.layer.cornerRadius = 8
+        view.contentInset = UIEdgeInsets(top: 10, left: 10, bottom: 10, right: 10)
         return view
     }()
     
@@ -76,33 +68,30 @@ open class PhotoGeneralView<ZoomViewType: ZoomView<ZoomAssetViewType>, ZoomAsset
     
     open func didInitialize() {
         self.addSubview(self.zoomView)
+        self.addSubview(self.progressView)
         self.addSubview(self.emptyView)
-        self.addSubview(self.progressBackgroundView)
-        self.progressBackgroundView.addSubview(self.progressView)
         
-        self.emptyView.image = self.configuration.emptyImage
-        self.progressView.tintColor = self.configuration.progressTintColor
-        self.progressBackgroundView.backgroundColor = self.configuration.progressBackgroundColor
-        
-        self.updateProgress()
+        self.updateUI()
     }
     
     open override func layoutSubviews() {
         super.layoutSubviews()
         self.zoomView.frame = self.bounds
-        self.emptyView.frame = self.bounds
         
-        let progressBackgroundSize = min(self.bounds.width * 0.16, 80)
-        self.progressBackgroundView.frame = CGRect(
-            x: (self.bounds.width - progressBackgroundSize) / 2,
-            y: (self.bounds.height - progressBackgroundSize) / 2,
-            width: progressBackgroundSize,
-            height: progressBackgroundSize
+        let spacing = 20.0
+        let emptyLimitSize = CGSize(width: self.bounds.width - spacing, height: .greatestFiniteMagnitude)
+        let emptySize = self.emptyView.sizeThatFits(emptyLimitSize)
+        self.emptyView.frame = CGRect(
+            x: (self.bounds.width - emptySize.width) / 2,
+            y: (self.bounds.height - emptySize.height) / 2,
+            width: emptySize.width,
+            height: emptySize.height
         )
-        let progressSize = progressBackgroundSize - 20
+        
+        let progressSize = min(self.bounds.width * 0.17, 75)
         self.progressView.frame = CGRect(
-            x: (progressBackgroundSize - progressSize) / 2,
-            y: (progressBackgroundSize - progressSize) / 2,
+            x: (self.bounds.width - progressSize) / 2,
+            y: (self.bounds.height - progressSize) / 2,
             width: progressSize,
             height: progressSize
         )
@@ -127,7 +116,7 @@ extension PhotoGeneralView {
             self.progress = nil
         }
         
-        self.progressView.setProgress(self.progress ?? 0, animated: true)
+        self.progressView.setValue(self.progress ?? 0, animated: true)
     }
     
     public func setError(_ error: PhotoMediatorError?) {
@@ -138,7 +127,7 @@ extension PhotoGeneralView {
         }
         
         if let error = self.error {
-            self.emptyView.title = NSAttributedString(string: error.localizedDescription, attributes: nil)
+            self.emptyView.title = error.localizedDescription
             self.emptyView.isHidden = false
         } else {
             self.emptyView.isHidden = true
@@ -149,11 +138,18 @@ extension PhotoGeneralView {
 
 extension PhotoGeneralView {
     
+    private func updateUI() {
+        self.emptyView.image = self.configuration.emptyImage
+        
+        self.setError(nil)
+        self.updateProgress()
+    }
+    
     private func updateProgress() {
         if self.error != nil || self.progress == 1 || self.progress == nil {
-            self.progressBackgroundView.isHidden = true
+            self.progressView.isHidden = true
         } else {
-            self.progressBackgroundView.isHidden = false
+            self.progressView.isHidden = false
         }
     }
     
