@@ -45,7 +45,7 @@ struct ImageBuilder: PhotoBuilder {
     }
     
     func createTransitionView() -> UIImageView {
-        let imageView = SDAnimatedImageView()
+        let imageView = View.ZoomAssetViewType()
         imageView.autoPlayAnimatedImage = false
         return imageView
     }

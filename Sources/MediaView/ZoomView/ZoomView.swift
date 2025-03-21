@@ -129,15 +129,7 @@ open class ZoomView<AssetView: ZoomAssetView>: BasisMediaView {
         }
         
         /// assetView
-        let assetSize = {
-            if let asset = self.assetView.asset {
-                return asset.size
-            } else if let thumbnail = self.assetView.thumbnail {
-                return thumbnail.size
-            } else {
-                return .zero
-            }
-        }()
+        let assetSize = self.assetView.sizeThatFits(self.bounds.size)
         self.assetView.frame = self.contentViewFrameThatFits(assetSize)
         
         /// scrollView.content

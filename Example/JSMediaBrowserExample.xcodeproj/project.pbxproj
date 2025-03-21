@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		7A6D25CA2D8D031C00582C1B /* Browser+ZoomAsset.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A6D25C92D8D031C00582C1B /* Browser+ZoomAsset.swift */; };
+		7A6D25CB2D8D031C00582C1B /* Browser+ZoomAsset.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A6D25C92D8D031C00582C1B /* Browser+ZoomAsset.swift */; };
 		7A730FA92D22719D006C8FA6 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A730F9F2D22719D006C8FA6 /* AppDelegate.swift */; };
 		7A730FAC2D22719D006C8FA6 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7A730FA02D22719D006C8FA6 /* Assets.xcassets */; };
 		7A730FAE2D22719D006C8FA6 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7A730FA32D22719D006C8FA6 /* LaunchScreen.storyboard */; };
@@ -56,6 +58,7 @@
 		33FEC61117D9E153785DAB8A /* Pods-JSMediaBrowserExampleMacOS.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-JSMediaBrowserExampleMacOS.release.xcconfig"; path = "Target Support Files/Pods-JSMediaBrowserExampleMacOS/Pods-JSMediaBrowserExampleMacOS.release.xcconfig"; sourceTree = "<group>"; };
 		382E47F6077E027B6EF9A441 /* Pods-JSMediaBrowserExample.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-JSMediaBrowserExample.debug.xcconfig"; path = "Target Support Files/Pods-JSMediaBrowserExample/Pods-JSMediaBrowserExample.debug.xcconfig"; sourceTree = "<group>"; };
 		55FEF3CE8C59B767521C3A7C /* Pods-JSMediaBrowserExampleMacOS.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-JSMediaBrowserExampleMacOS.debug.xcconfig"; path = "Target Support Files/Pods-JSMediaBrowserExampleMacOS/Pods-JSMediaBrowserExampleMacOS.debug.xcconfig"; sourceTree = "<group>"; };
+		7A6D25C92D8D031C00582C1B /* Browser+ZoomAsset.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Browser+ZoomAsset.swift"; sourceTree = "<group>"; };
 		7A730F872D227191006C8FA6 /* JSMediaBrowserExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = JSMediaBrowserExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		7A730F9F2D22719D006C8FA6 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		7A730FA02D22719D006C8FA6 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -208,6 +211,7 @@
 			children = (
 				7AE273A82D261C1600E72D33 /* Browser.swift */,
 				7AE05C122D8434C10067CEC1 /* Browser+Convenient.swift */,
+				7A6D25C92D8D031C00582C1B /* Browser+ZoomAsset.swift */,
 				7A730FC12D2271E2006C8FA6 /* BrowserViewController.swift */,
 				7A730FC22D2271E2006C8FA6 /* PageControl.swift */,
 				7A730FC32D2271E2006C8FA6 /* ShareControl.swift */,
@@ -456,6 +460,7 @@
 				7AE273A92D261C1600E72D33 /* Browser.swift in Sources */,
 				7A730FC62D2271E2006C8FA6 /* HomeViewController.swift in Sources */,
 				7AE05C132D8434C10067CEC1 /* Browser+Convenient.swift in Sources */,
+				7A6D25CA2D8D031C00582C1B /* Browser+ZoomAsset.swift in Sources */,
 				7A730FC72D2271E2006C8FA6 /* ShareControl.swift in Sources */,
 				7AE273B92D26313000E72D33 /* AppDelegate+Debug.swift in Sources */,
 				7A730FC82D2271E2006C8FA6 /* BrowserViewController.swift in Sources */,
@@ -472,6 +477,7 @@
 				7AE273AA2D261C1600E72D33 /* Browser.swift in Sources */,
 				7A730FD72D2272D1006C8FA6 /* HomeViewController.swift in Sources */,
 				7AE05C142D8434C10067CEC1 /* Browser+Convenient.swift in Sources */,
+				7A6D25CB2D8D031C00582C1B /* Browser+ZoomAsset.swift in Sources */,
 				7A730FD82D2272D1006C8FA6 /* ShareControl.swift in Sources */,
 				7AE273B82D26313000E72D33 /* AppDelegate+Debug.swift in Sources */,
 				7A730FD92D2272D1006C8FA6 /* BrowserViewController.swift in Sources */,

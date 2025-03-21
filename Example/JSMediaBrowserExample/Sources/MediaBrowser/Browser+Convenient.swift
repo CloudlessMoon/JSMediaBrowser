@@ -22,5 +22,3 @@ extension PhotoGeneralView {
     }
     
 }
-
-extension SDAnimatedImageView: @retroactive ZoomAssetView {}
