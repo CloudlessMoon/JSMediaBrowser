@@ -78,7 +78,7 @@ open class PhotoGeneralView<ZoomViewType: ZoomView<ZoomAssetViewType>, ZoomAsset
         super.layoutSubviews()
         self.zoomView.frame = self.bounds
         
-        let spacing = 20.0
+        let spacing = 30.0
         let emptyLimitSize = CGSize(width: self.bounds.width - spacing, height: .greatestFiniteMagnitude)
         let emptySize = self.emptyView.sizeThatFits(emptyLimitSize)
         self.emptyView.frame = CGRect(
@@ -132,6 +132,8 @@ extension PhotoGeneralView {
         } else {
             self.emptyView.isHidden = true
         }
+        
+        self.setNeedsLayout()
     }
     
 }
