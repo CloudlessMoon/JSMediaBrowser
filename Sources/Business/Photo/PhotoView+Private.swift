@@ -32,7 +32,7 @@ internal extension PhotoView {
             return self.zoomView.thumbnail
         }
         set {
-            self.zoomView.thumbnail = newValue
+            self.setThumbnail(newValue)
         }
     }
     
