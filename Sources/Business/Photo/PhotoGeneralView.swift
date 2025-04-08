@@ -88,7 +88,7 @@ open class PhotoGeneralView<ZoomViewType: ZoomView<ZoomAssetViewType>, ZoomAsset
             height: emptySize.height
         )
         
-        let progressSize = min(self.bounds.width * 0.17, 75)
+        let progressSize = min(self.bounds.width * 0.15, 75)
         self.progressView.frame = CGRect(
             x: (self.bounds.width - progressSize) / 2,
             y: (self.bounds.height - progressSize) / 2,
