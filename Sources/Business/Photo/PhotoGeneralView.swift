@@ -33,7 +33,6 @@ open class PhotoGeneralView<ZoomViewType: ZoomView<ZoomAssetViewType>, ZoomAsset
         let view = PieProgressView()
         view.tintColor = .white
         view.backgroundColor = .black.withAlphaComponent(0.15)
-        view.layer.cornerRadius = 8
         view.contentInset = UIEdgeInsets(top: 10, left: 10, bottom: 10, right: 10)
         return view
     }()
@@ -95,6 +94,9 @@ open class PhotoGeneralView<ZoomViewType: ZoomView<ZoomAssetViewType>, ZoomAsset
             width: progressSize,
             height: progressSize
         )
+        if self.progressView.layer.cornerRadius != progressSize / 2 {
+            self.progressView.layer.cornerRadius = progressSize / 2
+        }
     }
     
 }
