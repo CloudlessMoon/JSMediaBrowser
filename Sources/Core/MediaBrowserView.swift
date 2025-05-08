@@ -80,8 +80,6 @@ open class MediaBrowserView: UIView {
     
     private var registeredCellIdentifiers = NSMutableSet()
     
-    private var previousOffsetIndex: CGFloat = 0.0
-    
     private var isScrollingToPage: Bool = false
     private var draggingPage: Int?
     private var endScrollingCompletions: [() -> Void] = []
@@ -338,24 +336,10 @@ extension MediaBrowserView: UIScrollViewDelegate {
         guard !self.collectionView.bounds.isEmpty else {
             return
         }
-        let offsetIndex = self.offsetIndex
-        defer {
-            self.previousOffsetIndex = offsetIndex
-        }
-        guard self.isDragging || self.isDecelerating || self.isTracking else {
+        guard (self.isDragging || self.isDecelerating || self.isTracking) && !self.isScrollingToPage else {
             return
         }
-        let betweenOrEqual = { (minimumValue: CGFloat, value: CGFloat, maximumValue: CGFloat) -> Bool in
-            return minimumValue <= value && value <= maximumValue
-        }
-        let fastToRight = (floor(offsetIndex) - floor(self.previousOffsetIndex) >= 1.0) && (floor(offsetIndex) - self.previousOffsetIndex > 0.5)
-        let turnPageToRight = fastToRight || betweenOrEqual(self.previousOffsetIndex, floor(offsetIndex) + 0.5, offsetIndex)
-        let fastToLeft = (floor(self.previousOffsetIndex) - floor(offsetIndex) >= 1.0) && (self.previousOffsetIndex - ceil(offsetIndex) > 0.5)
-        let turnPageToLeft = fastToLeft || betweenOrEqual(offsetIndex, floor(offsetIndex) + 0.5, self.previousOffsetIndex)
-        guard turnPageToRight || turnPageToLeft else {
-            return
-        }
-        let index = Int(round(offsetIndex))
+        let index = Int(round(self.offsetIndex))
         guard index >= 0 && index < self.totalUnitPage && self.currentPage != index else {
             return
         }
