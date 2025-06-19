@@ -51,19 +51,19 @@ extension TransitionAdapter {
 extension TransitionAdapter: UIViewControllerTransitioningDelegate, TransitionAnimatorDelegate {
     
     func animationController(forPresented presented: UIViewController, presenting: UIViewController, source: UIViewController) -> UIViewControllerAnimatedTransitioning? {
-        return self.animator(type: .presenting)
+        return self.animator(type: .appear)
     }
     
     func animationController(forDismissed dismissed: UIViewController) -> UIViewControllerAnimatedTransitioning? {
-        return self.animator(type: .dismiss)
+        return self.animator(type: .disappear)
     }
     
     func interactionControllerForPresentation(using animator: UIViewControllerAnimatedTransitioning) -> UIViewControllerInteractiveTransitioning? {
-        return self.interactiver(type: .presenting)
+        return self.interactiver(type: .appear)
     }
     
     func interactionControllerForDismissal(using animator: UIViewControllerAnimatedTransitioning) -> UIViewControllerInteractiveTransitioning? {
-        return self.interactiver(type: .dismiss)
+        return self.interactiver(type: .disappear)
     }
     
     var transitionThumbnailView: UIImageView? {
@@ -82,10 +82,12 @@ extension TransitionAdapter: UIViewControllerTransitioningDelegate, TransitionAn
             let renderedImage = cell.photoView.renderedImage
             let thumbnail = cell.photoView.thumbnail ?? owner.dataSource[owner.currentPage].thumbnail
             switch self.animator.type {
-            case .presenting:
+            case .appear:
                 return thumbnail ?? renderedImage
-            case .dismiss:
+            case .disappear:
                 return renderedImage ?? thumbnail
+            case .none:
+                return nil
             }
         }
         return nil

@@ -8,13 +8,14 @@
 import UIKit
 
 public enum TransitionerType: Int {
-    case presenting
-    case dismiss
+    case none
+    case appear
+    case disappear
 }
 
 public class Transitioner: NSObject {
     
-    public var type: TransitionerType = .presenting
+    public var type: TransitionerType = .none
     
     public private(set) weak var context: UIViewControllerContextTransitioning?
     
@@ -42,7 +43,7 @@ extension Transitioner {
         let fromView: UIView = transitionContext.view(forKey: .from) ?? fromViewController.view
         let toView: UIView = transitionContext.view(forKey: .to) ?? toViewController.view
         let containerView: UIView = transitionContext.containerView
-        let isAppear = self.type == .presenting
+        let isAppear = self.type == .appear
         
         /// 添加视图
         if isAppear {

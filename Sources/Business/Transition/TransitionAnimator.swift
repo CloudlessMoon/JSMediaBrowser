@@ -71,7 +71,7 @@ extension TransitionAnimator {
         using transitionContext: UIViewControllerContextTransitioning,
         completed: @escaping ((Bool) -> Void)
     ) {
-        let isAppear = self.type == .presenting
+        let isAppear = self.type == .appear
         let containerView = transitionContext.containerView
         let style = isAppear ? self.appearStyle : self.disappearStyle
         switch style {
