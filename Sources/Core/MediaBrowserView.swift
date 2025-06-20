@@ -172,6 +172,12 @@ extension MediaBrowserView {
     }
     
     public func reloadData() {
+        // 超出范围，建议业务处理下，这里写个保底
+        let numberOfPages = self.dataSource?.numberOfPages(in: self) ?? 0
+        if self.currentPage > numberOfPages - 1 && self.currentPage > 0 {
+            self.setCurrentPage(max(numberOfPages - 1, 0), animated: false)
+        }
+        
         self.collectionView.reloadData()
     }
     
