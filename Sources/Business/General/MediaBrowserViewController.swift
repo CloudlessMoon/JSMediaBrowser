@@ -265,17 +265,6 @@ extension MediaBrowserViewController {
         self.isPresented = true
         self.presentedFromViewController = sender
         
-        let viewController = navigationController ?? self
-        viewController.modalPresentationCapturesStatusBarAppearance = true
-        viewController.modalPresentationStyle = {
-            if JSCoreHelper.isIPhone {
-                return .custom
-            } else {
-                return .overCurrentContext
-            }
-        }()
-        viewController.transitioningDelegate = self.transitionAdapter
-        
         var presenter = sender
         guard presenter.isViewLoaded else {
             assertionFailure()
@@ -289,6 +278,18 @@ extension MediaBrowserViewController {
         if let presentedViewController = presenter.presentedViewController {
             presenter = presentedViewController
         }
+        
+        let viewController = navigationController ?? self
+        viewController.modalPresentationCapturesStatusBarAppearance = true
+        viewController.modalPresentationStyle = {
+            if JSCoreHelper.isIPhone || JSCoreHelper.isIPod {
+                return .custom
+            } else {
+                return .overCurrentContext
+            }
+        }()
+        viewController.transitioningDelegate = self.transitionAdapter
+        
         presenter.present(viewController, animated: animated, completion: completion)
     }
     
