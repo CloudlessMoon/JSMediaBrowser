@@ -60,7 +60,7 @@ public extension ZoomAssetView where Self: UIImageView, Asset: UIImage {
         if #available(iOS 17, *), asset.isHighDynamicRange {
             UIView.transition(
                 with: self,
-                duration: 0.2,
+                duration: 0.25,
                 options: [.transitionCrossDissolve, .curveEaseInOut, .allowUserInteraction]
             ) {
                 self.image = asset
