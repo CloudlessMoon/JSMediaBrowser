@@ -28,4 +28,7 @@ public protocol ZoomAssetView: UIView {
     func startPlaying()
     func stopPlaying()
     
+    func didDisplayed()
+    func didEndDisplayed()
+    
 }

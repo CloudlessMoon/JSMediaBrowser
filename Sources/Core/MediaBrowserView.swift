@@ -339,6 +339,10 @@ extension MediaBrowserView: UICollectionViewDelegateFlowLayout {
 extension MediaBrowserView: UIScrollViewDelegate {
     
     public func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        defer {
+            self.delegate?.mediaBrowserViewDidScroll(self)
+        }
+        
         guard !self.collectionView.bounds.isEmpty else {
             return
         }
@@ -356,10 +360,18 @@ extension MediaBrowserView: UIScrollViewDelegate {
     }
     
     public func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
+        defer {
+            self.delegate?.mediaBrowserViewWillBeginDragging(self)
+        }
+        
         self.handleBeginDragging()
     }
     
     public func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
+        defer {
+            self.delegate?.mediaBrowserViewDidEndDragging(self, willDecelerate: decelerate)
+        }
+        
         guard !decelerate else {
             return
         }
@@ -367,6 +379,10 @@ extension MediaBrowserView: UIScrollViewDelegate {
     }
     
     public func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
+        defer {
+            self.delegate?.mediaBrowserViewDidEndDecelerating(self)
+        }
+        
         self.handleEndDecelerating()
     }
     

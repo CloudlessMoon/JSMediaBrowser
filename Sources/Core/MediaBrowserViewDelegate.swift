@@ -23,4 +23,12 @@ public protocol MediaBrowserViewDelegate: AnyObject {
     
     func mediaBrowserView(_ mediaBrowserView: MediaBrowserView, didLongPressAt index: Int, point: CGPoint)
     
+    func mediaBrowserViewDidScroll(_ mediaBrowserView: MediaBrowserView)
+    
+    func mediaBrowserViewWillBeginDragging(_ mediaBrowserView: MediaBrowserView)
+    
+    func mediaBrowserViewDidEndDragging(_ mediaBrowserView: MediaBrowserView, willDecelerate decelerate: Bool)
+    
+    func mediaBrowserViewDidEndDecelerating(_ mediaBrowserView: MediaBrowserView)
+    
 }

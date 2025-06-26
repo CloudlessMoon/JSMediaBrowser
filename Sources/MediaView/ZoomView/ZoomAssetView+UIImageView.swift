@@ -53,9 +53,32 @@ public extension ZoomAssetView where Self: UIImageView, Asset: UIImage {
         self.stopAnimating()
     }
     
+    func didDisplayed() {
+        guard let asset = self.asset else {
+            return
+        }
+        if #available(iOS 17, *), asset.isHighDynamicRange {
+            UIView.transition(
+                with: self,
+                duration: 0.2,
+                options: [.transitionCrossDissolve, .curveEaseInOut, .allowUserInteraction]
+            ) {
+                self.image = asset
+            }
+        }
+    }
+    
+    func didEndDisplayed() {
+        
+    }
+    
     private func updateImage() {
         if let asset = self.asset {
-            self.image = asset
+            if #available(iOS 17, *), asset.isHighDynamicRange {
+                self.image = asset.imageRestrictedToStandardDynamicRange()
+            } else {
+                self.image = asset
+            }
         } else {
             self.image = self.thumbnail
         }

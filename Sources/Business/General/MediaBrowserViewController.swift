@@ -100,7 +100,7 @@ open class MediaBrowserViewController: UIViewController {
             guard let cell = self.currentPageCell as? PhotoCell else {
                 return
             }
-            self.startPlaying(for: cell, at: self.currentPage)
+            self.didDisplayedCell(cell, at: self.currentPage)
         }
     }
     
@@ -328,7 +328,7 @@ extension MediaBrowserViewController: MediaBrowserViewDataSource {
             guard let self = self else { return }
             cell.photoView.asset = asset
             /// 解决资源下载完成后不播放的问题
-            self.startPlaying(for: cell, at: index)
+            self.didDisplayedCell(cell, at: index)
         }
         let updateThumbnail = { (cell: PhotoCell, thumbnail: UIImage?) in
             cell.photoView.thumbnail = thumbnail
@@ -393,7 +393,7 @@ extension MediaBrowserViewController: MediaBrowserViewDataSource {
         cell.photoView.setViewport(insets: insets, maximumSize: size)
     }
     
-    private func startPlaying(for cell: PhotoCell, at index: Int) {
+    private func didDisplayedCell(_ cell: PhotoCell, at index: Int) {
         guard self.isViewAppeared && !self.isDragging && !self.isDecelerating && !self.isScrollAnimating else {
             return
         }
@@ -403,6 +403,18 @@ extension MediaBrowserViewController: MediaBrowserViewDataSource {
         guard !cell.isHidden && cell.window != nil else {
             return
         }
+        cell.photoView.assetView.didDisplayed()
+        
+        self.startPlaying(for: cell, at: index)
+    }
+    
+    private func didEndDisplayedCell(_ cell: PhotoCell, at index: Int) {
+        cell.photoView.assetView.didEndDisplayed()
+        
+        self.stopPlaying(for: cell, at: index)
+    }
+    
+    private func startPlaying(for cell: PhotoCell, at index: Int) {
         if let eventHandler = self.eventHandler {
             if eventHandler.shouldStartPlaying(at: index) {
                 cell.photoView.startPlaying()
@@ -412,7 +424,7 @@ extension MediaBrowserViewController: MediaBrowserViewDataSource {
         }
     }
     
-    private func stopPlaying(for cell: PhotoCell) {
+    private func stopPlaying(for cell: PhotoCell, at index: Int) {
         cell.photoView.stopPlaying()
     }
     
@@ -422,15 +434,13 @@ extension MediaBrowserViewController: MediaBrowserViewDelegate {
     
     public func mediaBrowserView(_ mediaBrowserView: MediaBrowserView, willDisplay cell: UICollectionViewCell, forPageAt index: Int) {
         if let cell = cell as? PhotoCell {
-            self.startPlaying(for: cell, at: index)
-            
             self.eventHandler?.willDisplayPhotoCell(cell, at: index)
         }
     }
     
     public func mediaBrowserView(_ mediaBrowserView: MediaBrowserView, didEndDisplaying cell: UICollectionViewCell, forPageAt index: Int) {
         if let cell = cell as? PhotoCell {
-            self.stopPlaying(for: cell)
+            self.didEndDisplayedCell(cell, at: index)
             
             self.eventHandler?.didEndDisplayingPhotoCell(cell, at: index)
         }
@@ -441,10 +451,6 @@ extension MediaBrowserViewController: MediaBrowserViewDelegate {
     }
     
     public func mediaBrowserView(_ mediaBrowserView: MediaBrowserView, didScrollTo index: Int) {
-        if let cell = self.currentPageCell as? PhotoCell {
-            self.startPlaying(for: cell, at: index)
-        }
-        
         self.eventHandler?.didScroll(to: index)
     }
     
@@ -475,6 +481,29 @@ extension MediaBrowserViewController: MediaBrowserViewDelegate {
     
     public func mediaBrowserView(_ mediaBrowserView: MediaBrowserView, didLongPressAt index: Int, point: CGPoint) {
         self.eventHandler?.didLongPress(at: index, point: self.view.convert(point, from: mediaBrowserView))
+    }
+    
+    public func mediaBrowserViewDidScroll(_ mediaBrowserView: MediaBrowserView) {
+        
+    }
+    
+    public func mediaBrowserViewWillBeginDragging(_ mediaBrowserView: MediaBrowserView) {
+        
+    }
+    
+    public func mediaBrowserViewDidEndDragging(_ mediaBrowserView: MediaBrowserView, willDecelerate decelerate: Bool) {
+        guard !decelerate else {
+            return
+        }
+        if let cell = self.currentPageCell as? PhotoCell {
+            self.didDisplayedCell(cell, at: self.currentPage)
+        }
+    }
+    
+    public func mediaBrowserViewDidEndDecelerating(_ mediaBrowserView: MediaBrowserView) {
+        if let cell = self.currentPageCell as? PhotoCell {
+            self.didDisplayedCell(cell, at: self.currentPage)
+        }
     }
     
 }
