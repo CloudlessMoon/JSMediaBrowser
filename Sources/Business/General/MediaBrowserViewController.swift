@@ -217,7 +217,14 @@ extension MediaBrowserViewController {
     }
     
     public func setCurrentPage(_ index: Int, animated: Bool, completion: (() -> Void)? = nil) {
-        self.contentView.setCurrentPage(index, animated: animated, completion: completion)
+        self.contentView.setCurrentPage(index, animated: animated) { [weak self] in
+            guard let self = self else { return }
+            if let cell = self.currentPageCell as? PhotoCell {
+                self.didDisplayedCell(cell, at: self.currentPage)
+            }
+            
+            completion?()
+        }
     }
     
     public var isTracking: Bool {
