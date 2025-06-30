@@ -326,11 +326,8 @@ extension MediaBrowserViewController: MediaBrowserViewDataSource {
         /// create
         cell.createPhotoView(dataItem.builder.createPhotoView())
         
-        let updateAsset = { [weak self] (cell: PhotoCell, asset: (any ZoomAsset)?, index: Int) in
-            guard let self = self else { return }
+        let updateAsset = { (cell: PhotoCell, asset: (any ZoomAsset)?, index: Int) in
             cell.photoView.asset = asset
-            /// 解决资源下载完成后不播放的问题
-            self.didDisplayedCell(cell, at: index)
         }
         let updateThumbnail = { (cell: PhotoCell, thumbnail: UIImage?) in
             cell.photoView.thumbnail = thumbnail
@@ -362,14 +359,19 @@ extension MediaBrowserViewController: MediaBrowserViewDataSource {
                     updateProgress(cell, receivedSize, expectedSize)
                 }
             },
-            completed: { [weak cell] result in
+            completed: { [weak cell, weak self] result in
                 JSCurrentOrAsyncExecuteOnMainThread {
+                    guard let self = self else { return }
                     guard let cell = cell, identifier == cell.mb_requestIdentifier else {
                         return
                     }
                     switch result {
                     case .success(let asset):
                         updateAsset(cell, asset, index)
+                        if asset != nil {
+                            /// 资源下载完成后调用一次
+                            self.didDisplayedCell(cell, at: index)
+                        }
                     case .failure(let error):
                         updateError(cell, error)
                     }
