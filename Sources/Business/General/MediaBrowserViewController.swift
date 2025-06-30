@@ -97,10 +97,7 @@ open class MediaBrowserViewController: UIViewController {
             guard oldValue != self.isViewAppeared else {
                 return
             }
-            guard let cell = self.currentPageCell as? PhotoCell else {
-                return
-            }
-            self.didDisplayedCell(cell, at: self.currentPage)
+            self.notifyDisplayedCurrentCell()
         }
     }
     
@@ -219,9 +216,7 @@ extension MediaBrowserViewController {
     public func setCurrentPage(_ index: Int, animated: Bool, completion: (() -> Void)? = nil) {
         self.contentView.setCurrentPage(index, animated: animated) { [weak self] in
             guard let self = self else { return }
-            if let cell = self.currentPageCell as? PhotoCell {
-                self.didDisplayedCell(cell, at: self.currentPage)
-            }
+            self.notifyDisplayedCurrentCell()
             
             completion?()
         }
@@ -400,6 +395,13 @@ extension MediaBrowserViewController: MediaBrowserViewDataSource {
         cell.photoView.setViewport(insets: insets, maximumSize: size)
     }
     
+    private func notifyDisplayedCurrentCell() {
+        guard let cell = self.currentPageCell as? PhotoCell else {
+           return
+        }
+        self.didDisplayedCell(cell, at: self.currentPage)
+    }
+    
     private func didDisplayedCell(_ cell: PhotoCell, at index: Int) {
         guard self.isViewAppeared && !self.isDragging && !self.isDecelerating && !self.isScrollAnimating else {
             return
@@ -502,15 +504,11 @@ extension MediaBrowserViewController: MediaBrowserViewDelegate {
         guard !decelerate else {
             return
         }
-        if let cell = self.currentPageCell as? PhotoCell {
-            self.didDisplayedCell(cell, at: self.currentPage)
-        }
+        self.notifyDisplayedCurrentCell()
     }
     
     public func mediaBrowserViewDidEndDecelerating(_ mediaBrowserView: MediaBrowserView) {
-        if let cell = self.currentPageCell as? PhotoCell {
-            self.didDisplayedCell(cell, at: self.currentPage)
-        }
+        self.notifyDisplayedCurrentCell()
     }
     
 }
