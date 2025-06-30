@@ -326,7 +326,7 @@ extension MediaBrowserViewController: MediaBrowserViewDataSource {
         /// create
         cell.createPhotoView(dataItem.builder.createPhotoView())
         
-        let updateAsset = { [weak self] (cell: PhotoCell, asset: (any ZoomAsset)?) in
+        let updateAsset = { [weak self] (cell: PhotoCell, asset: (any ZoomAsset)?, index: Int) in
             guard let self = self else { return }
             cell.photoView.asset = asset
             /// 解决资源下载完成后不播放的问题
@@ -342,7 +342,7 @@ extension MediaBrowserViewController: MediaBrowserViewDataSource {
             cell.photoView.setError(error)
         }
         
-        updateAsset(cell, nil)
+        updateAsset(cell, nil, index)
         updateThumbnail(cell, dataItem.thumbnail)
         updateProgress(cell, 0, 0)
         updateError(cell, nil)
@@ -369,7 +369,7 @@ extension MediaBrowserViewController: MediaBrowserViewDataSource {
                     }
                     switch result {
                     case .success(let asset):
-                        updateAsset(cell, asset)
+                        updateAsset(cell, asset, index)
                     case .failure(let error):
                         updateError(cell, error)
                     }
@@ -443,6 +443,8 @@ extension MediaBrowserViewController: MediaBrowserViewDelegate {
     
     public func mediaBrowserView(_ mediaBrowserView: MediaBrowserView, willDisplay cell: UICollectionViewCell, forPageAt index: Int) {
         if let cell = cell as? PhotoCell {
+            self.didDisplayedCell(cell, at: index)
+            
             self.eventHandler?.willDisplayPhotoCell(cell, at: index)
         }
     }
