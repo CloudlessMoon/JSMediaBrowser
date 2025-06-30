@@ -399,7 +399,7 @@ extension MediaBrowserViewController: MediaBrowserViewDataSource {
     
     private func notifyDisplayedCurrentCell() {
         guard let cell = self.currentPageCell as? PhotoCell else {
-           return
+            return
         }
         self.didDisplayedCell(cell, at: self.currentPage)
     }
@@ -414,6 +414,7 @@ extension MediaBrowserViewController: MediaBrowserViewDataSource {
         guard !cell.isHidden && cell.window != nil else {
             return
         }
+        print("didDisplayed index: \(index)")
         cell.photoView.assetView.didDisplayed()
         
         self.startPlaying(for: cell, at: index)
