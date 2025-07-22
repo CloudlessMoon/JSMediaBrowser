@@ -188,7 +188,7 @@ open class MediaBrowserViewController: UIViewController {
     }
     
     open override var preferredStatusBarStyle: UIStatusBarStyle {
-        return .lightContent
+        return .darkContent
     }
     
     open override var preferredStatusBarUpdateAnimation: UIStatusBarAnimation {
