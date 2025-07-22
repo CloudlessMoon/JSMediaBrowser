@@ -101,6 +101,15 @@ open class MediaBrowserViewController: UIViewController {
         }
     }
     
+    private var isStatusBarHidden: Bool = false {
+        didSet {
+            guard oldValue != self.isStatusBarHidden else {
+                return
+            }
+            self.setNeedsStatusBarAppearanceUpdate()
+        }
+    }
+    
     private var photoAtomicInt = PhotoCell.AtomicInt()
     
     public init(configuration: MediaBrowserViewControllerConfiguration = .init()) {
@@ -156,6 +165,13 @@ open class MediaBrowserViewController: UIViewController {
     open override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         self.isViewAppeared = true
+        
+        self.isStatusBarHidden = true
+    }
+    
+    open override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        self.isStatusBarHidden = false
     }
     
     open override func viewDidLayoutSubviews() {
@@ -168,7 +184,7 @@ open class MediaBrowserViewController: UIViewController {
     }
     
     open override var prefersStatusBarHidden: Bool {
-        return false
+        return self.isStatusBarHidden
     }
     
     open override var preferredStatusBarStyle: UIStatusBarStyle {
