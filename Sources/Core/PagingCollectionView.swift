@@ -28,6 +28,13 @@ open class PagingCollectionView: UICollectionView {
         self.alwaysBounceHorizontal = true
         self.scrollsToTop = false
         self.contentInsetAdjustmentBehavior = .never
+        
+        if #available(iOS 26.0, *) {
+            self.topEdgeEffect.isHidden = true
+            self.leftEdgeEffect.isHidden = true
+            self.bottomEdgeEffect.isHidden = true
+            self.rightEdgeEffect.isHidden = true
+        }
     }
     
     open override func touchesShouldCancel(in view: UIView) -> Bool {
