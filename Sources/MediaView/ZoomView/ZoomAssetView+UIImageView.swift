@@ -57,7 +57,7 @@ public extension ZoomAssetView where Self: UIImageView, Asset: UIImage {
         guard let asset = self.asset else {
             return
         }
-        if #available(iOS 17, *), asset.isHighDynamicRange {
+        if #available(iOS 17, *), self.isHighDynamicRange(for: asset){
             UIView.transition(
                 with: self,
                 duration: 0.25,
@@ -74,7 +74,7 @@ public extension ZoomAssetView where Self: UIImageView, Asset: UIImage {
     
     private func updateImage() {
         if let asset = self.asset {
-            if #available(iOS 17, *), asset.isHighDynamicRange {
+            if #available(iOS 17, *), self.isHighDynamicRange(for: asset) {
                 self.image = asset.imageRestrictedToStandardDynamicRange()
             } else {
                 self.image = asset
@@ -82,6 +82,11 @@ public extension ZoomAssetView where Self: UIImageView, Asset: UIImage {
         } else {
             self.image = self.thumbnail
         }
+    }
+    
+    @available(iOS 17, *)
+    private func isHighDynamicRange(for asset: Asset) -> Bool {
+        return asset.isHighDynamicRange && asset.size.width > 0 && asset.size.height > 0
     }
     
 }
