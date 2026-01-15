@@ -59,7 +59,9 @@ public protocol MediaBrowserViewControllerEventHandler {
     func didChangedData(current: [any PhotoItem], previous: [any PhotoItem])
     
     func willDisplayPhotoCell(_ cell: PhotoCell, at index: Int)
+    func didDisplayedPhotoCell(_ cell: PhotoCell, at index: Int)
     func didEndDisplayingPhotoCell(_ cell: PhotoCell, at index: Int)
+    func didEndDisplayedPhotoCell(_ cell: PhotoCell, at index: Int)
     
     func shouldStartPlaying(at index: Int) -> Bool
     
@@ -78,7 +80,11 @@ public extension MediaBrowserViewControllerEventHandler {
     
     func willDisplayPhotoCell(_ cell: PhotoCell, at index: Int) {}
     
+    func didDisplayedPhotoCell(_ cell: PhotoCell, at index: Int) {}
+    
     func didEndDisplayingPhotoCell(_ cell: PhotoCell, at index: Int) {}
+    
+    func didEndDisplayedPhotoCell(_ cell: PhotoCell, at index: Int) {}
     
     func shouldStartPlaying(at index: Int) -> Bool { true }
     
@@ -102,7 +108,9 @@ public struct DefaultMediaBrowserViewControllerEventHandler: MediaBrowserViewCon
     
     private let _didChangedData: ChangedDataSource?
     private let _willDisplayPhotoCell: DisplayCell?
+    private let _didDisplayedPhotoCell: DisplayCell?
     private let _didEndDisplayingPhotoCell: DisplayCell?
+    private let _didEndDisplayedPhotoCell: DisplayCell?
     private let _shouldStartPlaying: ShouldPlaying?
     private let _willScrollHalf: WillScroll?
     private let _didScroll: DidScroll?
@@ -113,7 +121,9 @@ public struct DefaultMediaBrowserViewControllerEventHandler: MediaBrowserViewCon
     public init(
         didChangedData: ChangedDataSource? = nil,
         willDisplayPhotoCell: DisplayCell? = nil,
+        didDisplayedPhotoCell: DisplayCell? = nil,
         didEndDisplayingPhotoCell: DisplayCell? = nil,
+        didEndDisplayedPhotoCell: DisplayCell? = nil,
         shouldStartPlaying: ShouldPlaying? = nil,
         willScrollHalf: WillScroll? = nil,
         didScroll: DidScroll? = nil,
@@ -123,7 +133,9 @@ public struct DefaultMediaBrowserViewControllerEventHandler: MediaBrowserViewCon
     ) {
         self._didChangedData = didChangedData
         self._willDisplayPhotoCell = willDisplayPhotoCell
+        self._didDisplayedPhotoCell = didDisplayedPhotoCell
         self._didEndDisplayingPhotoCell = didEndDisplayingPhotoCell
+        self._didEndDisplayedPhotoCell = didEndDisplayedPhotoCell
         self._shouldStartPlaying = shouldStartPlaying
         self._willScrollHalf = willScrollHalf
         self._didScroll = didScroll
@@ -148,8 +160,16 @@ public struct DefaultMediaBrowserViewControllerEventHandler: MediaBrowserViewCon
         self._willDisplayPhotoCell?(cell, index)
     }
     
+    public func didDisplayedPhotoCell(_ cell: PhotoCell, at index: Int) {
+        self._didDisplayedPhotoCell?(cell, index)
+    }
+    
     public func didEndDisplayingPhotoCell(_ cell: PhotoCell, at index: Int) {
         self._didEndDisplayingPhotoCell?(cell, index)
+    }
+    
+    public func didEndDisplayedPhotoCell(_ cell: PhotoCell, at index: Int) {
+        self._didEndDisplayedPhotoCell?(cell, index)
     }
     
     public func shouldStartPlaying(at index: Int) -> Bool {

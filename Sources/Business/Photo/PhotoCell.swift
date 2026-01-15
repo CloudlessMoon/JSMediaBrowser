@@ -23,7 +23,7 @@ open class PhotoCell: UICollectionViewCell {
             self.setNeedsLayout()
         }
     }
-
+    
     open override func layoutSubviews() {
         super.layoutSubviews()
         if self.photoView != nil {
@@ -35,7 +35,7 @@ open class PhotoCell: UICollectionViewCell {
 
 extension PhotoCell {
     
-    internal func createPhotoView(_ photoView: @autoclosure () -> any PhotoView) {
+    internal func createPhotoView(_ photoView: () -> any PhotoView) {
         guard self.photoView == nil else {
             return
         }

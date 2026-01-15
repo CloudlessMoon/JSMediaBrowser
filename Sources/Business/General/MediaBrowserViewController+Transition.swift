@@ -78,19 +78,19 @@ extension TransitionAdapter: UIViewControllerTransitioningDelegate, TransitionAn
         guard let owner = self.owner else {
             return nil
         }
-        if let cell = owner.currentPageCell as? PhotoCell {
-            let renderedImage = cell.photoView.renderedImage
-            let thumbnail = cell.photoView.thumbnail ?? owner.dataSource[owner.currentPage].thumbnail
-            switch self.animator.type {
-            case .appear:
-                return thumbnail ?? renderedImage
-            case .disappear:
-                return renderedImage ?? thumbnail
-            case .none:
-                return nil
-            }
+        guard let cell = owner.currentPhotoCell else {
+            return nil
         }
-        return nil
+        let renderedImage = cell.photoView.renderedImage
+        let thumbnail = cell.photoView.thumbnail ?? owner.dataSource[owner.currentPage].thumbnail
+        switch self.animator.type {
+        case .appear:
+            return thumbnail ?? renderedImage
+        case .disappear:
+            return renderedImage ?? thumbnail
+        case .none:
+            return nil
+        }
     }
     
     var transitionSourceView: UIView? {
@@ -111,11 +111,11 @@ extension TransitionAdapter: UIViewControllerTransitioningDelegate, TransitionAn
         guard let owner = self.owner else {
             return nil
         }
-        if let cell = owner.currentPageCell as? PhotoCell {
-            let assetView = cell.photoView.assetView
-            return assetView
+        guard let cell = owner.currentPhotoCell else {
+           return nil
         }
-        return nil
+        let assetView = cell.photoView.assetView
+        return assetView
     }
     
     var transitionContainerView: UIView? {
@@ -123,10 +123,13 @@ extension TransitionAdapter: UIViewControllerTransitioningDelegate, TransitionAn
     }
     
     var transitionMaskedView: UIView? {
-        if let cell = self.owner?.currentPageCell as? PhotoCell {
-            return cell
+        guard let owner = self.owner else {
+            return nil
         }
-        return nil
+        guard let cell = owner.currentPhotoCell else {
+           return nil
+        }
+        return cell
     }
     
     var transitionAnimatorViews: [UIView] {

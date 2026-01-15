@@ -178,7 +178,7 @@ open class MediaBrowserViewController: UIViewController {
         super.viewDidLayoutSubviews()
         self.contentView.js_frameApplyTransform = self.view.bounds
         
-        if let cell = self.currentPageCell as? PhotoCell {
+        if let cell = self.currentPhotoCell {
             self.configViewport(for: cell)
         }
     }
@@ -221,11 +221,11 @@ extension MediaBrowserViewController {
         return self.contentView.totalUnitPage
     }
     
-    public var currentPageCell: UICollectionViewCell? {
-        return self.contentView.currentPageCell
+    public var currentPhotoCell: PhotoCell? {
+        return self.contentView.currentPageCell as? PhotoCell
     }
     
-    public func cellForPage<Cell: UICollectionViewCell>(at index: Int) -> Cell? {
+    public func photoCellForPage(at index: Int) -> PhotoCell? {
         return self.contentView.cellForPage(at: index)
     }
     
@@ -340,7 +340,7 @@ extension MediaBrowserViewController: MediaBrowserViewDataSource {
         let dataItem = self.dataSource[index]
         
         /// create
-        cell.createPhotoView(dataItem.builder.createPhotoView())
+        cell.createPhotoView({ dataItem.builder.createPhotoView() })
         
         let updateAsset = { (cell: PhotoCell, asset: (any ZoomAsset)?, index: Int) in
             cell.photoView.asset = asset
@@ -414,7 +414,7 @@ extension MediaBrowserViewController: MediaBrowserViewDataSource {
     }
     
     private func notifyDisplayedCurrentCell() {
-        guard let cell = self.currentPageCell as? PhotoCell else {
+        guard let cell = self.currentPhotoCell else {
             return
         }
         self.didDisplayedCell(cell, at: self.currentPage)
@@ -430,16 +430,19 @@ extension MediaBrowserViewController: MediaBrowserViewDataSource {
         guard !cell.isHidden && cell.window != nil else {
             return
         }
-        print("didDisplayed index: \(index)")
         cell.photoView.assetView.didDisplayed()
         
         self.startPlaying(for: cell, at: index)
+        
+        self.eventHandler?.didDisplayedPhotoCell(cell, at: index)
     }
     
     private func didEndDisplayedCell(_ cell: PhotoCell, at index: Int) {
         cell.photoView.assetView.didEndDisplayed()
         
         self.stopPlaying(for: cell, at: index)
+        
+        self.eventHandler?.didEndDisplayedPhotoCell(cell, at: index)
     }
     
     private func startPlaying(for cell: PhotoCell, at index: Int) {
@@ -461,19 +464,21 @@ extension MediaBrowserViewController: MediaBrowserViewDataSource {
 extension MediaBrowserViewController: MediaBrowserViewDelegate {
     
     public func mediaBrowserView(_ mediaBrowserView: MediaBrowserView, willDisplay cell: UICollectionViewCell, forPageAt index: Int) {
-        if let cell = cell as? PhotoCell {
-            self.didDisplayedCell(cell, at: index)
-            
-            self.eventHandler?.willDisplayPhotoCell(cell, at: index)
+        guard let cell = cell as? PhotoCell else {
+            return
         }
+        self.eventHandler?.willDisplayPhotoCell(cell, at: index)
+        
+        self.didDisplayedCell(cell, at: index)
     }
     
     public func mediaBrowserView(_ mediaBrowserView: MediaBrowserView, didEndDisplaying cell: UICollectionViewCell, forPageAt index: Int) {
-        if let cell = cell as? PhotoCell {
-            self.didEndDisplayedCell(cell, at: index)
-            
-            self.eventHandler?.didEndDisplayingPhotoCell(cell, at: index)
+        guard let cell = cell as? PhotoCell else {
+            return
         }
+        self.eventHandler?.didEndDisplayingPhotoCell(cell, at: index)
+        
+        self.didEndDisplayedCell(cell, at: index)
     }
     
     public func mediaBrowserView(_ mediaBrowserView: MediaBrowserView, willScrollHalfFrom sourceIndex: Int, to targetIndex: Int) {
@@ -503,7 +508,7 @@ extension MediaBrowserViewController: MediaBrowserViewDelegate {
         guard self.zoomWhenDoubleTap else {
             return
         }
-        guard let cell = self.currentPageCell as? PhotoCell else {
+        guard let cell = self.currentPhotoCell else {
             return
         }
         cell.photoView.doubleTap(at: point, from: mediaBrowserView)
@@ -541,7 +546,7 @@ extension MediaBrowserViewController: UIGestureRecognizerDelegate {
             guard self.isPresented && self.hideWhenSliding else {
                 return false
             }
-            guard let cell = self.currentPageCell as? PhotoCell else {
+            guard let cell = self.currentPhotoCell else {
                 return true
             }
             let velocity = self.dismissingRecognizer.velocity(in: self.dismissingRecognizer.view)
@@ -594,7 +599,7 @@ extension MediaBrowserViewController: UIGestureRecognizerDelegate {
                 extrapolateRight: .clamp
             )
             let transform = CGAffineTransform(translationX: horizontalDistance, y: verticalDistance).scaledBy(x: ratio, y: ratio)
-            self.currentPageCell?.transform = transform
+            self.currentPhotoCell?.transform = transform
             self.transitionAdapter.transitionAnimatorViews.forEach {
                 $0.alpha = alpha
             }
@@ -625,7 +630,7 @@ extension MediaBrowserViewController: UIGestureRecognizerDelegate {
         self.gestureBeganLocation = CGPoint.zero
         
         UIView.animate(withDuration: self.transitionAdapter.animator.duration, delay: 0, options: .curveEaseInOut) {
-            self.currentPageCell?.transform = CGAffineTransform.identity
+            self.currentPhotoCell?.transform = CGAffineTransform.identity
             self.transitionAdapter.transitionAnimatorViews.forEach {
                 $0.alpha = 1.0
             }
