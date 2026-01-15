@@ -476,7 +476,7 @@ extension MediaBrowserViewController: MediaBrowserViewDelegate {
         guard let cell = cell as? PhotoCell else {
             return
         }
-        self.eventHandler?.didEndDisplayingPhotoCell(cell, at: index)
+        self.eventHandler?.willEndDisplayPhotoCell(cell, at: index)
         
         self.didEndDisplayedCell(cell, at: index)
     }
