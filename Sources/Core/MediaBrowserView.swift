@@ -214,9 +214,11 @@ extension MediaBrowserView {
         return self.cellForPage(at: index)
     }
     
-    public func dequeueReusableCell<Cell: UICollectionViewCell>(_ cellClass: Cell.Type,
-                                                                reuseIdentifier: String? = nil,
-                                                                at index: Int) -> Cell {
+    public func dequeueReusableCell<Cell: UICollectionViewCell>(
+        _ cellClass: Cell.Type,
+        reuseIdentifier: String? = nil,
+        at index: Int
+    ) -> Cell {
         let identifier = reuseIdentifier ?? "Page_\(cellClass)"
         if !self.registeredCellIdentifiers.contains(identifier) {
             self.registeredCellIdentifiers.add(identifier)
@@ -229,10 +231,12 @@ extension MediaBrowserView {
         return cell
     }
     
-    public func dequeueReusableCell<Cell: UICollectionViewCell>(_ nibName: String,
-                                                                bundle: Bundle? = Bundle.main,
-                                                                reuseIdentifier: String? = nil,
-                                                                at index: Int) -> Cell {
+    public func dequeueReusableCell<Cell: UICollectionViewCell>(
+        _ nibName: String,
+        bundle: Bundle? = Bundle.main,
+        reuseIdentifier: String? = nil,
+        at index: Int
+    ) -> Cell {
         let identifier = reuseIdentifier ?? "Page_Nib_\(nibName)"
         if !self.registeredCellIdentifiers.contains(identifier) {
             self.registeredCellIdentifiers.add(identifier)
