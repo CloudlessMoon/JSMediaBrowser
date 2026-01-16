@@ -14,7 +14,7 @@ import Then
 
 class HomeViewController: UIViewController {
     
-    lazy var collectionView: UICollectionView = {
+    private lazy var collectionView: UICollectionView = {
         let collectionView = UICollectionView(frame: CGRect.zero, collectionViewLayout: UICollectionViewFlowLayout())
         collectionView.backgroundColor = UIColor.clear
         collectionView.alwaysBounceVertical = true
@@ -23,13 +23,14 @@ class HomeViewController: UIViewController {
         return collectionView
     }()
     
-    lazy var dataSource: [String] = []
+    private var dataSource: [String] = []
     
     override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
         super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
         self.extendedLayoutIncludesOpaqueBars = true
     }
     
+    @available(*, unavailable, message: "use init()")
     required init?(coder: NSCoder) {
         super.init(coder: coder)
     }
@@ -74,19 +75,19 @@ class HomeViewController: UIViewController {
             array?.append(URL(fileURLWithPath: data).absoluteString)
         }
         self.dataSource = array ?? []
+        
+        self.title = "图片/视频预览"
+        self.navigationItem.rightBarButtonItems = [
+            UIBarButtonItem(title: "清理缓存", style: .plain, target: self, action: #selector(self.onClear))
+        ]
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        self.title = "图片/视频预览"
         self.navigationController?.setNavigationBarHidden(false, animated: false)
         self.navigationController?.navigationBar.barStyle = .black
         self.navigationController?.navigationBar.tintColor = .white
         self.navigationController?.navigationBar.titleTextAttributes = [NSAttributedString.Key.foregroundColor: UIColor.white]
-        
-        self.navigationItem.rightBarButtonItems = [
-            UIBarButtonItem(title: "清理缓存", style: .plain, target: self, action: #selector(self.onClear))
-        ]
     }
     
     override func viewDidDisappear(_ animated: Bool) {
