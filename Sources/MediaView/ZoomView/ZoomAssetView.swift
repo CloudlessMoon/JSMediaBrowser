@@ -9,8 +9,6 @@ import UIKit
 
 public protocol ZoomAsset: Equatable {
     
-    var size: CGSize { get }
-    
 }
 
 public protocol ZoomAssetView: UIView {
