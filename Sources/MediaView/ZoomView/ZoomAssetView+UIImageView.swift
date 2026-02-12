@@ -93,6 +93,10 @@ public extension ZoomAssetView where Self: UIImageView, Asset: UIImage {
 
 private extension UIView {
     
+    func getAssociatedValue(for key: UnsafeRawPointer) -> Any? {
+        return objc_getAssociatedObject(self, key)
+    }
+    
     func getAssociatedValue<T>(for key: UnsafeRawPointer) -> T? {
         return objc_getAssociatedObject(self, key) as? T
     }
