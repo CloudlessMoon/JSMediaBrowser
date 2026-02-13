@@ -32,6 +32,7 @@ open class PhotoGeneralView<ZoomViewType: ZoomView<ZoomAssetViewType>, ZoomAsset
     public private(set) lazy var progressView: PieProgressView = {
         let view = PieProgressView()
         view.tintColor = .white
+        view.trackColor = .white
         view.backgroundColor = .black.withAlphaComponent(0.15)
         view.contentInset = UIEdgeInsets(top: 10, left: 10, bottom: 10, right: 10)
         return view
