@@ -188,17 +188,9 @@ extension TransitionAnimator {
             return false
         }
         if toViewController.isBeingPresented {
-            if context.transitionWasCancelled {
-                return false
-            } else {
-                return true
-            }
+            return context.transitionWasCancelled ? false : true
         } else if fromViewController.isBeingDismissed {
-            if context.transitionWasCancelled {
-                return true
-            } else {
-                return false
-            }
+            return context.transitionWasCancelled ? true : false
         } else {
             assertionFailure()
             return false
