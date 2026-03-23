@@ -16,6 +16,7 @@ excluded:
   - Pods
   - DerivedData
   - build
+  - "**/.build/**"
 identifier_name:
   allowed_symbols: "_"
   min_length: 1
@@ -51,3 +52,6 @@ large_tuple:
 unused_optional_binding:
   severity: error
   ignore_optional_try: true
+type_body_length:
+  warning: 600
+  error: 600

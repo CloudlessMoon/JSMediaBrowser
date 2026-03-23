@@ -14,10 +14,6 @@ internal final class TransitionAdapter: NSObject {
         return TransitionAnimator(delegate: self)
     }()
     
-    private(set) lazy var interactiver: TransitionInteractiver = {
-        return TransitionInteractiver()
-    }()
-    
     private weak var owner: MediaBrowserViewController?
     
     init(owner: MediaBrowserViewController) {
@@ -28,42 +24,22 @@ internal final class TransitionAdapter: NSObject {
     
 }
 
-extension TransitionAdapter {
-    
-    private func animator(type: TransitionerType) -> TransitionAnimator? {
-        let animator = self.animator
-        animator.type = type
-        return animator
-    }
-    
-    private func interactiver(type: TransitionerType) -> TransitionInteractiver? {
-        let interactiver = self.interactiver
-        interactiver.type = type
-        
-        guard interactiver.wantsInteractiveStart else {
-            return nil
-        }
-        return interactiver
-    }
-    
-}
-
 extension TransitionAdapter: UIViewControllerTransitioningDelegate, TransitionAnimatorDelegate {
     
     func animationController(forPresented presented: UIViewController, presenting: UIViewController, source: UIViewController) -> UIViewControllerAnimatedTransitioning? {
-        return self.animator(type: .appear)
+        return self.animator
     }
     
     func animationController(forDismissed dismissed: UIViewController) -> UIViewControllerAnimatedTransitioning? {
-        return self.animator(type: .disappear)
+        return self.animator
     }
     
     func interactionControllerForPresentation(using animator: UIViewControllerAnimatedTransitioning) -> UIViewControllerInteractiveTransitioning? {
-        return self.interactiver(type: .appear)
+        return self.animator.wantsInteractiveStart ? self.animator : nil
     }
     
     func interactionControllerForDismissal(using animator: UIViewControllerAnimatedTransitioning) -> UIViewControllerInteractiveTransitioning? {
-        return self.interactiver(type: .disappear)
+        return self.animator.wantsInteractiveStart ? self.animator : nil
     }
     
     var transitionThumbnailView: UIImageView? {
@@ -83,13 +59,12 @@ extension TransitionAdapter: UIViewControllerTransitioningDelegate, TransitionAn
         }
         let renderedImage = cell.photoView.renderedImage
         let thumbnail = cell.photoView.thumbnail ?? owner.dataSource[owner.currentPage].thumbnail
-        switch self.animator.type {
-        case .appear:
+        
+        let viewController = owner.navigationController ?? owner
+        if viewController.isBeingPresented {
             return thumbnail ?? renderedImage
-        case .disappear:
+        } else {
             return renderedImage ?? thumbnail
-        case .none:
-            return nil
         }
     }
     
@@ -112,7 +87,7 @@ extension TransitionAdapter: UIViewControllerTransitioningDelegate, TransitionAn
             return nil
         }
         guard let cell = owner.currentPhotoCell else {
-           return nil
+            return nil
         }
         let assetView = cell.photoView.assetView
         return assetView
@@ -127,26 +102,9 @@ extension TransitionAdapter: UIViewControllerTransitioningDelegate, TransitionAn
             return nil
         }
         guard let cell = owner.currentPhotoCell else {
-           return nil
+            return nil
         }
         return cell
-    }
-    
-    var transitionAnimatorViews: [UIView] {
-        guard let owner = self.owner else {
-            return []
-        }
-        var views: [UIView] = []
-        if let dimmingView = owner.dimmingView {
-            views.append(dimmingView)
-        }
-        owner.viewIfLoaded?.subviews.forEach {
-            guard $0 != self.transitionContainerView else {
-                return
-            }
-            views.append($0)
-        }
-        return views
     }
     
 }

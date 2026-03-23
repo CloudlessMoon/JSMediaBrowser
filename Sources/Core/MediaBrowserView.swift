@@ -13,21 +13,6 @@ open class MediaBrowserView: UIView {
     
     public weak var delegate: MediaBrowserViewDelegate?
     
-    public var dimmingView: UIView? {
-        didSet {
-            guard oldValue != self.dimmingView else {
-                return
-            }
-            if let oldValue = oldValue, oldValue.superview == self {
-                oldValue.removeFromSuperview()
-            }
-            if let dimmingView = self.dimmingView {
-                dimmingView.removeFromSuperview()
-                self.insertSubview(dimmingView, at: 0)
-            }
-        }
-    }
-    
     public private(set) lazy var singleTapRecognizer: UITapGestureRecognizer = {
         let gesture = UITapGestureRecognizer(target: self, action: #selector(self.handleSingleTap))
         gesture.numberOfTapsRequired = 1
@@ -67,6 +52,12 @@ open class MediaBrowserView: UIView {
         }
     }
     
+    public private(set) lazy var dimmingView: UIView = {
+        let view = UIView()
+        view.backgroundColor = .black
+        return view
+    }()
+    
     private lazy var collectionView: PagingCollectionView = {
         let view = PagingCollectionView(layout: self.collectionViewLayout)
         view.dataSource = self
@@ -95,9 +86,7 @@ open class MediaBrowserView: UIView {
     }
     
     open func didInitialize() {
-        self.dimmingView = UIView()
-        self.dimmingView?.backgroundColor = .black
-        
+        self.addSubview(self.dimmingView)
         self.addSubview(self.collectionView)
         
         self.addGestureRecognizer(self.singleTapRecognizer)
@@ -111,12 +100,12 @@ open class MediaBrowserView: UIView {
     
     open override func layoutSubviews() {
         super.layoutSubviews()
+        self.dimmingView.frame = self.bounds
+        
         if self.collectionView.bounds.size != self.bounds.size {
             self.collectionView.frame = self.bounds
             self.scrollToPage(at: self.currentPage, animated: false)
         }
-        
-        self.dimmingView?.frame = self.bounds
     }
     
 }

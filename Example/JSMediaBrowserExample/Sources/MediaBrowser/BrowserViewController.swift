@@ -14,11 +14,11 @@ import SDWebImage
 
 class BrowserViewController: MediaBrowserViewController {
     
-    lazy var shareControl: ShareControl = {
+    private lazy var shareControl: ShareControl = {
         return ShareControl()
     }()
     
-    lazy var pageControl: PageControl = {
+    private lazy var pageControl: PageControl = {
         return PageControl()
     }()
     
@@ -90,6 +90,26 @@ class BrowserViewController: MediaBrowserViewController {
             guard let self = self else { return }
             self.setCurrentPage($0, animated: true)
         }
+        
+        self.addTransition(
+            prepare: { [weak self] in
+                guard let self = self else { return }
+                if $0.type.isAppear && !$0.isCancelled {
+                    self.shareControl.alpha = 0.0
+                    self.pageControl.alpha = self.shareControl.alpha
+                }
+            },
+            animating: { [weak self] in
+                guard let self = self else { return }
+                if $0.isInteractive {
+                    self.shareControl.alpha = $0.type.isAppear ? $0.percentComplete : 1 - $0.percentComplete
+                } else {
+                    self.shareControl.alpha = $0.type.isAppear ? 1.0 : 0.0
+                }
+                self.pageControl.alpha = self.shareControl.alpha
+            },
+            completion: { _ in }
+        )
     }
     
     override func forceEnableInteractivePopGestureRecognizer() -> Bool {

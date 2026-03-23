@@ -27,30 +27,9 @@ open class MediaBrowserViewController: UIViewController {
         }
     }
     
-    public var dimmingView: UIView? {
-        get {
-            return self.contentView.dimmingView
-        }
-        set {
-            self.contentView.dimmingView = newValue
-        }
-    }
-    
     public var pageSpacing: CGFloat {
         didSet {
             self.contentView.pageSpacing = self.pageSpacing
-        }
-    }
-    
-    public var appearStyle: TransitioningStyle {
-        didSet {
-            self.transitionAdapter.animator.appearStyle = self.appearStyle
-        }
-    }
-    
-    public var disappearStyle: TransitioningStyle {
-        didSet {
-            self.transitionAdapter.animator.disappearStyle = self.disappearStyle
         }
     }
     
@@ -83,10 +62,7 @@ open class MediaBrowserViewController: UIViewController {
     private var gestureBeganLocation = CGPoint.zero
     
     private lazy var transitionAdapter: TransitionAdapter = {
-        let adapter = TransitionAdapter(owner: self)
-        adapter.animator.appearStyle = self.appearStyle
-        adapter.animator.disappearStyle = self.disappearStyle
-        return adapter
+        return TransitionAdapter(owner: self)
     }()
     
     private weak var presentedFromViewController: UIViewController?
@@ -114,8 +90,6 @@ open class MediaBrowserViewController: UIViewController {
     
     public init(configuration: MediaBrowserViewControllerConfiguration = .init()) {
         self.configuration = configuration
-        self.appearStyle = configuration.appearStyle
-        self.disappearStyle = configuration.disappearStyle
         self.hideWhenSingleTap = configuration.hideWhenSingleTap
         self.hideWhenSliding = configuration.hideWhenSliding
         self.hideWhenSliding = configuration.hideWhenSliding
@@ -149,6 +123,24 @@ open class MediaBrowserViewController: UIViewController {
         
         self.view.addGestureRecognizer(self.dismissingRecognizer)
         
+        self.addTransition(
+            prepare: { [weak self] in
+                guard let self = self else { return }
+                if $0.type.isAppear && !$0.isCancelled {
+                    self.contentView.dimmingView.alpha = 0.0
+                }
+            },
+            animating: { [weak self] in
+                guard let self = self else { return }
+                if $0.isInteractive {
+                    self.contentView.dimmingView.alpha = $0.type.isAppear ? $0.percentComplete : 1 - $0.percentComplete
+                } else {
+                    self.contentView.dimmingView.alpha = $0.type.isAppear ? 1.0 : 0.0
+                }
+            },
+            completion: { _ in }
+        )
+        
         /// 当contentView未布局且dataSource为空时，调用collectionView.cellForItem(at:)会导致代理不回调，应该是UIKit的bug
         /// 这里加上reloadData可以解决，保证标记一次刷新
         self.reloadData()
@@ -172,6 +164,14 @@ open class MediaBrowserViewController: UIViewController {
     open override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         self.isStatusBarHidden = false
+    }
+    
+    open override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        let viewController = self.navigationController ?? self
+        if viewController.isBeingDismissed || viewController.isMovingFromParent || self.view.superview == nil {
+            self.transitionAdapter.animator.resetAnimations()
+        }
     }
     
     open override func viewDidLayoutSubviews() {
@@ -316,6 +316,18 @@ extension MediaBrowserViewController {
             return
         }
         self.dismiss(animated: animated, completion: completion)
+    }
+    
+    public func addTransition(
+        prepare: @escaping TransitionContextCaller,
+        animating: @escaping TransitionContextCaller,
+        completion: @escaping TransitionContextCaller
+    ) {
+        self.transitionAdapter.animator.add(
+            prepare: prepare,
+            animating: animating,
+            completion: completion
+        )
     }
     
 }
@@ -577,7 +589,7 @@ extension MediaBrowserViewController: UIGestureRecognizerDelegate {
             break
         case .began:
             self.gestureBeganLocation = gestureRecognizer.location(in: gestureRecognizerView)
-            self.transitionAdapter.interactiver.begin()
+            self.transitionAdapter.animator.beginInteractive(type: .disappear(style: .zoom))
             self.hide(animated: true)
         case .changed:
             let location = gestureRecognizer.location(in: gestureRecognizerView)
@@ -591,25 +603,24 @@ extension MediaBrowserViewController: UIGestureRecognizerDelegate {
                 extrapolateLeft: .clamp,
                 extrapolateRight: .clamp
             )
-            let alpha = JSCoreHelper.interpolateValue(
+            let transform = CGAffineTransform(translationX: horizontalDistance, y: verticalDistance).scaledBy(x: ratio, y: ratio)
+            self.currentPhotoCell?.transform = transform
+            
+            let percentComplete = JSCoreHelper.interpolateValue(
                 abs(verticalDistance),
                 inputRange: [0, height],
-                outputRange: [1.0, 0.2],
+                outputRange: [0.0, 1.0],
                 extrapolateLeft: .clamp,
                 extrapolateRight: .clamp
             )
-            let transform = CGAffineTransform(translationX: horizontalDistance, y: verticalDistance).scaledBy(x: ratio, y: ratio)
-            self.currentPhotoCell?.transform = transform
-            self.transitionAdapter.transitionAnimatorViews.forEach {
-                $0.alpha = alpha
-            }
+            self.transitionAdapter.animator.updateInteractive(type: .disappear(style: .zoom), percentComplete)
         case .ended, .cancelled, .failed:
             let location = gestureRecognizer.location(in: gestureRecognizer.view)
             let verticalDistance = location.y - self.gestureBeganLocation.y
             if abs(verticalDistance) > self.hideWhenSlidingDistance {
                 self.beginDismissingAnimation()
             } else {
-                self.resetDismissingAnimation()
+                self.cancleDismissingAnimation()
             }
         @unknown default:
             break
@@ -617,26 +628,23 @@ extension MediaBrowserViewController: UIGestureRecognizerDelegate {
     }
     
     private func beginDismissingAnimation() {
-        if let context = self.transitionAdapter.interactiver.context {
-            self.transitionAdapter.animator.performAnimation(using: context) { finished in
-                self.transitionAdapter.interactiver.finish()
-            }
-        } else {
-            self.resetDismissingAnimation()
-        }
+        self.transitionAdapter.animator.finishInteractive()
+        
+        self.transitionAdapter.animator.performAnimation(type: .disappear(style: .zoom))
     }
     
-    private func resetDismissingAnimation() {
+    private func cancleDismissingAnimation() {
         self.gestureBeganLocation = CGPoint.zero
         
-        UIView.animate(withDuration: self.transitionAdapter.animator.duration, delay: 0, options: .curveEaseInOut) {
-            self.currentPhotoCell?.transform = CGAffineTransform.identity
-            self.transitionAdapter.transitionAnimatorViews.forEach {
-                $0.alpha = 1.0
-            }
-        } completion: { finished in
-            self.transitionAdapter.interactiver.cancel()
-        }
+        self.transitionAdapter.animator.cancelInteractive()
+        
+        self.transitionAdapter.animator.animate(
+            type: .appear(style: .zoom),
+            animations: {
+                self.currentPhotoCell?.transform = CGAffineTransform.identity
+            },
+            completion: {}
+        )
     }
     
 }
