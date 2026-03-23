@@ -49,7 +49,7 @@ public struct TransitionContext {
     public let percentComplete: CGFloat
     public let isCancelled: Bool
     
-    internal init(
+    public init(
         type: TransitionType,
         isInteractive: Bool,
         percentComplete: CGFloat,

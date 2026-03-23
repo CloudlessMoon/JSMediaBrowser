@@ -53,10 +53,8 @@ extension TransitionAnimator: UIViewControllerAnimatedTransitioning {
     func animateTransition(using transitionContext: UIViewControllerContextTransitioning) {
         self.context = transitionContext
         
-        let isAppear = self.isAppear
-        let type: TransitionType = isAppear ? .appear(style: .zoom) : .disappear(style: .zoom)
-        self.beginTransition(type: type)
-        self.performAnimation(type: type)
+        self.beginTransition()
+        self.performAnimation(style: .zoom)
     }
     
     func transitionDuration(using transitionContext: UIViewControllerContextTransitioning?) -> TimeInterval {
@@ -71,9 +69,7 @@ extension TransitionAnimator: UIViewControllerInteractiveTransitioning {
         self.context = transitionContext
         
         if self.isInteractive {
-            let isAppear = self.isAppear
-            let type: TransitionType = isAppear ? .appear(style: .zoom) : .disappear(style: .zoom)
-            self.beginTransition(type: type)
+            self.beginTransition()
         } else {
             DispatchQueue.main.async {
                 self.cancelInteractive()
@@ -90,8 +86,8 @@ extension TransitionAnimator: UIViewControllerInteractiveTransitioning {
 
 extension TransitionAnimator {
     
-    func performAnimation(type: TransitionType) {
-        switch type.style {
+    func performAnimation(style: TransitionStyle) {
+        switch style {
         case .zoom:
             self.zoomAnimate()
         case .fade:
@@ -99,13 +95,15 @@ extension TransitionAnimator {
         }
     }
     
-    func animate(type: TransitionType, animations: @escaping () -> Void, completion: @escaping () -> Void) {
+    func animate(style: TransitionStyle, animations: @escaping () -> Void, completion: @escaping () -> Void) {
         guard let context = self.context else {
             assertionFailure()
             return
         }
-        let isCancelled = context.transitionWasCancelled
         let isInteractive = context.isInteractive
+        let isCancelled = context.transitionWasCancelled
+        let isAppear = self.isAppear
+        let type: TransitionType = isAppear ? .appear(style: style) : .disappear(style: style)
         
         self.notifyPrepares(.init(
             type: type,
@@ -117,7 +115,7 @@ extension TransitionAnimator {
         UIView.animate(
             withDuration: self.duration,
             delay: 0,
-            options: type.isAppear ? .curveEaseInOut : .curveEaseOut,
+            options: isAppear ? .curveEaseInOut : .curveEaseOut,
             animations: {
                 animations()
                 
@@ -194,7 +192,7 @@ extension TransitionAnimator {
         ))
     }
     
-    func updateInteractive(type: TransitionType, _ percentComplete: CGFloat) {
+    func updateInteractive(style: TransitionStyle, _ percentComplete: CGFloat) {
         self.checkInteractiveBegan()
         
         guard let context = self.context else {
@@ -203,6 +201,8 @@ extension TransitionAnimator {
         }
         context.updateInteractiveTransition(percentComplete)
         
+        let isAppear = self.isAppear
+        let type: TransitionType = isAppear ? .appear(style: style) : .disappear(style: style)
         self.notifyAnimatings(.init(
             type: type,
             isInteractive: true,
@@ -251,16 +251,24 @@ extension TransitionAnimator {
             return false
         }
         if toViewController.isBeingPresented {
-            return true
+            if context.transitionWasCancelled {
+                return false
+            } else {
+                return true
+            }
         } else if fromViewController.isBeingDismissed {
-            return false
+            if context.transitionWasCancelled {
+                return true
+            } else {
+                return false
+            }
         } else {
             assertionFailure()
             return false
         }
     }
     
-    private func beginTransition(type: TransitionType) {
+    private func beginTransition() {
         guard let context = self.context else {
             assertionFailure()
             return
@@ -275,8 +283,9 @@ extension TransitionAnimator {
         let toView: UIView = context.view(forKey: .to) ?? toViewController.view
         let containerView: UIView = context.containerView
         
+        let isAppear = self.isAppear
         /// 添加视图
-        if type.isAppear {
+        if isAppear {
             if toView.superview == nil {
                 containerView.addSubview(toView)
             }
@@ -293,7 +302,7 @@ extension TransitionAnimator {
         }
         let finalFrame: CGRect = context.finalFrame(for: toViewController)
         /// dismiss时finalFrame可能与原视图的frame不一致, 导致一些UI异常
-        if !finalFrame.isEmpty && type.isAppear {
+        if !finalFrame.isEmpty && isAppear {
             toView.frame = finalFrame
         }
         /// 触发toView的布局, 提前获得toView内视图的Frame, 用作后续动画使用
@@ -375,7 +384,7 @@ extension TransitionAnimator {
         target.maskedView.layer.mask = self.maskLayer
         
         self.animate(
-            type: isAppear ? .appear(style: .zoom) : .disappear(style: .zoom),
+            style: .zoom,
             animations: {
                 imageView.frame = isAppear ? target.rect : source.rect
                 imageView.layer.cornerRadius = isAppear ? 0 : source.cornerRadius
@@ -403,7 +412,7 @@ extension TransitionAnimator {
             transitionContainerView.alpha = 0.0
         }
         self.animate(
-            type: isAppear ? .appear(style: .fade) : .disappear(style: .fade),
+            style: .fade,
             animations: {
                 transitionContainerView.alpha = isAppear ? 1 : 0
             },
