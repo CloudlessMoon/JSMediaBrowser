@@ -250,7 +250,14 @@ extension TransitionAnimator {
         guard let toViewController = context.viewController(forKey: .to) else {
             return false
         }
-        return fromViewController.isBeingPresented || toViewController.isBeingPresented
+        if toViewController.isBeingPresented {
+            return true
+        } else if fromViewController.isBeingDismissed {
+            return false
+        } else {
+            assertionFailure()
+            return false
+        }
     }
     
     private func beginTransition(type: TransitionType) {
@@ -400,9 +407,7 @@ extension TransitionAnimator {
             animations: {
                 transitionContainerView.alpha = isAppear ? 1 : 0
             },
-            completion: {
-                transitionContainerView.alpha = 1
-            }
+            completion: {}
         )
     }
     
