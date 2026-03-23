@@ -589,7 +589,7 @@ extension MediaBrowserViewController: UIGestureRecognizerDelegate {
             break
         case .began:
             self.gestureBeganLocation = gestureRecognizer.location(in: gestureRecognizerView)
-            self.transitionAdapter.animator.beginInteractive(type: .disappear(style: .zoom))
+            self.transitionAdapter.animator.beginInteractive()
             self.hide(animated: true)
         case .changed:
             let location = gestureRecognizer.location(in: gestureRecognizerView)
@@ -613,7 +613,7 @@ extension MediaBrowserViewController: UIGestureRecognizerDelegate {
                 extrapolateLeft: .clamp,
                 extrapolateRight: .clamp
             )
-            self.transitionAdapter.animator.updateInteractive(style: .zoom, percentComplete)
+            self.transitionAdapter.animator.updateInteractive(percentComplete)
         case .ended, .cancelled, .failed:
             let location = gestureRecognizer.location(in: gestureRecognizer.view)
             let verticalDistance = location.y - self.gestureBeganLocation.y
@@ -630,7 +630,7 @@ extension MediaBrowserViewController: UIGestureRecognizerDelegate {
     private func beginDismissingAnimation() {
         self.transitionAdapter.animator.finishInteractive()
         
-        self.transitionAdapter.animator.performAnimation(style: .zoom)
+        self.transitionAdapter.animator.performZoomAnimation()
     }
     
     private func cancleDismissingAnimation() {
@@ -639,7 +639,6 @@ extension MediaBrowserViewController: UIGestureRecognizerDelegate {
         self.transitionAdapter.animator.cancelInteractive()
         
         self.transitionAdapter.animator.animate(
-            style: .zoom,
             animations: {
                 self.currentPhotoCell?.transform = CGAffineTransform.identity
             },

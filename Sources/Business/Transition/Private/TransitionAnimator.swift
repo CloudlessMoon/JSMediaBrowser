@@ -54,7 +54,7 @@ extension TransitionAnimator: UIViewControllerAnimatedTransitioning {
         self.context = transitionContext
         
         self.beginTransition()
-        self.performAnimation(style: .zoom)
+        self.performZoomAnimation()
     }
     
     func transitionDuration(using transitionContext: UIViewControllerContextTransitioning?) -> TimeInterval {
@@ -70,6 +70,15 @@ extension TransitionAnimator: UIViewControllerInteractiveTransitioning {
         
         if self.isInteractive {
             self.beginTransition()
+            
+            let isAppear = self.isAppear
+            let type: TransitionType = isAppear ? .appear(style: .zoom) : .disappear(style: .zoom)
+            self.notifyPrepares(.init(
+                type: type,
+                isInteractive: true,
+                percentComplete: 0,
+                isCancelled: false
+            ))
         } else {
             DispatchQueue.main.async {
                 self.cancelInteractive()
@@ -86,59 +95,12 @@ extension TransitionAnimator: UIViewControllerInteractiveTransitioning {
 
 extension TransitionAnimator {
     
-    func performAnimation(style: TransitionStyle) {
-        switch style {
-        case .zoom:
-            self.zoomAnimate()
-        case .fade:
-            self.fadeAnimate()
-        }
+    func performZoomAnimation() {
+        self.zoomAnimate()
     }
     
-    func animate(style: TransitionStyle, animations: @escaping () -> Void, completion: @escaping () -> Void) {
-        guard let context = self.context else {
-            assertionFailure()
-            return
-        }
-        let isInteractive = context.isInteractive
-        let isCancelled = context.transitionWasCancelled
-        let isAppear = self.isAppear
-        let type: TransitionType = isAppear ? .appear(style: style) : .disappear(style: style)
-        
-        self.notifyPrepares(.init(
-            type: type,
-            isInteractive: isInteractive,
-            percentComplete: 0,
-            isCancelled: isCancelled
-        ))
-        
-        UIView.animate(
-            withDuration: self.duration,
-            delay: 0,
-            options: isAppear ? .curveEaseInOut : .curveEaseOut,
-            animations: {
-                animations()
-                
-                self.notifyAnimatings(.init(
-                    type: type,
-                    isInteractive: isInteractive,
-                    percentComplete: 0,
-                    isCancelled: isCancelled
-                ))
-            },
-            completion: { _ in
-                completion()
-                
-                self.notifyCompletions(.init(
-                    type: type,
-                    isInteractive: isInteractive,
-                    percentComplete: 1,
-                    isCancelled: isCancelled
-                ))
-                
-                self.endTransition()
-            }
-        )
+    func animate(animations: @escaping () -> Void, completion: @escaping () -> Void) {
+        self.animate(style: .zoom, animations: animations, completion: completion)
     }
     
     func add(
@@ -151,24 +113,6 @@ extension TransitionAnimator {
         self.completions.append(completion)
     }
     
-    func notifyPrepares(_ context: TransitionContext) {
-        for prepares in self.prepares {
-            prepares(context)
-        }
-    }
-    
-    func notifyAnimatings(_ context: TransitionContext) {
-        for animating in self.animatings {
-            animating(context)
-        }
-    }
-    
-    func notifyCompletions(_ context: TransitionContext) {
-        for completion in self.completions {
-            completion(context)
-        }
-    }
-    
     func resetAnimations() {
         self.prepares.removeAll()
         self.animatings.removeAll()
@@ -179,20 +123,13 @@ extension TransitionAnimator {
 
 extension TransitionAnimator {
     
-    func beginInteractive(type: TransitionType) {
+    func beginInteractive() {
         self.checkInteractiveEnd()
         
         self.isInteractive = true
-        
-        self.notifyPrepares(.init(
-            type: type,
-            isInteractive: true,
-            percentComplete: 0,
-            isCancelled: false
-        ))
     }
     
-    func updateInteractive(style: TransitionStyle, _ percentComplete: CGFloat) {
+    func updateInteractive(_ percentComplete: CGFloat) {
         self.checkInteractiveBegan()
         
         guard let context = self.context else {
@@ -202,7 +139,7 @@ extension TransitionAnimator {
         context.updateInteractiveTransition(percentComplete)
         
         let isAppear = self.isAppear
-        let type: TransitionType = isAppear ? .appear(style: style) : .disappear(style: style)
+        let type: TransitionType = isAppear ? .appear(style: .zoom) : .disappear(style: .zoom)
         self.notifyAnimatings(.init(
             type: type,
             isInteractive: true,
@@ -418,6 +355,70 @@ extension TransitionAnimator {
             },
             completion: {}
         )
+    }
+    
+    private func animate(style: TransitionStyle, animations: @escaping () -> Void, completion: @escaping () -> Void) {
+        guard let context = self.context else {
+            assertionFailure()
+            return
+        }
+        let isInteractive = context.isInteractive
+        let isCancelled = context.transitionWasCancelled
+        let isAppear = self.isAppear
+        let type: TransitionType = isAppear ? .appear(style: style) : .disappear(style: style)
+        
+        self.notifyPrepares(.init(
+            type: type,
+            isInteractive: isInteractive,
+            percentComplete: 0,
+            isCancelled: isCancelled
+        ))
+        
+        UIView.animate(
+            withDuration: self.duration,
+            delay: 0,
+            options: isAppear ? .curveEaseInOut : .curveEaseOut,
+            animations: {
+                animations()
+                
+                self.notifyAnimatings(.init(
+                    type: type,
+                    isInteractive: isInteractive,
+                    percentComplete: 0,
+                    isCancelled: isCancelled
+                ))
+            },
+            completion: { _ in
+                completion()
+                
+                self.notifyCompletions(.init(
+                    type: type,
+                    isInteractive: isInteractive,
+                    percentComplete: 1,
+                    isCancelled: isCancelled
+                ))
+                
+                self.endTransition()
+            }
+        )
+    }
+    
+    private func notifyPrepares(_ context: TransitionContext) {
+        for prepares in self.prepares {
+            prepares(context)
+        }
+    }
+    
+    private func notifyAnimatings(_ context: TransitionContext) {
+        for animating in self.animatings {
+            animating(context)
+        }
+    }
+    
+    private func notifyCompletions(_ context: TransitionContext) {
+        for completion in self.completions {
+            completion(context)
+        }
     }
     
     private func checkInteractiveBegan() {
