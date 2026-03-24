@@ -593,6 +593,9 @@ extension MediaBrowserViewController: UIGestureRecognizerDelegate {
             self.transitionAdapter.animator.beginInteractive()
             self.hide(animated: true)
         case .changed:
+            guard self.transitionAdapter.animator.canUpdateInteractive() else {
+                return
+            }
             let location = gestureRecognizer.location(in: gestureRecognizerView)
             let height = NSNumber(value: Double(gestureRecognizerView.bounds.height / 2))
             let horizontalDistance = location.x - self.gestureBeganLocation.x
