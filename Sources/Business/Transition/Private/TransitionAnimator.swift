@@ -24,7 +24,7 @@ final class TransitionAnimator: NSObject {
     
     let duration: TimeInterval = 0.25
     
-    private(set) weak var context: UIViewControllerContextTransitioning? {
+    private weak var context: UIViewControllerContextTransitioning? {
         didSet {
             self.updateAppear()
         }
@@ -64,6 +64,12 @@ extension TransitionAnimator: UIViewControllerAnimatedTransitioning {
     
     func transitionDuration(using transitionContext: UIViewControllerContextTransitioning?) -> TimeInterval {
         return self.duration
+    }
+    
+    func animationEnded(_ transitionCompleted: Bool) {
+        if !self.isAppear && transitionCompleted {
+            self.resetAnimations()
+        }
     }
     
 }
@@ -118,12 +124,6 @@ extension TransitionAnimator {
         self.completions.append(completion)
     }
     
-    func resetAnimations() {
-        self.prepares.removeAll()
-        self.animatings.removeAll()
-        self.completions.removeAll()
-    }
-    
 }
 
 extension TransitionAnimator {
@@ -175,6 +175,8 @@ extension TransitionAnimator {
             return
         }
         context.cancelInteractiveTransition()
+        
+        self.updateAppear()
     }
     
 }
@@ -395,6 +397,12 @@ extension TransitionAnimator {
         for completion in self.completions {
             completion(context)
         }
+    }
+    
+    private func resetAnimations() {
+        self.prepares.removeAll()
+        self.animatings.removeAll()
+        self.completions.removeAll()
     }
     
     private func checkInteractiveBegan() {

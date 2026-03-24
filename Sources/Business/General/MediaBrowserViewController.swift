@@ -168,10 +168,7 @@ open class MediaBrowserViewController: UIViewController {
     
     open override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
-        let viewController = self.navigationController ?? self
-        if viewController.isBeingDismissed {
-            self.transitionAdapter.animator.resetAnimations()
-        }
+        self.isStatusBarHidden = false
     }
     
     open override func viewDidLayoutSubviews() {
