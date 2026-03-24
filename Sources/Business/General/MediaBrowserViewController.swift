@@ -210,6 +210,10 @@ open class MediaBrowserViewController: UIViewController {
 
 extension MediaBrowserViewController {
     
+    public var dimmingView: UIView {
+        return self.contentView.dimmingView
+    }
+    
     public var currentPage: Int {
         return self.contentView.currentPage
     }
