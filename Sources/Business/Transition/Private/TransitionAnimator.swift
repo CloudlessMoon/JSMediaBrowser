@@ -24,7 +24,11 @@ final class TransitionAnimator: NSObject {
     
     let duration: TimeInterval = 0.25
     
-    private(set) weak var context: UIViewControllerContextTransitioning?
+    private(set) weak var context: UIViewControllerContextTransitioning? {
+        didSet {
+            self.updateAppear()
+        }
+    }
     
     private lazy var maskLayer: CALayer = {
         return CALayer()
@@ -32,6 +36,7 @@ final class TransitionAnimator: NSObject {
     
     private var retainMaskLayer: CALayer?
     
+    private var isAppear: Bool = false
     private var isInteractive: Bool = false
     
     private var prepares: [TransitionContextCaller] = []
@@ -175,27 +180,6 @@ extension TransitionAnimator {
 }
 
 extension TransitionAnimator {
-    
-    private var isAppear: Bool {
-        guard let context = self.context else {
-            assertionFailure()
-            return false
-        }
-        guard let fromViewController = context.viewController(forKey: .from) else {
-            return false
-        }
-        guard let toViewController = context.viewController(forKey: .to) else {
-            return false
-        }
-        if toViewController.isBeingPresented {
-            return context.transitionWasCancelled ? false : true
-        } else if fromViewController.isBeingDismissed {
-            return context.transitionWasCancelled ? true : false
-        } else {
-            assertionFailure()
-            return false
-        }
-    }
     
     private func beginTransition() {
         guard let context = self.context else {
@@ -419,6 +403,28 @@ extension TransitionAnimator {
     
     private func checkInteractiveEnd() {
         assert(!self.isInteractive, "可能未调用finish()或者cancel(), 请检查代码, 保证begin与finish、cancel成对出现")
+    }
+    
+    private func updateAppear() {
+        guard let context = self.context else {
+            assertionFailure()
+            return
+        }
+        guard let fromViewController = context.viewController(forKey: .from) else {
+            assertionFailure()
+            return
+        }
+        guard let toViewController = context.viewController(forKey: .to) else {
+            assertionFailure()
+            return
+        }
+        if toViewController.isBeingPresented {
+            self.isAppear = context.transitionWasCancelled ? false : true
+        } else if fromViewController.isBeingDismissed {
+            self.isAppear = context.transitionWasCancelled ? true : false
+        } else {
+            assertionFailure()
+        }
     }
     
 }
