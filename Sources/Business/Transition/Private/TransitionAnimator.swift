@@ -129,14 +129,10 @@ extension TransitionAnimator {
 extension TransitionAnimator {
     
     func beginInteractive() {
-        self.checkInteractiveEnd()
-        
         self.isInteractive = true
     }
     
     func updateInteractive(_ percentComplete: CGFloat) {
-        self.checkInteractiveBegan()
-        
         guard let context = self.context else {
             return
         }
@@ -153,8 +149,6 @@ extension TransitionAnimator {
     }
     
     func finishInteractive() {
-        self.checkInteractiveBegan()
-        
         self.isInteractive = false
         
         guard let context = self.context else {
@@ -164,8 +158,6 @@ extension TransitionAnimator {
     }
     
     func cancelInteractive() {
-        self.checkInteractiveBegan()
-        
         self.isInteractive = false
         
         guard let context = self.context else {
@@ -398,14 +390,6 @@ extension TransitionAnimator {
         self.prepares.removeAll()
         self.animatings.removeAll()
         self.completions.removeAll()
-    }
-    
-    private func checkInteractiveBegan() {
-        assert(self.isInteractive, "可能未调用begin(), 请检查代码, 保证begin与finish、cancel成对出现")
-    }
-    
-    private func checkInteractiveEnd() {
-        assert(!self.isInteractive, "可能未调用finish()或者cancel(), 请检查代码, 保证begin与finish、cancel成对出现")
     }
     
     private func updateAppear() {
