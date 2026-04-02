@@ -138,7 +138,6 @@ extension TransitionAnimator {
         self.checkInteractiveBegan()
         
         guard let context = self.context else {
-            assertionFailure()
             return
         }
         context.updateInteractiveTransition(percentComplete)
@@ -159,7 +158,6 @@ extension TransitionAnimator {
         self.isInteractive = false
         
         guard let context = self.context else {
-            assertionFailure()
             return
         }
         context.finishInteractiveTransition()
@@ -171,7 +169,6 @@ extension TransitionAnimator {
         self.isInteractive = false
         
         guard let context = self.context else {
-            assertionFailure()
             return
         }
         context.cancelInteractiveTransition()
