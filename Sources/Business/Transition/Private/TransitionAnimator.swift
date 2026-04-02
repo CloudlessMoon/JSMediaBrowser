@@ -134,10 +134,6 @@ extension TransitionAnimator {
         self.isInteractive = true
     }
     
-    func canUpdateInteractive() -> Bool {
-        return self.context != nil
-    }
-    
     func updateInteractive(_ percentComplete: CGFloat) {
         self.checkInteractiveBegan()
         
