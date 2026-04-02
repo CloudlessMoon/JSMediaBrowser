@@ -338,6 +338,8 @@ extension TransitionAnimator {
     private func animate(style: TransitionStyle, animations: @escaping () -> Void, completion: @escaping () -> Void) {
         guard let context = self.context else {
             assertionFailure()
+            animations()
+            completion()
             return
         }
         let isInteractive = context.isInteractive
