@@ -241,9 +241,6 @@ extension TransitionAnimator {
             return
         }
         let isAppear = self.isAppear
-        let fadeAnimate = {
-            self.fadeAnimate()
-        }
         let source: (rect: CGRect, cornerRadius: CGFloat)? = {
             let transitionSourceView = self.delegate?.transitionSourceView
             let transitionSourceRect = self.delegate?.transitionSourceRect ?? .zero
@@ -265,7 +262,7 @@ extension TransitionAnimator {
             return (rect, cornerRadius)
         }()
         guard let source = source else {
-            return fadeAnimate()
+            return self.fadeAnimate()
         }
         let target: (maskedView: UIView, rect: CGRect)? = {
             guard let transitionTargetView = self.delegate?.transitionTargetView else {
@@ -281,10 +278,10 @@ extension TransitionAnimator {
             return (transitionMaskedView, rect)
         }()
         guard let target = target else {
-            return fadeAnimate()
+            return self.fadeAnimate()
         }
         guard let imageView = self.delegate?.transitionThumbnailView else {
-            return fadeAnimate()
+            return self.fadeAnimate()
         }
         imageView.image = self.delegate?.transitionThumbnail
         imageView.contentMode = .scaleAspectFill
