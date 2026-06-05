@@ -285,28 +285,23 @@ extension MediaBrowserViewController {
         self.presentedFromViewController = sender
         
         var presenter = sender
-        guard presenter.isViewLoaded else {
-            assertionFailure()
-            return
+        if !(presenter is UITabBarController), let tabBarController = presenter.tabBarController, tabBarController.tabBar.bounds.height > 0 {
+            presenter = tabBarController
         }
-        if !(presenter is UITabBarController), let tabBarController = presenter.tabBarController, tabBarController.isViewLoaded {
-            if !tabBarController.tabBar.isHidden && tabBarController.tabBar.bounds.height > 0 && !presenter.hidesBottomBarWhenPushed {
-                presenter = tabBarController
-            }
-        }
-        if let presentedViewController = presenter.presentedViewController {
+        while let presentedViewController = presenter.presentedViewController {
             presenter = presentedViewController
         }
+        guard presenter != self else {
+            assertionFailure("不能present自己")
+            return
+        }
+        assert(presenter.isViewLoaded, "presenter.view未加载，不允许present");
+        assert(presenter.viewIfLoaded?.window != nil, "presenter不在window上，不允许present");
+        assert(!presenter.isBeingDismissed, "presenter正在Dismiss中，不允许present");
         
         let viewController = navigationController ?? self
         viewController.modalPresentationCapturesStatusBarAppearance = true
-        viewController.modalPresentationStyle = {
-            if JSCoreHelper.isIPhone || JSCoreHelper.isIPod {
-                return .custom
-            } else {
-                return .overCurrentContext
-            }
-        }()
+        viewController.modalPresentationStyle = .overCurrentContext
         viewController.transitioningDelegate = self.transitionAdapter
         
         presenter.present(viewController, animated: animated, completion: completion)
