@@ -25,7 +25,7 @@ class BrowserViewController: MediaBrowserViewController {
     init() {
         super.init()
         
-        self.eventHandler = DefaultMediaBrowserViewControllerEventHandler(
+        self.eventHandler = MediaBrowserViewControllerEventHandlerProvider(
             didChangedData: { [weak self] _, _ in
                 guard let self = self else { return }
                 self.updatePageControl()

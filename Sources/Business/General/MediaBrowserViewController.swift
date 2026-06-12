@@ -295,9 +295,9 @@ extension MediaBrowserViewController {
             assertionFailure("不能present自己")
             return
         }
-        assert(presenter.isViewLoaded, "presenter.view未加载，不允许present");
-        assert(presenter.viewIfLoaded?.window != nil, "presenter不在window上，不允许present");
-        assert(!presenter.isBeingDismissed, "presenter正在Dismiss中，不允许present");
+        assert(presenter.isViewLoaded, "presenter.view未加载，不允许present")
+        assert(presenter.viewIfLoaded?.window != nil, "presenter不在window上，不允许present")
+        assert(!presenter.isBeingDismissed, "presenter正在Dismiss中，不允许present")
         
         let viewController = navigationController ?? self
         viewController.modalPresentationCapturesStatusBarAppearance = true

@@ -54,7 +54,7 @@ public enum ZoomViewAssetMode: Equatable {
     case aspectFit
 }
 
-public struct DefaultZoomViewEventHandler: ZoomViewEventHandler {
+public struct ZoomViewEventHandlerProvider: ZoomViewEventHandler {
     
     public typealias Zoom = () -> Void
     public typealias EndZooming = (CGFloat) -> Void

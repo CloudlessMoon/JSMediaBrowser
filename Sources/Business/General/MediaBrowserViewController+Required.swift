@@ -91,7 +91,7 @@ public extension MediaBrowserViewControllerEventHandler {
     
 }
 
-public struct DefaultMediaBrowserViewControllerEventHandler: MediaBrowserViewControllerEventHandler {
+public struct MediaBrowserViewControllerEventHandlerProvider: MediaBrowserViewControllerEventHandler {
     
     public typealias ChangedDataSource = ([any PhotoItem], [any PhotoItem]) -> Void
     public typealias ShouldPlaying = (Int) -> Bool
