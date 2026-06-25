@@ -285,7 +285,7 @@ extension MediaBrowserViewController {
         self.presentedFromViewController = sender
         
         var presenter = sender
-        if !(presenter is UITabBarController), let tabBarController = presenter.tabBarController, tabBarController.tabBar.bounds.height > 0 {
+        if !(presenter is UITabBarController), let tabBarController = presenter.tabBarController, !tabBarController.tabBar.isHidden {
             presenter = tabBarController
         }
         while let presentedViewController = presenter.presentedViewController {

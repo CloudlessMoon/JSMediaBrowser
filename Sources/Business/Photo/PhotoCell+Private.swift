@@ -44,7 +44,7 @@ internal extension PhotoCell {
     
 }
 
-private struct AssociatedKeys {
+private enum AssociatedKeys {
     static var token: UInt8 = 0
     static var requestIdentifier: UInt8 = 0
 }

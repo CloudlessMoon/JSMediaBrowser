@@ -107,7 +107,7 @@ private extension UIView {
     
 }
 
-private struct AssociatedKeys {
+private enum AssociatedKeys {
     static var asset: UInt8 = 0
     static var thumbnail: UInt8 = 0
 }
