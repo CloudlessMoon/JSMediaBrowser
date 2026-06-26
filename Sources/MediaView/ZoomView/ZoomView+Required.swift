@@ -7,18 +7,29 @@
 
 import UIKit
 
-public struct ZoomViewConfiguration {
+public struct ZoomViewStyle {
     
-    public var assetMode: ZoomViewAssetMode
-    public var isEnabledZoom: Bool
-    public var minimumZoomScale: CGFloat
-    public var maximumZoomScale: CGFloat
+    public static var `default` = {
+        return ZoomViewStyle.standard
+    }
+    
+    public static let standard = ZoomViewStyle(
+        assetMode: .automatic,
+        isEnabledZoom: true,
+        minimumZoomScale: 1.0,
+        maximumZoomScale: 3.0
+    )
+    
+    public var assetMode: ZoomViewAssetMode?
+    public var isEnabledZoom: Bool?
+    public var minimumZoomScale: CGFloat?
+    public var maximumZoomScale: CGFloat?
     
     public init(
-        assetMode: ZoomViewAssetMode = .automatic,
-        isEnabledZoom: Bool = true,
-        minimumZoomScale: CGFloat = 1.0,
-        maximumZoomScale: CGFloat = 2.0
+        assetMode: ZoomViewAssetMode? = nil,
+        isEnabledZoom: Bool? = nil,
+        minimumZoomScale: CGFloat? = nil,
+        maximumZoomScale: CGFloat? = nil,
     ) {
         self.assetMode = assetMode
         self.isEnabledZoom = isEnabledZoom

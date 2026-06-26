@@ -10,8 +10,6 @@ import JSCoreKit
 
 open class ZoomView<AssetView: ZoomAssetView>: BasisMediaView {
     
-    public let configuration: ZoomViewConfiguration
-    
     public var eventHandler: ZoomViewEventHandler?
     
     public let assetView: AssetView
@@ -96,17 +94,16 @@ open class ZoomView<AssetView: ZoomAssetView>: BasisMediaView {
     private var isNeededRevertZoom: Bool = false
     
     public init(
+        style: ZoomViewStyle = .default(),
         assetView: AssetView,
-        configuration: ZoomViewConfiguration = .init(),
         eventHandler: ZoomViewEventHandler? = nil
     ) {
-        self.assetView = assetView
-        self.configuration = configuration
-        self.assetMode = configuration.assetMode
-        self.isEnabledZoom = configuration.isEnabledZoom
-        self.minimumZoomScale = configuration.minimumZoomScale
-        self.maximumZoomScale = configuration.maximumZoomScale
+        self.assetMode = style.assetMode ?? .automatic
+        self.isEnabledZoom = style.isEnabledZoom ?? false
+        self.minimumZoomScale = style.minimumZoomScale ?? 1.0
+        self.maximumZoomScale = style.maximumZoomScale ?? 1.0
         
+        self.assetView = assetView
         self.eventHandler = eventHandler
         
         super.init()

@@ -16,7 +16,7 @@ extension PhotoGeneralView {
     convenience init(zoomView: ZoomViewType) {
         let image = UIImage(named: "img_fail")?.sd_resizedImage(with: .init(width: 80, height: 80), scaleMode: .aspectFit)
         self.init(
-            configuration: .init(emptyImage: image),
+            style: .init(emptyImage: image),
             zoomView: zoomView
         )
     }

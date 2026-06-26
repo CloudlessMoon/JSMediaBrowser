@@ -7,22 +7,40 @@
 
 import UIKit
 
-open class PhotoGeneralView<ZoomViewType: ZoomView<ZoomAssetViewType>, ZoomAssetViewType: ZoomAssetView>: UIView, PhotoView {
+public struct PhotoGeneralViewStyle {
     
-    public struct Configuration {
-        public var emptyImage: UIImage?
-        
-        public init(emptyImage: UIImage? = nil) {
-            self.emptyImage = emptyImage
-        }
+    public static var `default` = {
+        return PhotoGeneralViewStyle.standard
     }
     
-    public let configuration: Configuration
+    public static let standard = PhotoGeneralViewStyle()
+    
+    public var emptyImage: UIImage?
+    
+    public init(emptyImage: UIImage? = nil) {
+        self.emptyImage = emptyImage
+    }
+    
+}
+
+open class PhotoGeneralView<ZoomViewType: ZoomView<ZoomAssetViewType>, ZoomAssetViewType: ZoomAssetView>: UIView, PhotoView {
     
     public let zoomView: ZoomViewType
     
+    public var emptyImage: UIImage? {
+        didSet {
+            guard oldValue != self.emptyImage else {
+                return
+            }
+            self.emptyView.image = self.emptyImage
+            
+            self.setNeedsLayout()
+        }
+    }
+    
     public private(set) lazy var emptyView: EmptyView = {
         let view = EmptyView()
+        view.image = self.emptyImage
         view.backgroundColor = .black.withAlphaComponent(0.4)
         view.layer.cornerRadius = 8
         view.contentInset = UIEdgeInsets(top: 15, left: 15, bottom: 15, right: 15)
@@ -53,8 +71,8 @@ open class PhotoGeneralView<ZoomViewType: ZoomView<ZoomAssetViewType>, ZoomAsset
         }
     }
     
-    public init(configuration: Configuration, zoomView: ZoomViewType) {
-        self.configuration = configuration
+    public init(style: PhotoGeneralViewStyle = .default(), zoomView: ZoomViewType) {
+        self.emptyImage = style.emptyImage
         self.zoomView = zoomView
         
         super.init(frame: .zero)
@@ -71,7 +89,8 @@ open class PhotoGeneralView<ZoomViewType: ZoomView<ZoomAssetViewType>, ZoomAsset
         self.addSubview(self.progressView)
         self.addSubview(self.emptyView)
         
-        self.updateUI()
+        self.setError(nil)
+        self.updateProgress()
     }
     
     open override func layoutSubviews() {
@@ -142,13 +161,6 @@ extension PhotoGeneralView {
 }
 
 extension PhotoGeneralView {
-    
-    private func updateUI() {
-        self.emptyView.image = self.configuration.emptyImage
-        
-        self.setError(nil)
-        self.updateProgress()
-    }
     
     private func updateProgress() {
         if self.error != nil || self.progress == 1 || self.progress == nil {
