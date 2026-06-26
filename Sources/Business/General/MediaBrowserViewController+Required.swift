@@ -7,20 +7,32 @@
 
 import UIKit
 
-public struct MediaBrowserViewControllerConfiguration {
+public struct MediaBrowserViewControllerStyle {
     
-    public var hideWhenSingleTap: Bool
-    public var hideWhenSliding: Bool
-    public var hideWhenSlidingDistance: CGFloat
-    public var zoomWhenDoubleTap: Bool
-    public var pageSpacing: CGFloat
+    public static var `default` = {
+        return MediaBrowserViewControllerStyle.standard
+    }
+    
+    public static let standard = MediaBrowserViewControllerStyle(
+        hideWhenSingleTap: true,
+        hideWhenSliding: true,
+        hideWhenSlidingDistance: 70,
+        zoomWhenDoubleTap: true,
+        pageSpacing: 10
+    )
+    
+    public var hideWhenSingleTap: Bool?
+    public var hideWhenSliding: Bool?
+    public var hideWhenSlidingDistance: CGFloat?
+    public var zoomWhenDoubleTap: Bool?
+    public var pageSpacing: CGFloat?
     
     public init(
-        hideWhenSingleTap: Bool = true,
-        hideWhenSliding: Bool = true,
-        hideWhenSlidingDistance: CGFloat = 70,
-        zoomWhenDoubleTap: Bool = true,
-        pageSpacing: CGFloat = 10
+        hideWhenSingleTap: Bool? = nil,
+        hideWhenSliding: Bool? = nil,
+        hideWhenSlidingDistance: CGFloat? = nil,
+        zoomWhenDoubleTap: Bool? = nil,
+        pageSpacing: CGFloat? = nil,
     ) {
         self.hideWhenSingleTap = hideWhenSingleTap
         self.hideWhenSliding = hideWhenSliding

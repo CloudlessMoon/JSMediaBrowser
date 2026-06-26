@@ -41,8 +41,6 @@ open class MediaBrowserViewController: UIViewController {
     
     public var zoomWhenDoubleTap: Bool
     
-    public let configuration: MediaBrowserViewControllerConfiguration
-    
     internal private(set) lazy var contentView: MediaBrowserView = {
         let view = MediaBrowserView()
         view.dataSource = self
@@ -65,7 +63,7 @@ open class MediaBrowserViewController: UIViewController {
         return TransitionAdapter(owner: self)
     }()
     
-    private weak var presentedFromViewController: UIViewController?
+    private weak var sourceViewController: UIViewController?
     private var isPresented: Bool = false
     
     private var isViewAppeared: Bool = false {
@@ -88,14 +86,13 @@ open class MediaBrowserViewController: UIViewController {
     
     private var photoAtomicInt = PhotoCell.AtomicInt()
     
-    public init(configuration: MediaBrowserViewControllerConfiguration = .init()) {
-        self.configuration = configuration
-        self.hideWhenSingleTap = configuration.hideWhenSingleTap
-        self.hideWhenSliding = configuration.hideWhenSliding
-        self.hideWhenSliding = configuration.hideWhenSliding
-        self.hideWhenSlidingDistance = configuration.hideWhenSlidingDistance
-        self.zoomWhenDoubleTap = configuration.zoomWhenDoubleTap
-        self.pageSpacing = configuration.pageSpacing
+    public init(style: MediaBrowserViewControllerStyle = .default()) {
+        self.hideWhenSingleTap = style.hideWhenSingleTap ?? false
+        self.hideWhenSliding = style.hideWhenSliding ?? false
+        self.hideWhenSliding = style.hideWhenSliding ?? false
+        self.hideWhenSlidingDistance = style.hideWhenSlidingDistance ?? 0
+        self.zoomWhenDoubleTap = style.zoomWhenDoubleTap ?? false
+        self.pageSpacing = style.pageSpacing ?? 0
         
         super.init(nibName: nil, bundle: nil)
         
@@ -148,9 +145,9 @@ open class MediaBrowserViewController: UIViewController {
     
     open override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        if self.isPresented {
+        if self.isPresented, let navigationController = self.navigationController {
             /// 外部可能设置导航栏, 这里需要隐藏
-            self.navigationController?.setNavigationBarHidden(true, animated: false)
+            navigationController.setNavigationBarHidden(true, animated: false)
         }
     }
     
@@ -194,14 +191,14 @@ open class MediaBrowserViewController: UIViewController {
     
     open override var shouldAutorotate: Bool {
         guard let orientationViewController = self.orientationViewController else {
-            return true
+            return super.shouldAutorotate
         }
         return orientationViewController.shouldAutorotate
     }
     
     open override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
         guard let orientationViewController = self.orientationViewController else {
-            return .allButUpsideDown
+            return super.supportedInterfaceOrientations
         }
         return orientationViewController.supportedInterfaceOrientations
     }
@@ -282,7 +279,7 @@ extension MediaBrowserViewController {
         completion: (() -> Void)? = nil
     ) {
         self.isPresented = true
-        self.presentedFromViewController = sender
+        self.sourceViewController = sender
         
         var presenter = sender
         if !(presenter is UITabBarController), let tabBarController = presenter.tabBarController, !tabBarController.tabBar.isHidden {
@@ -647,13 +644,33 @@ extension MediaBrowserViewController: UIGestureRecognizerDelegate {
 extension MediaBrowserViewController {
     
     private var orientationViewController: UIViewController? {
-        if let presentedFromViewController = self.presentedFromViewController {
-            return presentedFromViewController
-        } else if let viewControllers = self.navigationController?.viewControllers, let index = viewControllers.firstIndex(of: self) {
-            return index > 0 ? viewControllers[index - 1] : nil
-        } else {
+        let viewController: UIViewController? = {
+            if self.isPresented {
+                guard let sourceViewController = self.sourceViewController else {
+                    return nil
+                }
+                if let navigationController = sourceViewController as? UINavigationController {
+                    return navigationController.topViewController
+                } else if let tabBarController = sourceViewController as? UITabBarController, let selectedViewController = tabBarController.selectedViewController {
+                    if let navigationController = selectedViewController as? UINavigationController {
+                        return navigationController.topViewController
+                    } else {
+                        return selectedViewController
+                    }
+                } else {
+                    return sourceViewController
+                }
+            } else if let viewControllers = self.navigationController?.viewControllers, let index = viewControllers.firstIndex(of: self) {
+                return index > 0 ? viewControllers[index - 1] : nil
+            } else {
+                return self.parent
+            }
+        }()
+        guard viewController != self else {
+            assertionFailure("请检查代码")
             return nil
         }
+        return viewController
     }
     
 }

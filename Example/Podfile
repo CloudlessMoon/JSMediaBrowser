@@ -11,7 +11,7 @@ def pod_Common
   pod "SnapKit"
   pod "Then"
   pod 'SwiftLint', :configurations => ['Debug']
-  pod "LookinServer", :subspecs => ['Swift'], :configurations => ["Debug"]
+  pod "LookInsideServer", :git => "https://github.com/LookInsideApp/LookInside-Release.git", :configurations => ['Debug']
 end
 
 target "JSMediaBrowserExample" do
