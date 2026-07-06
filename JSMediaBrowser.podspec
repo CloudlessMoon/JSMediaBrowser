@@ -6,7 +6,7 @@ Pod::Spec.new do |s|
   s.homepage     = "https://github.com/CloudlessMoon/JSMediaBrowser"
   s.author       = "CloudlessMoon"
   s.platform     = :ios, "13.0"
-  s.swift_versions = ["5.1"]
+  s.swift_versions = ["5.9"]
   s.requires_arc = true
   s.source       = { :git => "https://github.com/CloudlessMoon/JSMediaBrowser.git", :tag => "#{s.version}" }
   s.frameworks   = "UIKit"
