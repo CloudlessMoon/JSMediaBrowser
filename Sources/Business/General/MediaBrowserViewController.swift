@@ -556,9 +556,18 @@ extension MediaBrowserViewController: UIGestureRecognizerDelegate {
             }
             let velocity = self.dismissingRecognizer.velocity(in: self.dismissingRecognizer.view)
             return !cell.photoView.isScrolling(with: velocity)
-        } else {
-            return true
         }
+        return true
+    }
+    
+    public func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldReceive touch: UITouch) -> Bool {
+        if gestureRecognizer == self.dismissingRecognizer {
+            guard touch.view is UIControl else {
+                return true
+            }
+            return false
+        }
+        return true
     }
     
     public func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldBeRequiredToFailBy otherGestureRecognizer: UIGestureRecognizer) -> Bool {
