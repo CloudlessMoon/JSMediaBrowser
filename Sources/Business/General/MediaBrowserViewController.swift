@@ -118,7 +118,7 @@ open class MediaBrowserViewController: UIViewController {
         self.view.backgroundColor = nil
         self.view.addSubview(self.contentView)
         
-        self.view.addGestureRecognizer(self.dismissingRecognizer)
+        self.contentView.addGestureRecognizer(self.dismissingRecognizer)
         
         self.addTransition(
             prepare: { [weak self] in
