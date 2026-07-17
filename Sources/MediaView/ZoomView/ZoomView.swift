@@ -249,26 +249,27 @@ extension ZoomView {
         return CGRect(
             x: self.bounds.minX,
             y: self.bounds.minY,
-            width: JSFloorPixelValue(contentSize.width * self.zoomScale),
-            height: JSFloorPixelValue(contentSize.height * self.zoomScale)
+            width: (contentSize.width * self.zoomScale).jsc.floorPixelValue(),
+            height: (contentSize.height * self.zoomScale).jsc.floorPixelValue()
         )
     }
     
     public func contentSizeThatFits(_ size: CGSize) -> CGSize {
         let size = self.assetSize(with: size)
         return CGSize(
-            width: JSFloorPixelValue(size.width),
-            height: JSFloorPixelValue(size.height)
+            width: size.width.jsc.floorPixelValue(),
+            height: size.height.jsc.floorPixelValue()
         )
     }
     
     public func contentInsetThatFits(_ size: CGSize) -> UIEdgeInsets {
         let contentInset = self.assetInset(with: size)
         return UIEdgeInsets(
-            top: JSFloorPixelValue(contentInset.top),
-            left: JSFloorPixelValue(contentInset.left),
-            bottom: JSFloorPixelValue(contentInset.bottom),
-            right: JSFloorPixelValue(contentInset.right))
+            top: contentInset.top.jsc.floorPixelValue(),
+            left: contentInset.left.jsc.floorPixelValue(),
+            bottom: contentInset.bottom.jsc.floorPixelValue(),
+            right: contentInset.right.jsc.floorPixelValue()
+        )
     }
     
 }
