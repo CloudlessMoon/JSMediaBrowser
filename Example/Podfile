@@ -1,4 +1,4 @@
-platform :ios, "13.0"
+platform :ios, "15.0"
 use_frameworks! :linkage => :dynamic
 
 def pod_Common
@@ -22,14 +22,14 @@ target "JSMediaBrowserExampleMacOS" do
   pod_Common
 end
 
-def set_iphoneos_deployment_target(target)
+def set_deployment_target(target)
   target.build_configurations.each do |config|
-    config.build_settings["IPHONEOS_DEPLOYMENT_TARGET"] = "13.0"
+    config.build_settings["IPHONEOS_DEPLOYMENT_TARGET"] = "15.0"
   end
 end
 
 post_install do |installer|
   installer.pods_project.targets.each do |target|
-    set_iphoneos_deployment_target(target)
+    set_deployment_target(target)
   end
 end
