@@ -1,18 +1,19 @@
 
 Pod::Spec.new do |s|
   s.name             = "JSMediaBrowser"
+
+  s.version          = "5.0.0"
+  s.platform         = :ios, "15.0"
+  s.swift_versions   = ["5.9"]
+  s.requires_arc     = true
+
   s.summary          = "图片、视频浏览器"
   s.homepage         = "https://github.com/CloudlessMoon/JSMediaBrowser"
   s.license          = "MIT"
   s.author           = "CloudlessMoon"
   s.source           = { :git => "https://github.com/CloudlessMoon/JSMediaBrowser.git", :tag => "#{s.version}" }
-  s.version          = '5.0.0'
-  s.platform         = :ios, '15.0'
-  s.swift_versions   = ['5.9']
-  s.requires_arc     = true
-  s.frameworks       = "UIKit"
   
-  s.dependency "JSCoreKit", "~> 1.0"
+  s.dependency "JSCoreKit", "~> 2.0"
   
   s.default_subspec = "Core"
   s.subspec "Core" do |ss|
