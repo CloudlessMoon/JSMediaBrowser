@@ -11,7 +11,7 @@ Pod::Spec.new do |s|
   s.homepage         = "https://github.com/CloudlessMoon/JSMediaBrowser"
   s.license          = "MIT"
   s.author           = "CloudlessMoon"
-  s.source           = { :git => "https://github.com/CloudlessMoon/JSMediaBrowser.git", :tag => "#{s.version}" }
+  s.source           = { :git => "https://github.com/CloudlessMoon/JSMediaBrowser.git", :tag => s.version.to_s }
   
   s.dependency "JSCoreKit", "~> 2.0"
   
