@@ -161,10 +161,10 @@ extension MediaBrowserView {
     }
     
     public func reloadData() {
-        // 超出范围，建议业务处理下，这里写个保底
-        let numberOfPages = self.dataSource?.numberOfPages(in: self) ?? 0
-        if self.currentPage > numberOfPages - 1 && self.currentPage > 0 {
-            self.setCurrentPage(max(numberOfPages - 1, 0), animated: false)
+        // 超出范围
+        let maximumIndex = self.maximumIndex
+        if self.currentPage > maximumIndex {
+            self.setCurrentPage(maximumIndex, animated: false)
         }
         
         self.collectionView.reloadData()
@@ -386,8 +386,12 @@ extension MediaBrowserView: UIScrollViewDelegate {
         }
     }
     
+    private var maximumIndex: Int {
+        return max(self.totalUnitPage - 1, 0)
+    }
+    
     private var offsetIndex: CGFloat {
-        let maximumIndex = CGFloat(self.totalUnitPage - 1)
+        let maximumIndex = CGFloat(self.maximumIndex)
         let pageWidth = self.collectionView.bounds.width
         guard pageWidth > 0 && maximumIndex >= 0 else {
             return 0

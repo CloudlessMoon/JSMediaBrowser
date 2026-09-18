@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		6536FE916487CE81E17A7C7D /* Pods_JSMediaBrowserExampleMacOS.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BE7C969E948E0469C85FE506 /* Pods_JSMediaBrowserExampleMacOS.framework */; };
 		7A2BB742304552B00037C818 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7A2BB739304552B00037C818 /* Assets.xcassets */; };
 		7A2BB744304552B00037C818 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7A2BB73C304552B00037C818 /* LaunchScreen.storyboard */; };
 		7A2BB745304552B00037C818 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7A2BB73E304552B00037C818 /* Main.storyboard */; };
@@ -53,9 +54,13 @@
 		7A2BB78D304556BB0037C818 /* data2.gif in Resources */ = {isa = PBXBuildFile; fileRef = 7A2BB74F304553180037C818 /* data2.gif */; };
 		7A2BB78E304556BB0037C818 /* TestHDR3.JPG in Resources */ = {isa = PBXBuildFile; fileRef = 7A2BB755304553180037C818 /* TestHDR3.JPG */; };
 		7A2BB78F304556BB0037C818 /* data4.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 7A2BB751304553180037C818 /* data4.jpg */; };
+		985913CA36F36813823B456F /* Pods_JSMediaBrowserExample.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D555C9F85B2F8D99B6A4C647 /* Pods_JSMediaBrowserExample.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		058935885126BF542AF3EDD7 /* Pods-JSMediaBrowserExample.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-JSMediaBrowserExample.release.xcconfig"; path = "Target Support Files/Pods-JSMediaBrowserExample/Pods-JSMediaBrowserExample.release.xcconfig"; sourceTree = "<group>"; };
+		0A63A03830A5B307DB083596 /* Pods-JSMediaBrowserExampleMacOS.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-JSMediaBrowserExampleMacOS.debug.xcconfig"; path = "Target Support Files/Pods-JSMediaBrowserExampleMacOS/Pods-JSMediaBrowserExampleMacOS.debug.xcconfig"; sourceTree = "<group>"; };
+		69351230CD0F5E908D72EF8C /* Pods-JSMediaBrowserExample.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-JSMediaBrowserExample.debug.xcconfig"; path = "Target Support Files/Pods-JSMediaBrowserExample/Pods-JSMediaBrowserExample.debug.xcconfig"; sourceTree = "<group>"; };
 		7A2BB720304552A70037C818 /* JSMediaBrowserExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = JSMediaBrowserExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		7A2BB739304552B00037C818 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		7A2BB73A304552B00037C818 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -82,7 +87,10 @@
 		7A2BB75E304553180037C818 /* PageControl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageControl.swift; sourceTree = "<group>"; };
 		7A2BB75F304553180037C818 /* ShareControl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareControl.swift; sourceTree = "<group>"; };
 		7A2BB794304556BB0037C818 /* JSMediaBrowserExampleMacOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = JSMediaBrowserExampleMacOS.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		7A2BB795304556BB0037C818 /* JSMediaBrowserExample copy-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "JSMediaBrowserExample copy-Info.plist"; path = "/Users/jiasong/Documents/Projects/JSMediaBrowser/Example/JSMediaBrowserExample copy-Info.plist"; sourceTree = "<absolute>"; };
+		7A2BB795304556BB0037C818 /* MacOS-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "MacOS-Info.plist"; path = "/Users/jiasong/Documents/Projects/JSMediaBrowser/Example/JSMediaBrowserExample/MacOS-Info.plist"; sourceTree = "<absolute>"; };
+		BE7C969E948E0469C85FE506 /* Pods_JSMediaBrowserExampleMacOS.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_JSMediaBrowserExampleMacOS.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		D555C9F85B2F8D99B6A4C647 /* Pods_JSMediaBrowserExample.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_JSMediaBrowserExample.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		F841F80A3511B53737C97FF6 /* Pods-JSMediaBrowserExampleMacOS.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-JSMediaBrowserExampleMacOS.release.xcconfig"; path = "Target Support Files/Pods-JSMediaBrowserExampleMacOS/Pods-JSMediaBrowserExampleMacOS.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -90,6 +98,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				985913CA36F36813823B456F /* Pods_JSMediaBrowserExample.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -97,18 +106,40 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6536FE916487CE81E17A7C7D /* Pods_JSMediaBrowserExampleMacOS.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		2DE7A5E8294A9011F05D6E47 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				D555C9F85B2F8D99B6A4C647 /* Pods_JSMediaBrowserExample.framework */,
+				BE7C969E948E0469C85FE506 /* Pods_JSMediaBrowserExampleMacOS.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		3B9C3B727C97A799FD4E1F6D /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				69351230CD0F5E908D72EF8C /* Pods-JSMediaBrowserExample.debug.xcconfig */,
+				058935885126BF542AF3EDD7 /* Pods-JSMediaBrowserExample.release.xcconfig */,
+				0A63A03830A5B307DB083596 /* Pods-JSMediaBrowserExampleMacOS.debug.xcconfig */,
+				F841F80A3511B53737C97FF6 /* Pods-JSMediaBrowserExampleMacOS.release.xcconfig */,
+			);
+			path = Pods;
+			sourceTree = "<group>";
+		};
 		7A2BB717304552A70037C818 = {
 			isa = PBXGroup;
 			children = (
 				7A2BB741304552B00037C818 /* JSMediaBrowserExample */,
-				7A2BB795304556BB0037C818 /* JSMediaBrowserExample copy-Info.plist */,
 				7A2BB721304552A70037C818 /* Products */,
+				3B9C3B727C97A799FD4E1F6D /* Pods */,
+				2DE7A5E8294A9011F05D6E47 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -127,6 +158,7 @@
 				7A2BB761304553180037C818 /* Sources */,
 				7A2BB739304552B00037C818 /* Assets.xcassets */,
 				7A2BB73A304552B00037C818 /* Info.plist */,
+				7A2BB795304556BB0037C818 /* MacOS-Info.plist */,
 				7A2BB73C304552B00037C818 /* LaunchScreen.storyboard */,
 				7A2BB73E304552B00037C818 /* Main.storyboard */,
 			);
@@ -199,18 +231,18 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 7A2BB733304552A90037C818 /* Build configuration list for PBXNativeTarget "JSMediaBrowserExample" */;
 			buildPhases = (
+				9E862A5FFD9E802BABC7B245 /* [CP] Check Pods Manifest.lock */,
 				7A2BB71C304552A70037C818 /* Sources */,
 				7A2BB71D304552A70037C818 /* Frameworks */,
 				7A2BB71E304552A70037C818 /* Resources */,
 				7A2BB749304553010037C818 /* ShellScript */,
+				676C211E96695617BF06A2E9 /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 			);
 			name = JSMediaBrowserExample;
-			packageProductDependencies = (
-			);
 			productName = JSMediaBrowserExample;
 			productReference = 7A2BB720304552A70037C818 /* JSMediaBrowserExample.app */;
 			productType = "com.apple.product-type.application";
@@ -219,18 +251,18 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 7A2BB791304556BB0037C818 /* Build configuration list for PBXNativeTarget "JSMediaBrowserExampleMacOS" */;
 			buildPhases = (
+				3D07A806D0CD61C9EE709DD8 /* [CP] Check Pods Manifest.lock */,
 				7A2BB776304556BB0037C818 /* Sources */,
 				7A2BB782304556BB0037C818 /* Frameworks */,
 				7A2BB783304556BB0037C818 /* Resources */,
 				7A2BB790304556BB0037C818 /* ShellScript */,
+				AB7ABF8F41D741E59681EFF3 /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 			);
 			name = JSMediaBrowserExampleMacOS;
-			packageProductDependencies = (
-			);
 			productName = JSMediaBrowserExample;
 			productReference = 7A2BB794304556BB0037C818 /* JSMediaBrowserExampleMacOS.app */;
 			productType = "com.apple.product-type.application";
@@ -311,6 +343,49 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		3D07A806D0CD61C9EE709DD8 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-JSMediaBrowserExampleMacOS-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		676C211E96695617BF06A2E9 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-JSMediaBrowserExample/Pods-JSMediaBrowserExample-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			inputPaths = (
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-JSMediaBrowserExample/Pods-JSMediaBrowserExample-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-JSMediaBrowserExample/Pods-JSMediaBrowserExample-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
 		7A2BB749304553010037C818 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -344,6 +419,49 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "${PODS_ROOT}/SwiftLint/swiftlint --strict\n";
+		};
+		9E862A5FFD9E802BABC7B245 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-JSMediaBrowserExample-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		AB7ABF8F41D741E59681EFF3 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-JSMediaBrowserExampleMacOS/Pods-JSMediaBrowserExampleMacOS-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			inputPaths = (
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-JSMediaBrowserExampleMacOS/Pods-JSMediaBrowserExampleMacOS-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-JSMediaBrowserExampleMacOS/Pods-JSMediaBrowserExampleMacOS-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -408,6 +526,7 @@
 /* Begin XCBuildConfiguration section */
 		7A2BB734304552A90037C818 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 69351230CD0F5E908D72EF8C /* Pods-JSMediaBrowserExample.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -441,6 +560,7 @@
 		};
 		7A2BB735304552A90037C818 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 058935885126BF542AF3EDD7 /* Pods-JSMediaBrowserExample.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -595,6 +715,7 @@
 		};
 		7A2BB792304556BB0037C818 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 0A63A03830A5B307DB083596 /* Pods-JSMediaBrowserExampleMacOS.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -603,7 +724,7 @@
 				DEVELOPMENT_TEAM = KJ6AEY5JEH;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = "JSMediaBrowserExample copy-Info.plist";
+				INFOPLIST_FILE = "JSMediaBrowserExample/MacOS-Info.plist";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
@@ -628,6 +749,7 @@
 		};
 		7A2BB793304556BB0037C818 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = F841F80A3511B53737C97FF6 /* Pods-JSMediaBrowserExampleMacOS.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -636,7 +758,7 @@
 				DEVELOPMENT_TEAM = KJ6AEY5JEH;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = "JSMediaBrowserExample copy-Info.plist";
+				INFOPLIST_FILE = "JSMediaBrowserExample/MacOS-Info.plist";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
