@@ -261,33 +261,6 @@ extension MediaBrowserView: UIGestureRecognizerDelegate {
         return true
     }
     
-    @objc private func handleSingleTap(_ gestureRecognizer: UITapGestureRecognizer) {
-        self.delegate?.mediaBrowserView(
-            _: self,
-            didSingleTapAt: self.index(of: gestureRecognizer) ?? self.currentPage,
-            point: gestureRecognizer.location(in: self)
-        )
-    }
-    
-    @objc private func handleDoubleTap(_ gestureRecognizer: UITapGestureRecognizer) {
-        self.delegate?.mediaBrowserView(
-            _: self,
-            didDoubleTapAt: self.index(of: gestureRecognizer) ?? self.currentPage,
-            point: gestureRecognizer.location(in: self)
-        )
-    }
-    
-    @objc private func handleLongPress(_ gestureRecognizer: UILongPressGestureRecognizer) {
-        guard gestureRecognizer.state == .began else {
-            return
-        }
-        self.delegate?.mediaBrowserView(
-            _: self,
-            didLongPressAt: self.index(of: gestureRecognizer) ?? self.currentPage,
-            point: gestureRecognizer.location(in: self)
-        )
-    }
-    
 }
 
 extension MediaBrowserView: UICollectionViewDataSource {
@@ -386,6 +359,10 @@ extension MediaBrowserView: UIScrollViewDelegate {
         }
     }
     
+}
+
+extension MediaBrowserView {
+    
     private var maximumIndex: Int {
         return max(self.totalUnitPage - 1, 0)
     }
@@ -450,6 +427,33 @@ extension MediaBrowserView: UIScrollViewDelegate {
     
     private func callDidScrollToIndex() {
         self.delegate?.mediaBrowserView(self, didScrollTo: self.currentPage)
+    }
+    
+    @objc private func handleSingleTap(_ gestureRecognizer: UITapGestureRecognizer) {
+        self.delegate?.mediaBrowserView(
+            _: self,
+            didSingleTapAt: self.index(of: gestureRecognizer) ?? self.currentPage,
+            point: gestureRecognizer.location(in: self)
+        )
+    }
+    
+    @objc private func handleDoubleTap(_ gestureRecognizer: UITapGestureRecognizer) {
+        self.delegate?.mediaBrowserView(
+            _: self,
+            didDoubleTapAt: self.index(of: gestureRecognizer) ?? self.currentPage,
+            point: gestureRecognizer.location(in: self)
+        )
+    }
+    
+    @objc private func handleLongPress(_ gestureRecognizer: UILongPressGestureRecognizer) {
+        guard gestureRecognizer.state == .began else {
+            return
+        }
+        self.delegate?.mediaBrowserView(
+            _: self,
+            didLongPressAt: self.index(of: gestureRecognizer) ?? self.currentPage,
+            point: gestureRecognizer.location(in: self)
+        )
     }
     
 }
