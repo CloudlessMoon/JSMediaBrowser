@@ -655,20 +655,9 @@ extension MediaBrowserViewController {
     private var orientationViewController: UIViewController? {
         let viewController: UIViewController? = {
             if self.isPresented {
-                guard let sourceViewController = self.sourceViewController else {
-                    return nil
-                }
-                if let navigationController = sourceViewController as? UINavigationController {
-                    return navigationController.topViewController
-                } else if let tabBarController = sourceViewController as? UITabBarController, let selectedViewController = tabBarController.selectedViewController {
-                    if let navigationController = selectedViewController as? UINavigationController {
-                        return navigationController.topViewController
-                    } else {
-                        return selectedViewController
-                    }
-                } else {
-                    return sourceViewController
-                }
+                /// 朝向跟随位于自己正下方的页面：对 source 向下解析容器，不把问题抛回容器本尊——
+                /// 容根的朝向转发若回看 presentedViewController（弹层自己）会互相递归爆栈
+                return Self.beneathViewController(of: self.sourceViewController)
             } else if let viewControllers = self.navigationController?.viewControllers, let index = viewControllers.firstIndex(of: self) {
                 return index > 0 ? viewControllers[index - 1] : nil
             } else {
@@ -678,6 +667,26 @@ extension MediaBrowserViewController {
         guard viewController != self else {
             assertionFailure("请检查代码")
             return nil
+        }
+        return viewController
+    }
+
+    /// 向下解析容器取栈顶页面（导航栈→可见页、Tab→选中项、分栏→折叠取 compact 列/展开取次栏、缺省回主栏）；
+    /// 只向下走、不回追 presentedViewController 链——present 出来的弹层自己就在那条链的栈顶
+    private static func beneathViewController(of viewController: UIViewController?) -> UIViewController? {
+        guard let viewController = viewController else {
+            return nil
+        }
+        if let navigationController = viewController as? UINavigationController {
+            return beneathViewController(of: navigationController.visibleViewController)
+        }
+        if let tabBarController = viewController as? UITabBarController {
+            return beneathViewController(of: tabBarController.selectedViewController)
+        }
+        if let splitViewController = viewController as? UISplitViewController {
+            let column: UISplitViewController.Column = splitViewController.isCollapsed ? .compact : .secondary
+            let columnViewController = splitViewController.viewController(for: column) ?? splitViewController.viewController(for: .primary)
+            return beneathViewController(of: columnViewController)
         }
         return viewController
     }
