@@ -671,14 +671,16 @@ extension MediaBrowserViewController {
         return viewController
     }
 
-    /// 向下解析容器取栈顶页面（导航栈→可见页、Tab→选中项、分栏→折叠取 compact 列/展开取次栏、缺省回主栏）；
-    /// 只向下走、不回追 presentedViewController 链——present 出来的弹层自己就在那条链的栈顶
+    /// 向下解析容器取栈顶页面（导航栈→栈顶页、Tab→选中项、分栏→折叠取 compact 列/展开取次栏、缺省回主栏）；
+    /// 只向下走、不回追 presentedViewController 链——present 出来的弹层自己就在那条链的栈顶。
+    /// 导航栈取 topViewController 而非 visibleViewController：后者会跟着栈顶页的 presented 链走，
+    /// 把弹层（乃至浏览器自己）挖出来
     private static func beneathViewController(of viewController: UIViewController?) -> UIViewController? {
         guard let viewController = viewController else {
             return nil
         }
         if let navigationController = viewController as? UINavigationController {
-            return beneathViewController(of: navigationController.visibleViewController)
+            return beneathViewController(of: navigationController.topViewController)
         }
         if let tabBarController = viewController as? UITabBarController {
             return beneathViewController(of: tabBarController.selectedViewController)
