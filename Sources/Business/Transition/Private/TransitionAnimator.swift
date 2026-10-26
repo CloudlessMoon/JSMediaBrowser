@@ -238,7 +238,11 @@ extension TransitionAnimator {
             if let transitionSourceView = transitionSourceView, transitionSourceRect.isEmpty {
                 rect = transitionContainerView.convert(transitionSourceView.frame, from: transitionSourceView.superview)
             } else if !transitionSourceRect.isEmpty {
-                rect = transitionContainerView.convert(transitionSourceRect, from: transitionSourceView)
+                if let transitionSourceView = transitionSourceView {
+                    rect = transitionContainerView.convert(transitionSourceRect, from: transitionSourceView)
+                } else {
+                    rect = transitionSourceRect
+                }
             } else {
                 rect = .zero
             }
